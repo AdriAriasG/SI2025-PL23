@@ -1,5 +1,6 @@
 package giis.demo.jdbc;
 
+/*Comentario de prueba realizado por Iván*/
 public class Entity {
 	private Integer id;
 	private Integer id2;
