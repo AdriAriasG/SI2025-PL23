@@ -13,11 +13,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import app.dto.AgenciaDTO;
 import app.model.AsignacionModel;
-// import app.model.InformeModel;  // HU #33548 - Descomentar mañana
+// import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
 import app.view.AsignacionView;
-// import app.view.InformeView;  // HU #33548 - Descomentar mañana
+// import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
 import app.controller.AsignacionController;
-// import app.controller.InformeController;  // HU #33548 - Descomentar mañana
+// import app.controller.InformeController;  // HU #33548 - Descomentar cuando implemente - adri
 
 public class SwingMain {
 
@@ -131,16 +131,16 @@ public class SwingMain {
         // HU #33537: Asignación de reporteros (ADRIAN)
         if (buttonText.contains("#33537")) {
             AsignacionModel model = new AsignacionModel();
-            AsignacionView view = new AsignacionView(false); // Modo no edición
+            AsignacionView view = new AsignacionView(false); // Modo no edición (HU37)
             new AsignacionController(model, view, agencia);
         }
         // HU #33543: Modificar asignación (ADRIAN)
         else if (buttonText.contains("#33543")) {
             AsignacionModel model = new AsignacionModel();
-            AsignacionView view = new AsignacionView(true); // Modo edición
+            AsignacionView view = new AsignacionView(true); // Modo edición (HU43)
             new AsignacionController(model, view, agencia);
         }
-        // HU #33548: Informe de un evento (ADRIAN) - Descomentar mañana
+        // HU #33548: Informe de un evento (ADRIAN) - Descomentar cuando implemente - adri
         /*
         else if (buttonText.contains("#33548")) {
             InformeModel model = new InformeModel();
