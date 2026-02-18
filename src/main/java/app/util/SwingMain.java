@@ -12,6 +12,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import app.dto.AgenciaDTO;
+import app.model.AsignacionModel;
+// import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
+import app.view.AsignacionView;
+// import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
+import app.controller.AsignacionController;
+// import app.controller.InformeController;  // HU #33548 - Descomentar cuando implemente - adri
 
 public class SwingMain {
 
@@ -131,11 +137,41 @@ public class SwingMain {
         button.setMaximumSize(new Dimension(450, 30));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + text);
+                handleButtonAction(text);
             }
         });
         frame.getContentPane().add(button);
         frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0, 2)));
+    }
+
+    /**
+     * Maneja las acciones de los botones según su texto
+     */
+    private void handleButtonAction(String buttonText) {
+        // HU #33537: Asignación de reporteros (ADRIAN)
+        if (buttonText.contains("#33537")) {
+            AsignacionModel model = new AsignacionModel();
+            AsignacionView view = new AsignacionView(false); // Modo no edición (HU37)
+            new AsignacionController(model, view, agencia);
+        }
+        // HU #33543: Modificar asignación (ADRIAN)
+        else if (buttonText.contains("#33543")) {
+            AsignacionModel model = new AsignacionModel();
+            AsignacionView view = new AsignacionView(true); // Modo edición (HU43)
+            new AsignacionController(model, view, agencia);
+        }
+        // HU #33548: Informe de un evento (ADRIAN) - Descomentar cuando implemente - adri
+        /*
+        else if (buttonText.contains("#33548")) {
+            InformeModel model = new InformeModel();
+            InformeView view = new InformeView();
+            new InformeController(model, view, agencia);
+        }
+        */
+        // Resto de botones no implementados
+        else {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + buttonText);
+        }
     }
 
     public JFrame getFrame() { return this.frame; }
