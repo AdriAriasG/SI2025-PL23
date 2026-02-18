@@ -3,6 +3,8 @@ package app.controller;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import app.dto.OfrecimientoDTO;
 import app.model.OfrecimientosRecibidosModel;
 import app.view.OfrecimientosRecibidosView;
@@ -12,6 +14,7 @@ public class OfrecimientosRecibidosController {
 	
 	private OfrecimientosRecibidosModel model;
 	private OfrecimientosRecibidosView view;
+	private List<OfrecimientoDTO> datosActuales;
 	
 	public OfrecimientosRecibidosController(OfrecimientosRecibidosModel model,
 											OfrecimientosRecibidosView view) {
@@ -24,8 +27,8 @@ public class OfrecimientosRecibidosController {
 		cargarDatosTabla();
 		
 		//Eventos de los botones
-		view.getBtnAceptar().addActionListener(e -> aceptarOfrecimiento());
-		view.getBtnRechazar().addActionListener(e -> rechazarOfrecimiento());
+		view.getBtnAceptar().addActionListener(e -> gestionar("ACEPTADO", true));
+		view.getBtnRechazar().addActionListener(e -> gestionar("RECHAZADO", false));
 		
 		//Mostrar la ventana
 		view.getFrame().setVisible(true);
@@ -33,27 +36,40 @@ public class OfrecimientosRecibidosController {
 	
 	private void cargarDatosTabla() {
 		
+		
 		view.getTableModel().setRowCount(0);
 		
-		List<OfrecimientoDTO> lista = model.getOfrecimientos();
+		datosActuales = model.getOfrecimientos();
+		if(datosActuales.isEmpty()) {
+			view.mostrarMensajeVacio(true);
+		}
+		else {
+			view.mostrarMensajeVacio(false);
+			for(OfrecimientoDTO o : datosActuales) {
+				view.getTableModel().addRow(new Object[] {
+						o.getNombre(),
+						o.getFecha()
+				});
 		
-		for(OfrecimientoDTO o : lista) {
-			view.getTableModel().addRow(new Object[] {
-					o.getNombre(),
-					o.getFecha()
-			});
+			}
 		}
 	}
 	
 	
-	private void aceptarOfrecimiento() {
+	private void gestionar(String nuevoEstado, boolean accesoConcedido) {
+		
+		int fila = view.getTable().getSelectedRow();
+		
+		if(fila == -1) {
+			JOptionPane.showMessageDialog(view.getFrame(), "Por favor, seleccione un evento", "Ningún evento seleccionado",JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		int idOfrecimiento = datosActuales.get(fila).getId();
+		model.actualizarEstadoOfrecimiento(idOfrecimiento, nuevoEstado, accesoConcedido);
+		JOptionPane.showMessageDialog(view.getFrame(), "Operación realizada con éxito");
+		cargarDatosTabla();
 		
 	}
 	
-	private void rechazarOfrecimiento() {
-		
-	}
-	
-	
-
 }

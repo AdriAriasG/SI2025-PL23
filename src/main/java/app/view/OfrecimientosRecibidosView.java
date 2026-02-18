@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -21,6 +22,9 @@ public class OfrecimientosRecibidosView {
 	private DefaultTableModel model;
 	private JButton btnAceptar;
 	private JButton btnRechazar;
+	private JLabel lblMensajeVacio;
+	private JScrollPane scrollPane;
+	private JScrollPane sP;
 	
 	
 	public OfrecimientosRecibidosView() {
@@ -50,8 +54,16 @@ public class OfrecimientosRecibidosView {
 		table.setRowHeight(25);
 		table.setGridColor(Color.BLACK);
 		
-		JScrollPane sP = new JScrollPane(table);
+		sP = new JScrollPane(table);
 		frame.getContentPane().add(sP, BorderLayout.CENTER);
+		
+		
+		//Mensaje tabla vacía
+		lblMensajeVacio = new javax.swing.JLabel("No hay eventos pendientes de gestionar");
+		lblMensajeVacio.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		lblMensajeVacio.setForeground(Color.GRAY);
+		
+		
 		
 		//Ahora los botones
 		JPanel panelBotones = new JPanel();
@@ -59,6 +71,9 @@ public class OfrecimientosRecibidosView {
 		
 		btnAceptar = new JButton("Aceptar");
 		btnRechazar = new JButton("Rechazar");
+		
+		panelBotones.add(btnAceptar);
+		panelBotones.add(btnRechazar);
 		
 		frame.getContentPane().add(panelBotones, BorderLayout.SOUTH);
 	}
@@ -81,6 +96,18 @@ public class OfrecimientosRecibidosView {
 	
 	public JTable getTable() {
 		return table;
+	}
+	
+	public void mostrarMensajeVacio(boolean mostrar){
+		if(mostrar) {
+			sP.setViewportView(lblMensajeVacio);
+		}
+		else {
+			sP.setViewportView(table);
+		}
+		
+		sP.revalidate();
+		sP.repaint();
 	}
 	
 	

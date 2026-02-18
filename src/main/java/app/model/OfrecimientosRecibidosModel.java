@@ -7,6 +7,7 @@ import app.util.Database;
 public class OfrecimientosRecibidosModel {
 	
 	private Database db = new Database();
+	
 
 	public List<OfrecimientoDTO> getOfrecimientos(){
 		String sql = "SELECT o.id, e.nombre, e.fecha " +
@@ -16,6 +17,13 @@ public class OfrecimientosRecibidosModel {
 		
 		return db.executeQueryPojo(OfrecimientoDTO.class, sql);
 		
+	}
+	
+	public void actualizarEstadoOfrecimiento(int id, String estado, boolean acceso) {
+		
+		int accesoValor = acceso? 1:0;
+		String sql = "UPDATE Ofrecimiento SET estado = ?, acceso_concedido=? WHERE id =?";
+		db.executeUpdate(sql, estado, accesoValor, id);
 	}
 	
 }
