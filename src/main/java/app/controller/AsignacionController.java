@@ -166,12 +166,8 @@ public class AsignacionController {
             model.eliminarAsignacion(idEventoSeleccionado, idReportero);
             view.showInfo("Asignación eliminada correctamente.");
             
-            // Recargar datos
-            onEventoSeleccionado();
-            
-            // Actualizar número de asignados en la tabla de eventos
-            int num = model.getNumeroAsignados(idEventoSeleccionado);
-            view.actualizarAsignadosEnTabla(idEventoSeleccionado, num);
+            // Recargar TODOS los datos para reflejar cambios
+            recargarDatosCompletos();
         }
     }
 
@@ -229,12 +225,79 @@ public class AsignacionController {
                 view.showInfo("Se asignaron " + exitosas + " reportero(s) correctamente.");
             }
 
-            // Recargar datos
-            onEventoSeleccionado();
+            // Recargar TODOS los datos para reflejar cambios
+            recargarDatosCompletos();
+        }
+    }
+
+    /**
+     * Recarga completamente todos los datos de la vista.
+     * Se usa después de asignar o eliminar para reflejar los cambios.
+     */
+    private void recargarDatosCompletos() {
+        // Guardar el evento que estaba seleccionado
+        int eventoPrevio = idEventoSeleccionado;
+        
+        // Recargar la lista de eventos
+        List<EventoDTO> eventos;
+        if (view.isModoEdicion()) {
+            int filtroIndex = view.getCbFiltro().getSelectedIndex();
+            if (filtroIndex == 0) {
+                eventos = model.getEventosSinAsignar(agencia.getId());
+            } else {
+                eventos = model.getEventosConAsignados(agencia.getId());
+            }
+        } else {
+            eventos = model.getEventosSinAsignar(agencia.getId());
+        }
+        
+        view.setEventos(eventos);
+        
+        // Actualizar número de asignados para cada evento
+        for (EventoDTO e : eventos) {
+            int num = model.getNumeroAsignados(e.getId());
+            view.actualizarAsignadosEnTabla(e.getId(), num);
+        }
+        
+        // Buscar si el evento previo sigue en la lista
+        boolean eventoEncontrado = false;
+        for (EventoDTO e : eventos) {
+            if (e.getId() == eventoPrevio) {
+                eventoEncontrado = true;
+                break;
+            }
+        }
+        
+        // Si el evento sigue existiendo en la lista, seleccionarlo y recargar sus datos
+        if (eventoEncontrado) {
+            idEventoSeleccionado = eventoPrevio;
             
-            // Actualizar número de asignados en la tabla de eventos
-            int num = model.getNumeroAsignados(idEventoSeleccionado);
-            view.actualizarAsignadosEnTabla(idEventoSeleccionado, num);
+            // Seleccionar el evento en la tabla
+            for (int i = 0; i < view.getTablaEventos().getRowCount(); i++) {
+                if ((int) view.getTablaEventos().getValueAt(i, 0) == eventoPrevio) {
+                    view.getTablaEventos().setRowSelectionInterval(i, i);
+                    break;
+                }
+            }
+            
+            // Recargar reporteros disponibles y asignados
+            List<ReporteroDTO> disponibles = model.getReporterosDisponibles(eventoPrevio, agencia.getId());
+            view.setDisponibles(disponibles);
+            
+            if (view.isModoEdicion()) {
+                List<ReporteroDTO> asignados = model.getReporterosAsignados(eventoPrevio);
+                view.setAsignados(asignados);
+            }
+            
+            view.clearParaAsignar();
+        } else {
+            // El evento ya no está en la lista (ej: pasó de "sin asignar" a "con asignados")
+            idEventoSeleccionado = -1;
+            view.setDisponibles(new java.util.ArrayList<>());
+            view.clearParaAsignar();
+            if (view.isModoEdicion()) {
+                view.setAsignados(new java.util.ArrayList<>());
+            }
         }
     }
 }
