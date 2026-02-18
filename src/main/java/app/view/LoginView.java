@@ -10,7 +10,7 @@ public class LoginView {
     private JComboBox<AgenciaDTO> cbAgencias;
     private JButton btnContinuar;
 
-    public LoginView() {
+   public LoginView() {
         initialize();
     }
 
