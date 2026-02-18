@@ -19,6 +19,15 @@ public class SwingMain {
     private AgenciaDTO agencia;
 
     public static void main(String[] args) {
+        // Inicializar la base de datos automáticamente al arrancar
+        try {
+            Database db = new Database();
+            db.createDatabase(false);
+            db.loadDatabase();
+        } catch (Exception e) {
+            System.err.println("Error al inicializar la base de datos: " + e.getMessage());
+        }
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
