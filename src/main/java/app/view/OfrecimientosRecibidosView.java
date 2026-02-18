@@ -1,6 +1,7 @@
 package app.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -9,6 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
+import javax.swing.border.LineBorder;
+import javax.swing.border.EmptyBorder;
+import java.awt.Dimension;
 
 public class OfrecimientosRecibidosView {
 	
@@ -30,16 +34,21 @@ public class OfrecimientosRecibidosView {
 		frame = new JFrame();
 		frame.setTitle("Ofrecimientos recibidos");
 		frame.setBounds(100,100,500,350);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(null); //Centrar en pantalla
 		
 		//Configuramos layout inicial
-		frame.getContentPane().setLayout(new BorderLayout(10,10));
+		JPanel contentPane = new JPanel(new BorderLayout(10,10));
+		contentPane.setBorder(new EmptyBorder(20,20,20,20));
+		frame.setContentPane(contentPane);
 		
 		//Creamos tabla y modelo
 		String[] columnas = {"Evento", "Fecha"};
 		model = new DefaultTableModel(columnas,0);
 		table = new JTable(model);
+		
+		table.setRowHeight(25);
+		table.setGridColor(Color.BLACK);
 		
 		JScrollPane sP = new JScrollPane(table);
 		frame.getContentPane().add(sP, BorderLayout.CENTER);
