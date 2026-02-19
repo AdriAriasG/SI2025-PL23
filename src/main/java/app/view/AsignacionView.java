@@ -77,7 +77,7 @@ public class AsignacionView {
         panelEventos.setLayout(new BoxLayout(panelEventos, BoxLayout.Y_AXIS));
         panelEventos.setBorder(BorderFactory.createTitledBorder("Eventos"));
         
-        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Fecha", "Asignados"}, 0) {
+        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Fecha"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -88,7 +88,6 @@ public class AsignacionView {
         tablaEventos.getColumnModel().getColumn(0).setPreferredWidth(40);
         tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(200);
         tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(100);
-        tablaEventos.getColumnModel().getColumn(3).setPreferredWidth(80);
         
         JScrollPane scrollEventos = new JScrollPane(tablaEventos);
         scrollEventos.setPreferredSize(new Dimension(700, 120));
@@ -191,19 +190,7 @@ public class AsignacionView {
     public void setEventos(List<EventoDTO> eventos) {
         modeloEventos.setRowCount(0);
         for (EventoDTO e : eventos) {
-            modeloEventos.addRow(new Object[]{e.getId(), e.getNombre(), e.getFecha(), "-"});
-        }
-    }
-    
-    /**
-     * Actualiza el número de asignados en la tabla de eventos
-     */
-    public void actualizarAsignadosEnTabla(int idEvento, int numAsignados) {
-        for (int i = 0; i < modeloEventos.getRowCount(); i++) {
-            if ((int) modeloEventos.getValueAt(i, 0) == idEvento) {
-                modeloEventos.setValueAt(numAsignados, i, 3);
-                break;
-            }
+            modeloEventos.addRow(new Object[]{e.getId(), e.getNombre(), e.getFecha()});
         }
     }
     
