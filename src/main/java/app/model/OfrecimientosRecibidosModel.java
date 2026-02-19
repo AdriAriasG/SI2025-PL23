@@ -10,10 +10,10 @@ public class OfrecimientosRecibidosModel {
 	
 
 	public List<OfrecimientoDTO> getOfrecimientos(){
-		String sql = "SELECT o.id, e.nombre, e.fecha " +
+		String sql = "SELECT o.id, e.nombre, e.fecha, o.estado " +
                 "FROM Ofrecimiento o " +
                 "JOIN Evento e ON o.id_evento = e.id " +
-                "WHERE o.estado = 'PENDIENTE'";
+                "ORDER BY e.fecha DESC";
 		
 		return db.executeQueryPojo(OfrecimientoDTO.class, sql);
 		

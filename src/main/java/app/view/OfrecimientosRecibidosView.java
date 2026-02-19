@@ -47,7 +47,7 @@ public class OfrecimientosRecibidosView {
 		frame.setContentPane(contentPane);
 		
 		//Creamos tabla y modelo
-		String[] columnas = {"Evento", "Fecha"};
+		String[] columnas = {"Evento", "Fecha","Estado"};
 		model = new DefaultTableModel(columnas,0);
 		table = new JTable(model);
 		

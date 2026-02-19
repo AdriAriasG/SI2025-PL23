@@ -5,6 +5,7 @@ public class OfrecimientoDTO {
 	private int id;
 	private String nombre;
 	private String fecha;
+	private String estado;
 	
 	
 	public OfrecimientoDTO() {}
@@ -15,5 +16,7 @@ public class OfrecimientoDTO {
 	public void setNombre(String nombre) { this.nombre = nombre;}
 	public String getFecha() { return fecha;}
 	public void setFecha(String fecha) { this.fecha = fecha;}
+	public String getEstado(){return estado;}
+	public void setEstado(String estado) {this.estado = estado;}
 
 }

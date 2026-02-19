@@ -48,7 +48,8 @@ public class OfrecimientosRecibidosController {
 			for(OfrecimientoDTO o : datosActuales) {
 				view.getTableModel().addRow(new Object[] {
 						o.getNombre(),
-						o.getFecha()
+						o.getFecha(),
+						o.getEstado()
 				});
 		
 			}
@@ -66,6 +67,13 @@ public class OfrecimientosRecibidosController {
 		}
 		
 		int idOfrecimiento = datosActuales.get(fila).getId();
+		OfrecimientoDTO seleccionado = datosActuales.get(fila);
+		
+		if(!seleccionado.getEstado().equalsIgnoreCase("PENDIENTE")) {
+			JOptionPane.showMessageDialog(view.getFrame(), "Ya se ha tomado una decisión para este ofrecimiento", "Acción no permitida", JOptionPane.ERROR_MESSAGE);;
+			return;
+		}
+		
 		model.actualizarEstadoOfrecimiento(idOfrecimiento, nuevoEstado, accesoConcedido);
 		JOptionPane.showMessageDialog(view.getFrame(), "Operación realizada con éxito");
 		cargarDatosTabla();
