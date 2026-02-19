@@ -98,12 +98,6 @@ public class AsignacionController {
         }
 
         view.setEventos(eventos);
-        
-        // Actualizar número de asignados para cada evento
-        for (EventoDTO e : eventos) {
-            int num = model.getNumeroAsignados(e.getId());
-            view.actualizarAsignadosEnTabla(e.getId(), num);
-        }
 
         // Limpiar selección y datos relacionados
         idEventoSeleccionado = -1;
@@ -252,12 +246,6 @@ public class AsignacionController {
         }
         
         view.setEventos(eventos);
-        
-        // Actualizar número de asignados para cada evento
-        for (EventoDTO e : eventos) {
-            int num = model.getNumeroAsignados(e.getId());
-            view.actualizarAsignadosEnTabla(e.getId(), num);
-        }
         
         // Buscar si el evento previo sigue en la lista
         boolean eventoEncontrado = false;
