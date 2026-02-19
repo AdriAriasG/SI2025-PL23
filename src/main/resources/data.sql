@@ -4,6 +4,7 @@
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -18,7 +19,9 @@ INSERT INTO Reportero (id, nombre, id_agencia) VALUES (7, 'Javier Torres', 2);
 -- Agencia 3
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (8, 'Sofia Ruiz', 3);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (9, 'Diego Moreno', 3);
-
+-- Agencia 39
+INSERT INTO Reportero(id, nombre, id_agencia) VALUES(90, 'Reportero Luis', 39);
+INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
@@ -34,7 +37,10 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (22, 'Cumbre Empresari
 -- Agencia 3
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (30, 'Exposicion Internacional', '2026-03-12', 3);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (31, 'Campeonato Natacion', '2026-03-18', 3);
-
+-- Agencia 39
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (92, 'Punto de Partida', '2026-05-08', 39);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (93, 'Impacto Cero', '2026-05-12', 39);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (94, 'Impacto Rápido', '2026-05-20', 39);
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
 -- Evento 10 (Final Copa Local) - tiene 2 reporteros asignados
@@ -59,6 +65,12 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (22, 7);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (30, 8);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (31, 9);
 
+-- Agencia 39
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (92, 90);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (93, 91);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (94, 90);
+
+
 -- EmpresaComunicacion
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (1, 'TeleCable');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (2, 'El Diario');
@@ -66,6 +78,11 @@ INSERT INTO EmpresaComunicacion (id, nombre) VALUES (3, 'Radio Voz');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (4, 'Canal Noticias');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (5, 'Prensa Digital');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (6, 'Emisora Central');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (110, 'VozTV');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (111, 'Voz Diario');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (112, 'Voz Radio');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (113, 'Voz Digital');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (114, 'Voz Streaming');
 
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos
@@ -86,6 +103,9 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (9, 20, 2, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (10, 20, 3, 'PENDIENTE', FALSE);
 
+-- Evento 92
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (200, 92, 110, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (201, 92, 112, 'ACEPTADO', FALSE);
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
