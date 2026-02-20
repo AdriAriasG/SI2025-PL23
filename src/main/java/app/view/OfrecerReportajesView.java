@@ -65,7 +65,7 @@ public class OfrecerReportajesView extends JFrame {
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
-		table.setFont(new Font("Tahoma", Font.PLAIN, 7));
+		table.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
 			},

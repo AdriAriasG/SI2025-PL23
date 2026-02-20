@@ -1,5 +1,6 @@
 package app.model;
 
+import app.dto.EmpresaComunicacionDTO;
 import java.util.List;
 
 import app.dto.EventoDTO;
@@ -17,4 +18,15 @@ public class OfrecerReportajesModel {
 		            "ORDER BY e.fecha, e.nombre";
 		        return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
+	
+	public List<EmpresaComunicacionDTO> getEmpresasDisponibles(int idEvento) {
+	    String sql =
+	        "SELECT ec.id, ec.nombre " +
+	        "FROM EmpresaComunicacion ec " +
+	        "WHERE ec.id NOT IN (" +
+	        "   SELECT o.id_empresa FROM Ofrecimiento o WHERE o.id_evento = ?" +
+	        ") " +
+	        "ORDER BY ec.nombre";
+	    return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento);
+	}
 }
