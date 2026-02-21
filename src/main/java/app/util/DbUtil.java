@@ -20,7 +20,7 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 
 public abstract class DbUtil {
 	public abstract String getUrl();
-	
+
 	public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(getUrl());
 	}
@@ -67,6 +67,25 @@ public abstract class DbUtil {
 		}
 	}
 
+	public <T> T executeQueryScalar(Class<T> type, String sql, Object... params) {
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+			QueryRunner runner = new QueryRunner();
+			return runner.query(conn, sql, rs -> {
+				if (rs.next()) {
+					return type.cast(rs.getObject(1));
+				}
+				return null;
+			}, params);
+		} catch (SQLException e) {
+			throw new UnexpectedException(e);
+		} finally {
+			DbUtils.closeQuietly(conn);
+		}
+	}
+
+
 	public void executeUpdate(String sql, Object... params) {
 		Connection conn = null;
 		try {
@@ -79,7 +98,7 @@ public abstract class DbUtil {
 			DbUtils.closeQuietly(conn);
 		}
 	}
-	
+
 	public void executeScript(String fileName) {
 		List<String> lines;
 		try {
@@ -114,7 +133,7 @@ public abstract class DbUtil {
 	public void executeBatch(String[] sqls) {
 		executeBatch(Arrays.asList(sqls));
 	}
-	
+
 	public void executeBatch(List<String> sqls) {
 		try (Connection cn = DriverManager.getConnection(getUrl()); Statement stmt = cn.createStatement()) {
 			for (String sql : sqls)
