@@ -13,6 +13,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import app.dto.AgenciaDTO;
 import app.model.AsignacionModel;
+import app.model.ReportajeModel;
+import app.view.ReportajeView;
+import app.controller.ReportajeController;
 // import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
 import app.view.AsignacionView;
 // import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
@@ -167,7 +170,19 @@ public class SwingMain {
             InformeView view = new InformeView();
             new InformeController(model, view, agencia);
         }
+        
         */
+        else if (buttonText.contains("#33538")) {
+        	 ReportajeModel model = new ReportajeModel();
+        	 ReportajeView view = new ReportajeView();
+        	 
+        	 // *** PENDIENTE: AQUÍ HAY QUE PASAR EL ID DEL REPORTERO LOGUEADO ****
+        	 // Pongo id = 1 como valor de prueba de momento
+        	 int idReportero = 1;
+        	 
+        	 new ReportajeController(model, view, idReportero);
+        }
+        
         // Resto de botones no implementados
         else {
             javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + buttonText);
