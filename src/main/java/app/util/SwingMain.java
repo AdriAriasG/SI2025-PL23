@@ -99,10 +99,27 @@ public class SwingMain {
         frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0,2)));
         
         
+        JButton btnReportajes = new JButton("HU #33542: Acceder al reportaje (IRENE)");
+        btnReportajes.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnReportajes.setMaximumSize(new Dimension(450,30));
+        
+        btnReportajes.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		app.model.AccesoReportajeModel modelRep = new app.model.AccesoReportajeModel();
+        		app.view.AccesoReportajeView viewRep = new app.view.AccesoReportajeView();
+        		app.controller.AccesoReportajeController controllerRep = new app.controller.AccesoReportajeController(viewRep, modelRep);	
+        		controllerRep.mostrarVista();
+        	}
+        });
+        
+        frame.getContentPane().add(btnReportajes);
+        frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0,2)));
+        
         
         addButton("HU #33546: Modificar decisión (IRENE)");
-        addButton("HU #33542: Acceder a reportaje (IRENE)");
 
+        
+        
         // --- MANTENIMIENTO BD ---
         addLabel("MANTENIMIENTO BD");
         JButton btnInit = new JButton("Inicializar Base de Datos en Blanco");

@@ -45,7 +45,12 @@ public class AccesoReportajeView {
 	
 	//Lista de eventos
 	String[] columnas = {"Evento", "Fecha"};
-	model = new DefaultTableModel(columnas, 0);
+	model = new DefaultTableModel(columnas, 0) {
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return false;
+		}
+	};
 	table = new JTable(model);
 	table.setRowHeight(25);
 	JScrollPane scrollTabla = new JScrollPane(table);
