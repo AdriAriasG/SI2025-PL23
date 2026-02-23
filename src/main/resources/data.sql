@@ -83,6 +83,9 @@ INSERT INTO EmpresaComunicacion (id, nombre) VALUES (111, 'Voz Diario');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (112, 'Voz Radio');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (113, 'Voz Digital');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (114, 'Voz Streaming');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (115, 'Voz Internacional');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (116, 'Voz Deportes');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (117, 'Voz Cultura');
 
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos
