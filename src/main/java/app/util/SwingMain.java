@@ -14,10 +14,13 @@ import java.awt.Dimension;
 import app.dto.AgenciaDTO;
 import app.model.AsignacionModel;
 // import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
+import app.model.OfrecerReportajesModel;
 import app.view.AsignacionView;
 // import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
+import app.view.OfrecerReportajesView;
 import app.controller.AsignacionController;
 // import app.controller.InformeController;  // HU #33548 - Descomentar cuando implemente - adri
+import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
 
@@ -185,6 +188,12 @@ public class SwingMain {
             new InformeController(model, view, agencia);
         }
         */
+     // HU #33539: Ofrecer reportajes (IVAN)
+        else if (buttonText.contains("#33539")) {
+            OfrecerReportajesModel model = new OfrecerReportajesModel();
+            OfrecerReportajesView view = new OfrecerReportajesView();
+            new OfrecerReportajesController(model, view, agencia);
+        }
         // Resto de botones no implementados
         else {
             javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + buttonText);
