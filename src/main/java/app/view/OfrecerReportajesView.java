@@ -22,6 +22,11 @@ public class OfrecerReportajesView extends JFrame {
 	private JTable table;
 	private JTable table_1;
 	private JTable table_2;
+	private JButton btnOfrecer;
+	private JButton btnAceptar;
+	private JButton btnCancelar;
+
+	
 
 	/**
 	 * Launch the application.
@@ -72,7 +77,13 @@ public class OfrecerReportajesView extends JFrame {
 			new String[] {
 				"ID", "Nombre", "Fecha"
 			}
-		));
+		) {
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+			}
+		}
+				);
 		scrollPane.setViewportView(table);
 		
 		JLabel lblNewLabel_2 = new JLabel("Empresas disponibles");
@@ -90,8 +101,16 @@ public class OfrecerReportajesView extends JFrame {
 			new String[] {
 				"Nombre"
 			}
-		));
+		) {
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+			
+		});
 		scrollPane_1.setViewportView(table_1);
+		
+		table_1.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		JLabel lblNewLabel_3 = new JLabel("Empresas seleccionadas");
 		lblNewLabel_3.setBounds(315, 53, 122, 14);
@@ -112,22 +131,32 @@ public class OfrecerReportajesView extends JFrame {
 			new String[] {
 				"Nombre"
 			}
-		));
+		) {
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+		});
 		scrollPane_2.setViewportView(table_2);
 		
-		JButton btnNewButton = new JButton("Ofrecer\r\n");
-		btnNewButton.setBounds(178, 182, 89, 23);
-		contentPane.add(btnNewButton);
-		
-		JButton btnNewButton_1 = new JButton("Aceptar\r\n");
-		btnNewButton_1.setBounds(249, 227, 89, 23);
-		contentPane.add(btnNewButton_1);
-		
-		JButton btnNewButton_2 = new JButton("Cancelar\r\n");
-		btnNewButton_2.setBounds(348, 227, 89, 23);
-		contentPane.add(btnNewButton_2);
+		btnOfrecer = new JButton("Ofrecer");
+		btnOfrecer.setBounds(178, 182, 89, 23);
+		contentPane.add(btnOfrecer);
+
+		btnAceptar = new JButton("Aceptar");
+		btnAceptar.setBounds(249, 227, 89, 23);
+		contentPane.add(btnAceptar);
+
+		btnCancelar = new JButton("Cancelar");
+		btnCancelar.setBounds(348, 227, 89, 23);
+		contentPane.add(btnCancelar);
 
 	}
+	
+	public JButton getBtnOfrecer() { return btnOfrecer; }
+	public JButton getBtnAceptar() { return btnAceptar; }
+	public JButton getBtnCancelar() { return btnCancelar; }
+	public JTable getTablaSeleccionadas() { return table_2; }
 	
 	public JTable getTablaEventos() {
 	    return table;
