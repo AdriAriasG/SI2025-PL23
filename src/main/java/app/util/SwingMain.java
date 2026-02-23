@@ -82,7 +82,27 @@ public class SwingMain {
 
         // --- EMPRESA DE COMUNICACIÓN (IRENE) ---
         addLabel("EMPRESA DE COMUNICACIÓN (Irene)");
-        addButton("HU #33540: Gestionar ofrecimientos (IRENE)");
+        JButton btnGestionar = new JButton("HU #33540: Gestionar ofrecimientos (IRENE)");
+        btnGestionar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnGestionar.setMaximumSize(new Dimension(450,30));
+        
+        btnGestionar.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		app.model.OfrecimientosRecibidosModel modelOfr = new app.model.OfrecimientosRecibidosModel();
+        		app.view.OfrecimientosRecibidosView viewOfr = new app.view.OfrecimientosRecibidosView();
+        		
+        		app.controller.OfrecimientosRecibidosController controllerOfr =
+        				new app.controller.OfrecimientosRecibidosController(modelOfr, viewOfr);
+        		
+        		controllerOfr.initController();
+        	}
+        });
+        
+        frame.getContentPane().add(btnGestionar);
+        frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0,2)));
+        
+        
+        
         addButton("HU #33546: Modificar decisión (IRENE)");
         addButton("HU #33542: Acceder a reportaje (IRENE)");
 
