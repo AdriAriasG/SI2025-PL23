@@ -13,15 +13,15 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import app.dto.AgenciaDTO;
 import app.model.AsignacionModel;
-// import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
+import app.model.InformeModel;
 import app.model.OfrecerReportajesModel;
 import app.view.AsignacionView;
 import app.view.AsignacionEdicionView;
-// import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
+import app.view.InformeView;
 import app.view.OfrecerReportajesView;
 import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
-// import app.controller.InformeController;  // HU #33548 - Descomentar cuando implemente - adri
+import app.controller.InformeController;
 import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
@@ -182,15 +182,13 @@ public class SwingMain {
             AsignacionEdicionView view = new AsignacionEdicionView(); // Vista específica para edición (HU43)
             new AsignacionEdicionController(model, view, agencia);
         }
-        // HU #33548: Informe de un evento (ADRIAN) - Descomentar cuando implemente - adri
-        /*
+        // HU #33548: Informe de un evento (ADRIAN)
         else if (buttonText.contains("#33548")) {
             InformeModel model = new InformeModel();
             InformeView view = new InformeView();
             new InformeController(model, view, agencia);
         }
-        */
-     // HU #33539: Ofrecer reportajes (IVAN)
+        // HU #33539: Ofrecer reportajes (IVAN)
         else if (buttonText.contains("#33539")) {
             OfrecerReportajesModel model = new OfrecerReportajesModel();
             OfrecerReportajesView view = new OfrecerReportajesView();
