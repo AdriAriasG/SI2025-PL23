@@ -14,12 +14,15 @@ import java.awt.Dimension;
 import app.dto.AgenciaDTO;
 import app.model.AsignacionModel;
 // import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
+import app.model.OfrecerReportajesModel;
 import app.view.AsignacionView;
 import app.view.AsignacionEdicionView;
 // import app.view.InformeView;  // HU #33548 - Descomentar cuando implemente - adri
+import app.view.OfrecerReportajesView;
 import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
 // import app.controller.InformeController;  // HU #33548 - Descomentar cuando implemente - adri
+import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
 
@@ -101,10 +104,27 @@ public class SwingMain {
         frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0,2)));
         
         
+        JButton btnReportajes = new JButton("HU #33542: Acceder al reportaje (IRENE)");
+        btnReportajes.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnReportajes.setMaximumSize(new Dimension(450,30));
+        
+        btnReportajes.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		app.model.AccesoReportajeModel modelRep = new app.model.AccesoReportajeModel();
+        		app.view.AccesoReportajeView viewRep = new app.view.AccesoReportajeView();
+        		app.controller.AccesoReportajeController controllerRep = new app.controller.AccesoReportajeController(viewRep, modelRep);	
+        		controllerRep.mostrarVista();
+        	}
+        });
+        
+        frame.getContentPane().add(btnReportajes);
+        frame.getContentPane().add(javax.swing.Box.createRigidArea(new Dimension(0,2)));
+        
         
         addButton("HU #33546: Modificar decisión (IRENE)");
-        addButton("HU #33542: Acceder a reportaje (IRENE)");
 
+        
+        
         // --- MANTENIMIENTO BD ---
         addLabel("MANTENIMIENTO BD");
         JButton btnInit = new JButton("Inicializar Base de Datos en Blanco");
@@ -170,6 +190,12 @@ public class SwingMain {
             new InformeController(model, view, agencia);
         }
         */
+     // HU #33539: Ofrecer reportajes (IVAN)
+        else if (buttonText.contains("#33539")) {
+            OfrecerReportajesModel model = new OfrecerReportajesModel();
+            OfrecerReportajesView view = new OfrecerReportajesView();
+            new OfrecerReportajesController(model, view, agencia);
+        }
         // Resto de botones no implementados
         else {
             javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + buttonText);
