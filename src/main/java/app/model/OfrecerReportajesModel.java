@@ -59,4 +59,7 @@ public class OfrecerReportajesModel {
 
 	    db.executeUpdate(sql, nextId, idEvento, idEmpresa);
 	}
+	
+	
+	
 }
