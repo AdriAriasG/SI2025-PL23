@@ -122,21 +122,18 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (201, 92, 112, 'ACEPTADO', FALSE);
 
 -- Evento 300
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-VALUES (400, 300, 1, 'ACEPTADO', FALSE);
-
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-VALUES (401, 300, 2, 'ACEPTADO', TRUE);
-
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-VALUES (402, 300, 3, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (400, 300, 1, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (405, 300, 4, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (406, 300, 5, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (407, 300, 6, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (401, 300, 2, 'ACEPTADO', TRUE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (402, 300, 3, 'PENDIENTE', FALSE);
 
 -- Evento 301
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-VALUES (403, 301, 4, 'ACEPTADO', FALSE);
-
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-VALUES (404, 301, 5, 'RECHAZADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (403, 301, 4, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (404, 301, 5, 'RECHAZADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (408, 301, 1, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (409, 301, 2, 'ACEPTADO', FALSE);
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
