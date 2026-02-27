@@ -32,31 +32,48 @@ public class ReportajeModel {
 	/*
 	 * Entrega un reportaje
 	 */
-	public void entregarReportaje(int idEvento, int idReportero, String titulo, String subtitulo, String cuerpo) {
+	public void entregarReportaje(int idEvento,
+			int idReportero,
+			String titulo,
+			String subtitulo,
+			String cuerpo) {
+
 		validarTituloUnico(titulo);
 		validarEventoAsignado(idEvento, idReportero);
 		validarEventoSinReportaje(idEvento);
 
-		String insertReportaje = "INSERT INTO Reportaje (id_evento, id_reportero_autor, titulo)"
-				+ "VALUES (?, ?, ?)";
+		String insertReportaje = """
+				INSERT INTO Reportaje (id_evento, id_reportero_autor, titulo)
+				VALUES (?, ?, ?)
+				RETURNING id
+				""";
 
-		db.executeUpdate(insertReportaje, idEvento, idReportero, titulo);
-
-		// Obtener id generado
 		Integer idReportaje = db.executeQueryScalar(
 				Integer.class,
-				"SELECT last_insert_rowid()"
+				insertReportaje,
+				idEvento,
+				idReportero,
+				titulo
 				);
 
-		String insertVersion = "INSERT INTO VersionReportaje (id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados)"
-				+ "VALUES (?, ?, ?, ?, ?)";
+		String insertVersion = """
+				INSERT INTO VersionReportaje
+				(id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador)
+				VALUES (?, ?, ?, ?, ?, ?)
+				""";
 
-		db.executeUpdate(insertVersion, idReportaje, subtitulo, cuerpo, LocalDateTime.now().toString(), "Versión inicial");
-
+		db.executeUpdate(insertVersion,
+				idReportaje,
+				subtitulo,
+				cuerpo,
+				LocalDateTime.now().toString(),
+				"Versión inicial",
+				idReportero
+				);
 	}
 
 	private void validarTituloUnico(String titulo) {
-		String sql = "SELECT COUNT(*) FROM Reportaje"
+		String sql = "SELECT COUNT(*) FROM Reportaje "
 				+ "WHERE titulo = ?";
 		long count = db.executeQueryScalar(Long.class, sql, titulo);
 
@@ -66,7 +83,7 @@ public class ReportajeModel {
 	}
 
 	private void validarEventoAsignado(int idEvento, int idReportero) {
-		String sql = "SELECT COUNT(*) FROM Asignacion"
+		String sql = "SELECT COUNT(*) FROM Asignacion "
 				+ "WHERE id_evento = ? AND id_reportero = ?";
 
 		long count = db.executeQueryScalar(Long.class, sql, idEvento, idReportero);

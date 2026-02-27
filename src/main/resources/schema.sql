@@ -10,20 +10,20 @@ DROP TABLE IF EXISTS AgenciaPrensa;
 
 -- CREATE TABLES
 CREATE TABLE AgenciaPrensa (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     nombre VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Reportero (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     nombre VARCHAR(255) NOT NULL,
-    id_agencia INT NOT NULL,
+    id_agencia INTEGER NOT NULL,
     FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id)
 );
 
 CREATE TABLE Evento (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     nombre VARCHAR(255) NOT NULL,
     fecha DATE NOT NULL,
     id_agencia INT NOT NULL,
@@ -31,24 +31,24 @@ CREATE TABLE Evento (
 );
 
 CREATE TABLE Asignacion (
-    id_evento INT NOT NULL,
-    id_reportero INT NOT NULL,
+    id_evento INTEGER NOT NULL,
+    id_reportero INTEGER NOT NULL,
     PRIMARY KEY (id_evento, id_reportero),
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero) REFERENCES Reportero(id)
 );
 
 CREATE TABLE Reportaje (
-    id INT PRIMARY KEY NOT NULL,
-    id_evento INT UNIQUE NOT NULL,
-    id_reportero_autor INT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_evento INTEGER UNIQUE NOT NULL,
+    id_reportero_autor INTEGER NOT NULL,
     titulo VARCHAR(255) UNIQUE NOT NULL,
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero_autor) REFERENCES Reportero(id)
 );
 
 CREATE TABLE VersionReportaje (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_reportaje INT NOT NULL,
     subtitulo VARCHAR(255),
     cuerpo TEXT,

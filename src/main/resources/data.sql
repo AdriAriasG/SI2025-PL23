@@ -4,6 +4,7 @@
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
+INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (16, 'Agencia Estrella', 'contacto@estrella.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -18,6 +19,9 @@ INSERT INTO Reportero (id, nombre, id_agencia) VALUES (7, 'Javier Torres', 2);
 -- Agencia 3
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (8, 'Sofia Ruiz', 3);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (9, 'Diego Moreno', 3);
+-- Agencia 16
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (16, 'Javier Rodríguez', 16);
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (17, 'Francisco Pérez', 16);
 
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
@@ -34,6 +38,9 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (22, 'Cumbre Empresari
 -- Agencia 3
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (30, 'Exposicion Internacional', '2026-03-12', 3);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (31, 'Campeonato Natacion', '2026-03-18', 3);
+--Agencia 16
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (76, 'Concierto Jazz', '2026-04-10', 16);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (77, 'Concierto Blues', '2026-04-12', 16);
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -59,6 +66,10 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (22, 7);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (30, 8);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (31, 9);
 
+-- Agencia 16
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (76,1);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (77,1);
+
 -- EmpresaComunicacion
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (1, 'TeleCable');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (2, 'El Diario');
@@ -66,6 +77,8 @@ INSERT INTO EmpresaComunicacion (id, nombre) VALUES (3, 'Radio Voz');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (4, 'Canal Noticias');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (5, 'Prensa Digital');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (6, 'Emisora Central');
+
+
 
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos
