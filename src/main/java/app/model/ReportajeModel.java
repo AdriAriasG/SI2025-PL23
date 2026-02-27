@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import app.dto.EventoDTO;
+import app.dto.VersionDTO;
 import app.util.ApplicationException;
 import app.util.Database;
 
@@ -14,7 +15,10 @@ public class ReportajeModel {
 	/*
 	 * Devuelve los eventos asignados al reportero que no tiene reportaje.
 	 */
-	public List<EventoDTO> getEventosPendientes(int idReportero){
+	public List<EventoDTO> getEventosAsignados(int idReportero, boolean soloEntregados){
+
+		String condicion = soloEntregados
+				? "r.id IS NOT NULL" : "r.id IS NULL";
 
 		String sql = """
 				SELECT e.id, e.nombre, e.fecha
@@ -22,9 +26,9 @@ public class ReportajeModel {
 				JOIN Asignacion a ON e.id = a.id_evento
 				LEFT JOIN Reportaje r ON e.id = r.id_evento
 				WHERE a.id_reportero = ?
-				  AND r.id IS NULL
-				ORDER BY e.fecha
-				""";
+				  AND """ + condicion + """
+				  		ORDER BY e.fecha
+				  		""";
 
 		return db.executeQueryPojo(EventoDTO.class, sql, idReportero);
 	}
@@ -70,6 +74,62 @@ public class ReportajeModel {
 				"Versión inicial",
 				idReportero
 				);
+	}
+
+	public void modificarReportaje(int idEvento,
+			int idReportero,
+			String nuevoSubtitulo,
+			String nuevoCuerpo) {
+		// Validamos si evento tiene reportaje
+		Integer idReportaje = db.executeQueryScalar(Integer.class, "SELECT id FROM Reportaje WHERE id_evento = ?", idEvento);
+
+		if (idReportaje == null) 
+			throw new ApplicationException("El evento no tiene reportaje entregado");
+
+		// Validar que el usuario es el autor
+		Integer autor = db.executeQueryScalar(Integer.class, "SELECT id_reportero_autor FROM REPORTAJE WHERE id_evento = ?", idEvento);
+
+		if (autor == null)
+			throw new ApplicationException("Solo el autor puede modificar el reportaje");
+
+		// Obtener version actual
+		VersionDTO versionActual = db.executeQueryPojo(
+				VersionDTO.class, 
+				""" 
+				SELECT subtitulo, cuerpo FROM VersionReportaje
+				WHERE idReportaje = ?
+				ORDER BY fecha_hora DESC
+				LIMIT 1
+				""", 
+				idReportaje).stream().findFirst().orElse(null);
+
+		if (versionActual == null) 
+			throw new ApplicationException("No existe ninguna versión previa del reportaje");
+
+		// Detectar cambios
+		boolean cambioSubtitulo = !versionActual.getSubtitulo().equals(nuevoSubtitulo);
+		boolean cambioCuerpo = !versionActual.getClass().equals(nuevoCuerpo);
+
+		if(!cambioSubtitulo && !cambioCuerpo) 
+			throw new ApplicationException("No se han realizado cambios");
+
+		String cambios;
+
+		if (cambioSubtitulo && cambioCuerpo) 
+			cambios = "Actualización de subtítulo y cuerpo";
+		else if (cambioSubtitulo)
+			cambios = "Actualización de subtítulo";
+		else 
+			cambios = "Actualización de cuerpo";
+
+		// Insertar nueva version
+		String insertVersion = """
+				INSERT INTO VersionReportaje (id_Reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador)
+				VALUES (?, ?, ?, ?, ?, ?, ?)
+				""";
+
+		db.executeUpdate(insertVersion, idReportaje, 
+				nuevoSubtitulo, nuevoCuerpo, LocalDateTime.now().toString(), cambios, idReportero);
 	}
 
 	private void validarTituloUnico(String titulo) {
