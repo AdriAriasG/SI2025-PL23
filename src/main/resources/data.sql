@@ -4,7 +4,11 @@
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
+
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (16, 'Agencia Estrella', 'contacto@estrella.com');
+
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciavoz.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -22,6 +26,13 @@ INSERT INTO Reportero (id, nombre, id_agencia) VALUES (9, 'Diego Moreno', 3);
 -- Agencia 16
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (16, 'Javier Rodríguez', 16);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (17, 'Francisco Pérez', 16);
+
+-- Agencia 39
+INSERT INTO Reportero(id, nombre, id_agencia) VALUES(90, 'Reportero Luis', 39);
+INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
+-- Agencia 40
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (200, 'Luis Castro', 40);
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40);
 
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
@@ -41,6 +52,14 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (31, 'Campeonato Natac
 --Agencia 16
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (76, 'Concierto Jazz', '2026-04-10', 16);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (77, 'Concierto Blues', '2026-04-12', 16);
+
+-- Agencia 39
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (92, 'Punto de Partida', '2026-05-08', 39);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (93, 'Impacto Cero', '2026-05-12', 39);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (94, 'Impacto Rápido', '2026-05-20', 39);
+--Agencia 40
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (300, 'Fiesta del Mar', '2026-06-10', 40);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesquero', '2026-06-15', 40);
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -70,6 +89,15 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (31, 9);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (76,1);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (77,1);
 
+-- Agencia 39
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (92, 90);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (93, 91);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (94, 90);
+
+--Agencia 40
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (300, 200);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (301, 201);
+
 -- EmpresaComunicacion
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (1, 'TeleCable');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (2, 'El Diario');
@@ -77,6 +105,14 @@ INSERT INTO EmpresaComunicacion (id, nombre) VALUES (3, 'Radio Voz');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (4, 'Canal Noticias');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (5, 'Prensa Digital');
 INSERT INTO EmpresaComunicacion (id, nombre) VALUES (6, 'Emisora Central');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (110, 'VozTV');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (111, 'Voz Diario');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (112, 'Voz Radio');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (113, 'Voz Digital');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (114, 'Voz Streaming');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (115, 'Voz Internacional');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (116, 'Voz Deportes');
+INSERT INTO EmpresaComunicacion (id, nombre) VALUES (117, 'Voz Cultura');
 
 
 
@@ -99,6 +135,23 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (9, 20, 2, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (10, 20, 3, 'PENDIENTE', FALSE);
 
+-- Evento 92
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (200, 92, 110, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (201, 92, 112, 'ACEPTADO', FALSE);
+
+-- Evento 300
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (400, 300, 1, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (405, 300, 4, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (406, 300, 5, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (407, 300, 6, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (401, 300, 2, 'ACEPTADO', TRUE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (402, 300, 3, 'PENDIENTE', FALSE);
+
+-- Evento 301
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (403, 301, 4, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (404, 301, 5, 'RECHAZADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (408, 301, 1, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (409, 301, 2, 'ACEPTADO', FALSE);
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
@@ -109,6 +162,13 @@ INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (3, 14,
 -- Evento 20 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (4, 20, 5, 'Noche inolvidable de rock');
 
+-- Reportajes (HU #33541)
+-- Evento 300 tiene reportaje
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo)
+VALUES (50, 300, 200, 'Gran éxito en la Fiesta del Mar');
+-- Evento 301 tiene reportaje
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo)
+VALUES (51, 301, 201, 'Nuevas medidas en el Congreso Pesquero');
 -- Versiones de Reportajes (HU #33545, #33547)
 -- Reportaje 1 - 3 versiones
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) 

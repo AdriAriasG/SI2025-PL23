@@ -48,6 +48,7 @@ public class AsignacionModel {
      * Un reportero está disponible si:
      * 1. Pertenece a la misma agencia que el evento
      * 2. No está asignado a otro evento en la misma fecha
+     * 3. No está ya asignado a este evento
      */
     public List<ReporteroDTO> getReporterosDisponibles(int idEvento, int idAgencia) {
         String sql = "SELECT r.id, r.nombre, r.id_agencia FROM Reportero r " +
@@ -58,8 +59,12 @@ public class AsignacionModel {
                      "    WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
                      "    AND a.id_evento != ?" +
                      ") " +
+                     "AND r.id NOT IN (" +
+                     "    SELECT a2.id_reportero FROM Asignacion a2 " +
+                     "    WHERE a2.id_evento = ?" +
+                     ") " +
                      "ORDER BY r.nombre";
-        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento);
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento);
     }
 
     /**
