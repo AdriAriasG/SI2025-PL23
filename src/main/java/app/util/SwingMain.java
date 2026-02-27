@@ -30,10 +30,12 @@ import app.view.DistribuirReportajeView;
 import app.view.AsignacionEdicionView;
 import app.view.InformeView;
 import app.view.OfrecerReportajesView;
+import app.view.ModificarEntregaView;
 import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
 import app.controller.DistribuirReportajeController;
 import app.controller.InformeController;
+import app.controller.ModificarEntregaController;
 import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
@@ -308,8 +310,15 @@ public class SwingMain {
 			ReportajeView view = new ReportajeView();
 
 			int idReportero = reporteroSeleccionado.getId();
-
+			
 			new ReportajeController(model, view, idReportero);
+		}
+		else if (buttonText.contains("#33545")){
+			ReportajeModel model = new ReportajeModel();
+			ModificarEntregaView view = new ModificarEntregaView();
+			
+			new ModificarEntregaController(model, view, reporteroSeleccionado.getId());
+			
 		}
 		else {
 			// HU #33545, #33547 - Por implementar

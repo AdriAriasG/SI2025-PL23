@@ -18,19 +18,39 @@ public class ReportajeModel {
 	public List<EventoDTO> getEventosAsignados(int idReportero, boolean soloEntregados){
 
 		String condicion = soloEntregados
-				? "r.id IS NOT NULL" : "r.id IS NULL";
+				? "r.id IS NOT NULL"
+						: "r.id IS NULL";
 
-		String sql = """
-				SELECT e.id, e.nombre, e.fecha
-				FROM Evento e
-				JOIN Asignacion a ON e.id = a.id_evento
-				LEFT JOIN Reportaje r ON e.id = r.id_evento
-				WHERE a.id_reportero = ?
-				  AND """ + condicion + """
-				  		ORDER BY e.fecha
-				  		""";
+		String sql =
+				"SELECT e.id, e.nombre, e.fecha " +
+						"FROM Evento e " +
+						"JOIN Asignacion a ON e.id = a.id_evento " +
+						"LEFT JOIN Reportaje r ON e.id = r.id_evento " +
+						"WHERE a.id_reportero = ? " +
+						"AND " + condicion + " " +
+						"ORDER BY e.fecha";
 
 		return db.executeQueryPojo(EventoDTO.class, sql, idReportero);
+	}
+
+	public VersionDTO getVersionActual(int idEvento) {
+
+		String sql = """
+				SELECT v.subtitulo, v.cuerpo
+				FROM VersionReportaje v
+				JOIN Reportaje r ON v.id_reportaje = r.id
+				WHERE r.id_evento = ?
+				ORDER BY v.fecha_hora DESC
+				LIMIT 1
+				""";
+		System.out.println("Buscando versión actual para evento: " + idEvento);
+
+		return db.executeQueryPojo(VersionDTO.class, sql, idEvento)
+				.stream()
+				.findFirst()
+				.orElse(null);
+		
+		
 	}
 
 	/*
@@ -94,14 +114,16 @@ public class ReportajeModel {
 
 		// Obtener version actual
 		VersionDTO versionActual = db.executeQueryPojo(
-				VersionDTO.class, 
-				""" 
-				SELECT subtitulo, cuerpo FROM VersionReportaje
-				WHERE idReportaje = ?
+				VersionDTO.class,
+				"""
+				SELECT subtitulo, cuerpo
+				FROM VersionReportaje
+				WHERE id_reportaje = ?
 				ORDER BY fecha_hora DESC
 				LIMIT 1
-				""", 
-				idReportaje).stream().findFirst().orElse(null);
+				""",
+				idReportaje
+				).stream().findFirst().orElse(null);
 
 		if (versionActual == null) 
 			throw new ApplicationException("No existe ninguna versión previa del reportaje");
@@ -125,7 +147,7 @@ public class ReportajeModel {
 		// Insertar nueva version
 		String insertVersion = """
 				INSERT INTO VersionReportaje (id_Reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador)
-				VALUES (?, ?, ?, ?, ?, ?, ?)
+				VALUES (?, ?, ?, ?, ?, ?)
 				""";
 
 		db.executeUpdate(insertVersion, idReportaje, 
