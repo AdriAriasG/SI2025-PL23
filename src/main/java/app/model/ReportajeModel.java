@@ -40,17 +40,16 @@ public class ReportajeModel {
 				FROM VersionReportaje v
 				JOIN Reportaje r ON v.id_reportaje = r.id
 				WHERE r.id_evento = ?
-				ORDER BY v.fecha_hora DESC
+				ORDER BY v.id DESC
 				LIMIT 1
 				""";
-		System.out.println("Buscando versión actual para evento: " + idEvento);
 
 		return db.executeQueryPojo(VersionDTO.class, sql, idEvento)
 				.stream()
 				.findFirst()
 				.orElse(null);
-		
-		
+
+
 	}
 
 	/*
@@ -119,7 +118,7 @@ public class ReportajeModel {
 				SELECT subtitulo, cuerpo
 				FROM VersionReportaje
 				WHERE id_reportaje = ?
-				ORDER BY fecha_hora DESC
+				ORDER BY id DESC
 				LIMIT 1
 				""",
 				idReportaje
@@ -129,8 +128,23 @@ public class ReportajeModel {
 			throw new ApplicationException("No existe ninguna versión previa del reportaje");
 
 		// Detectar cambios
-		boolean cambioSubtitulo = !versionActual.getSubtitulo().equals(nuevoSubtitulo);
-		boolean cambioCuerpo = !versionActual.getClass().equals(nuevoCuerpo);
+		String subtituloActual = versionActual.getSubtitulo() == null ? "" :
+			versionActual.getSubtitulo().trim();
+
+		String cuerpoActual = versionActual.getCuerpo() == null ? "" :
+			versionActual.getCuerpo().trim();
+
+		String nuevoSubtituloNormalizado =
+				nuevoSubtitulo == null ? "" : nuevoSubtitulo.trim();
+
+		String nuevoCuerpoNormalizado =
+				nuevoCuerpo == null ? "" : nuevoCuerpo.trim();
+
+		boolean cambioSubtitulo =
+				!subtituloActual.equals(nuevoSubtituloNormalizado);
+
+		boolean cambioCuerpo =
+				!cuerpoActual.equals(nuevoCuerpoNormalizado);
 
 		if(!cambioSubtitulo && !cambioCuerpo) 
 			throw new ApplicationException("No se han realizado cambios");
@@ -151,7 +165,7 @@ public class ReportajeModel {
 				""";
 
 		db.executeUpdate(insertVersion, idReportaje, 
-				nuevoSubtitulo, nuevoCuerpo, LocalDateTime.now().toString(), cambios, idReportero);
+				nuevoSubtituloNormalizado, nuevoCuerpoNormalizado, LocalDateTime.now().toString(), cambios, idReportero);
 	}
 
 	private void validarTituloUnico(String titulo) {
