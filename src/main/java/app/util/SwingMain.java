@@ -347,6 +347,13 @@ public class SwingMain {
 			controllerRep.mostrarVista();
 		}
 		// HU #33546 y otros no implementados
+		else if (buttonText.contains("#33546")) {
+			app.model.ModificacionOfrecimientosRecibidosModel modelMod = new app.model.ModificacionOfrecimientosRecibidosModel();
+			app.view.ModificacionOfrecimientosRecibidosView viewMod = new app.view.ModificacionOfrecimientosRecibidosView();
+			app.controller.ModificacionOfrecimientosRecibidosController controllerMod = 
+					new app.controller.ModificacionOfrecimientosRecibidosController(modelMod, viewMod, empresaSeleccionada.getId());    
+			controllerMod.mostrarVista();
+		}
 		else {
 			javax.swing.JOptionPane.showMessageDialog(frame, 
 					"Acción no implementada: " + buttonText + "\nEmpresa seleccionada: " + empresaSeleccionada.getNombre());
