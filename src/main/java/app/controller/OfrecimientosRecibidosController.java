@@ -15,11 +15,13 @@ public class OfrecimientosRecibidosController {
 	private OfrecimientosRecibidosModel model;
 	private OfrecimientosRecibidosView view;
 	private List<OfrecimientoDTO> datosActuales;
+	private int idEmpresa;
 	
 	public OfrecimientosRecibidosController(OfrecimientosRecibidosModel model,
-											OfrecimientosRecibidosView view) {
+											OfrecimientosRecibidosView view, int idEmpresa) {
 		this.model = model;
 		this.view = view;
+		this.idEmpresa = idEmpresa;
 	}
 	
 	public void initController() {
@@ -39,7 +41,7 @@ public class OfrecimientosRecibidosController {
 		
 		view.getTableModel().setRowCount(0);
 		
-		datosActuales = model.getOfrecimientos();
+		datosActuales = model.getOfrecimientos(this.idEmpresa);
 		if(datosActuales.isEmpty()) {
 			view.mostrarMensajeVacio(true);
 		}
