@@ -5,8 +5,8 @@ INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'conta
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
-INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciavoz.com');
-
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'contacto@puntoprensa.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -49,6 +49,9 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (94, 'Impacto Rápido'
 --Agencia 40
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (300, 'Fiesta del Mar', '2026-06-10', 40);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesquero', '2026-06-15', 40);
+-- Agencia 41
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (410, 'Foro Digital', '2026-07-01', 41);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (411, 'Cumbre Innovación', '2026-07-10', 41);
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
 -- Evento 10 (Final Copa Local) - tiene 2 reporteros asignados
@@ -134,6 +137,10 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (404, 301, 5, 'RECHAZADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (408, 301, 1, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (409, 301, 2, 'ACEPTADO', FALSE);
+
+-- Evento 410
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (500, 410, 1, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (501, 410, 2, 'ACEPTADO', FALSE);
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');

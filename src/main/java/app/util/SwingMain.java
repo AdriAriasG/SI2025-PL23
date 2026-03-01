@@ -18,6 +18,7 @@ import app.dto.AgenciaDTO;
 import app.dto.ReporteroDTO;
 import app.dto.EmpresaComunicacionDTO;
 import app.model.LoginModel;
+import app.model.ModificarOfrecimientoModel;
 import app.model.AsignacionModel;
 import app.model.DistribuirReportajeModel;
 import app.model.InformeModel;
@@ -26,11 +27,13 @@ import app.view.AsignacionView;
 import app.view.DistribuirReportajeView;
 import app.view.AsignacionEdicionView;
 import app.view.InformeView;
+import app.view.ModificarOfrecimientoView;
 import app.view.OfrecerReportajesView;
 import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
 import app.controller.DistribuirReportajeController;
 import app.controller.InformeController;
+import app.controller.ModificarOfrecimientoController;
 import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
@@ -271,11 +274,17 @@ public class SwingMain {
             OfrecerReportajesView view = new OfrecerReportajesView();
             new OfrecerReportajesController(model, view, agenciaSeleccionada);
         }
-        // HU #33541: Ofrecer reportajes (IVAN)
+        // HU #33541: Distribuir reportajes (IVAN)
         else if (buttonText.contains("#33541")) {
         	DistribuirReportajeModel model = new DistribuirReportajeModel();
         	DistribuirReportajeView view = new DistribuirReportajeView();
         	new DistribuirReportajeController(model, view, agenciaSeleccionada);
+        }
+        // HU #33544: Modificar ofrecimientos reportajes (IVAN)
+        else if (buttonText.contains("#33544")) {
+        	ModificarOfrecimientoModel model = new ModificarOfrecimientoModel();
+        	ModificarOfrecimientoView view = new ModificarOfrecimientoView();
+        	new ModificarOfrecimientoController(model, view, agenciaSeleccionada);
         }
         // Resto de botones no implementados
         else {
