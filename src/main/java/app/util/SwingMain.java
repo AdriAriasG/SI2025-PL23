@@ -344,7 +344,7 @@ public class SwingMain {
 			app.model.OfrecimientosRecibidosModel modelOfr = new app.model.OfrecimientosRecibidosModel();
 			app.view.OfrecimientosRecibidosView viewOfr = new app.view.OfrecimientosRecibidosView();
 			app.controller.OfrecimientosRecibidosController controllerOfr =
-					new app.controller.OfrecimientosRecibidosController(modelOfr, viewOfr);
+					new app.controller.OfrecimientosRecibidosController(modelOfr, viewOfr, empresaSeleccionada.getId());
 			controllerOfr.initController();
 		}
 		// HU #33542: Acceder al reportaje (IRENE)
@@ -352,10 +352,17 @@ public class SwingMain {
 			app.model.AccesoReportajeModel modelRep = new app.model.AccesoReportajeModel();
 			app.view.AccesoReportajeView viewRep = new app.view.AccesoReportajeView();
 			app.controller.AccesoReportajeController controllerRep = 
-					new app.controller.AccesoReportajeController(viewRep, modelRep);    
+					new app.controller.AccesoReportajeController(viewRep, modelRep, empresaSeleccionada.getId());    
 			controllerRep.mostrarVista();
 		}
 		// HU #33546 y otros no implementados
+		else if (buttonText.contains("#33546")) {
+			app.model.ModificacionOfrecimientosRecibidosModel modelMod = new app.model.ModificacionOfrecimientosRecibidosModel();
+			app.view.ModificacionOfrecimientosRecibidosView viewMod = new app.view.ModificacionOfrecimientosRecibidosView();
+			app.controller.ModificacionOfrecimientosRecibidosController controllerMod = 
+					new app.controller.ModificacionOfrecimientosRecibidosController(modelMod, viewMod, empresaSeleccionada.getId());    
+			controllerMod.mostrarVista();
+		}
 		else {
 			javax.swing.JOptionPane.showMessageDialog(frame, 
 					"Acción no implementada: " + buttonText + "\nEmpresa seleccionada: " + empresaSeleccionada.getNombre());

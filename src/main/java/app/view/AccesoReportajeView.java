@@ -3,6 +3,7 @@ package app.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 
@@ -26,6 +27,9 @@ public class AccesoReportajeView {
     private JLabel lblTitulo;
     private JLabel lblSubtitulo;
     private JTextPane txtCuerpo;
+    private JLabel lblMensajeVacio;
+    private JScrollPane scrollTabla;
+    
     
 	
 	public 	AccesoReportajeView() {
@@ -53,8 +57,14 @@ public class AccesoReportajeView {
 	};
 	table = new JTable(model);
 	table.setRowHeight(25);
-	JScrollPane scrollTabla = new JScrollPane(table);
+	scrollTabla = new JScrollPane(table);
 	
+	lblMensajeVacio = new JLabel("No hay reportajes disponibles para esta empresa");
+	lblMensajeVacio.setHorizontalAlignment(JLabel.CENTER);
+	lblMensajeVacio.setVerticalAlignment(JLabel.CENTER);
+	lblMensajeVacio.setForeground(Color.GRAY);
+	lblMensajeVacio.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+	lblMensajeVacio.setPreferredSize(new Dimension(0,0));
 	//Visor del reportaje
 	JPanel panelVisor = new JPanel(new BorderLayout(10,10));
 	panelVisor.setBackground(Color.WHITE);
@@ -92,6 +102,20 @@ public class AccesoReportajeView {
 	
 	contentPane.add(splitPane, BorderLayout.CENTER);
 	
+    }
+    
+    public void mostrarMensajeVacio(boolean mostrar) {
+    	if(mostrar) {
+    		scrollTabla.setViewportView(lblMensajeVacio);
+    		scrollTabla.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    		scrollTabla.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+    	}else {
+    		scrollTabla.setViewportView(table);
+    		scrollTabla.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    		scrollTabla.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    	}
+    	scrollTabla.revalidate();
+    	scrollTabla.repaint();
     }
     
     public JFrame getFrame() {
