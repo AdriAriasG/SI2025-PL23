@@ -22,7 +22,6 @@ public class ModificarOfrecimientoController {
 
     private Integer idEventoSeleccionado = null;
 
-
     private Set<Integer> empresasOfrecer = new HashSet<>();
     private Set<Integer> empresasQuitar = new HashSet<>();
 
@@ -50,9 +49,7 @@ public class ModificarOfrecimientoController {
 
         view.getBtnAceptar().addActionListener(e -> guardarCambios());
 
-        view.getComboFiltro().addActionListener(e -> {
-            cargarEmpresas();
-        });
+        view.getComboFiltro().addActionListener(e -> cargarEmpresas());
 
         view.getBtnOfrecer().addActionListener(e -> ofrecerEmpresa());
 
@@ -92,6 +89,10 @@ public class ModificarOfrecimientoController {
         idEventoSeleccionado =
             (int) view.getTablaEventos().getValueAt(fila, 0);
 
+        // 🔹 Muy importante: resetear estado temporal al cambiar evento
+        empresasOfrecer.clear();
+        empresasQuitar.clear();
+
         cargarEmpresas();
     }
 
@@ -103,26 +104,26 @@ public class ModificarOfrecimientoController {
         }
 
         List<EmpresaComunicacionDTO> con =
-            model.getEmpresasConOfrecimiento(idEventoSeleccionado);
+            new ArrayList<>(model.getEmpresasConOfrecimiento(idEventoSeleccionado));
 
         List<EmpresaComunicacionDTO> sin =
-            model.getEmpresasSinOfrecimiento(idEventoSeleccionado);
+            new ArrayList<>(model.getEmpresasSinOfrecimiento(idEventoSeleccionado));
 
-        // Aplicar movimientos pendientes
+        // 🔹 Aplicar movimientos pendientes SIN duplicar
 
         for (Integer id : empresasOfrecer) {
-            EmpresaComunicacionDTO e = model.getEmpresaById(id);
-            if (e != null) {
-                con.add(e);
-                sin.removeIf(emp -> emp.getId() == id);
+            sin.removeIf(emp -> emp.getId() == id);
+            if (con.stream().noneMatch(emp -> emp.getId() == id)) {
+                EmpresaComunicacionDTO e = model.getEmpresaById(id);
+                if (e != null) con.add(e);
             }
         }
 
         for (Integer id : empresasQuitar) {
-            EmpresaComunicacionDTO e = model.getEmpresaById(id);
-            if (e != null) {
-                sin.add(e);
-                con.removeIf(emp -> emp.getId() == id);
+            con.removeIf(emp -> emp.getId() == id);
+            if (sin.stream().noneMatch(emp -> emp.getId() == id)) {
+                EmpresaComunicacionDTO e = model.getEmpresaById(id);
+                if (e != null) sin.add(e);
             }
         }
 
@@ -134,10 +135,8 @@ public class ModificarOfrecimientoController {
 
         if (modoSin) {
 
-            // izquierda: TODAS las disponibles
             cargarTabla(view.getTablaDisponibles(), sin);
 
-            // derecha: SOLO las que estén en empresasOfrecer
             List<EmpresaComunicacionDTO> soloMovidas = new ArrayList<>();
             for (EmpresaComunicacionDTO e : con) {
                 if (empresasOfrecer.contains(e.getId())) {
@@ -149,10 +148,8 @@ public class ModificarOfrecimientoController {
 
         } else {
 
-            // derecha: TODAS las ofrecidas
             cargarTabla(view.getTablaOfrecidas(), con);
 
-            // izquierda: SOLO las que estén en empresasQuitar
             List<EmpresaComunicacionDTO> soloMovidas = new ArrayList<>();
             for (EmpresaComunicacionDTO e : sin) {
                 if (empresasQuitar.contains(e.getId())) {
@@ -173,8 +170,14 @@ public class ModificarOfrecimientoController {
 
         modelTabla.setRowCount(0);
 
+        // 🔹 Blindaje extra contra duplicados
+        Set<Integer> idsPintados = new HashSet<>();
+
         for (EmpresaComunicacionDTO e : datos) {
-            modelTabla.addRow(new Object[]{ e });
+            if (!idsPintados.contains(e.getId())) {
+                modelTabla.addRow(new Object[]{ e });
+                idsPintados.add(e.getId());
+            }
         }
     }
 
@@ -193,7 +196,6 @@ public class ModificarOfrecimientoController {
         empresasOfrecer.add(idEmpresa);
         empresasQuitar.remove(idEmpresa);
 
-
         cargarEmpresas();
     }
 
@@ -211,12 +213,12 @@ public class ModificarOfrecimientoController {
 
         if (model.tieneAccesoConcedido(idEventoSeleccionado, idEmpresa)) {
 
-        	javax.swing.JOptionPane.showMessageDialog(
-        		    view,
-        		    "No se puede quitar el ofrecimiento.\nLa empresa ya tiene acceso concedido al reportaje.",
-        		    "Operación no permitida",
-        		    javax.swing.JOptionPane.WARNING_MESSAGE
-        		);
+            javax.swing.JOptionPane.showMessageDialog(
+                view,
+                "No se puede quitar el ofrecimiento.\nLa empresa ya tiene acceso concedido al reportaje.",
+                "Operación no permitida",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
 
             return;
         }

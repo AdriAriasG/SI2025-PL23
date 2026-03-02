@@ -85,10 +85,15 @@ public class ModificarOfrecimientoModel {
             AND id_empresa = ?
         """;
 
-        List<Integer> res =
-            db.executeQueryArray(Integer.class, sql, idEvento, idEmpresa);
+        List<Object[]> res =
+            db.executeQueryArray(sql, idEvento, idEmpresa);
 
-        return !res.isEmpty() && res.get(0) == 1;
+        if (res.isEmpty()) {
+            return false;
+        }
+
+        Number value = (Number) res.get(0)[0];
+        return value.longValue() == 1;
     }
     public boolean estabaAceptadoSinAcceso(int idEvento, int idEmpresa) {
 
@@ -101,10 +106,15 @@ public class ModificarOfrecimientoModel {
             AND acceso_concedido = 0
         """;
 
-        List<Integer> res =
-            db.executeQueryArray(Integer.class, sql, idEvento, idEmpresa);
+        List<Object[]> res =
+            db.executeQueryArray(sql, idEvento, idEmpresa);
 
-        return !res.isEmpty() && res.get(0) > 0;
+        if (res.isEmpty()) {
+            return false;
+        }
+
+        Number count = (Number) res.get(0)[0];
+        return count.longValue() > 0;
     }
     
 }

@@ -140,4 +140,36 @@ public abstract class DbUtil {
 		} catch (SQLException e) {
 		}
 	}
+	
+	public <T> T executeQueryScalar(Class<T> type, String sql, Object... params) {
+	    Connection conn = null;
+	    try {
+	        conn = this.getConnection();
+	        QueryRunner runner = new QueryRunner();
+
+	        return runner.query(conn, sql, rs -> {
+	            if (rs.next()) {
+	                Object value = rs.getObject(1);
+
+	                if (value == null)
+	                    return null;
+
+	                if (type == Long.class)
+	                    return type.cast(((Number) value).longValue());
+
+	                if (type == Integer.class)
+	                    return type.cast(((Number) value).intValue());
+
+	                return type.cast(value);
+	            }
+	            return null;
+	        }, params);
+
+	    } catch (SQLException e) {
+	        throw new UnexpectedException(e);
+	    } finally {
+	        DbUtils.closeQuietly(conn);
+	    }
+	}
+	
 }
