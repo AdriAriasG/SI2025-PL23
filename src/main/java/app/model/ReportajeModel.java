@@ -33,6 +33,23 @@ public class ReportajeModel {
 		return db.executeQueryPojo(EventoDTO.class, sql, idReportero);
 	}
 
+	public List<VersionDTO> getVersiones(int idEvento) {
+		String sql = """
+				SELECT v.id,
+				v.subtitulo,
+				v.cuerpo,
+				v.fecha_hora,
+				v.cambios_realizados,
+				v.id_reportero_modificador
+				FROM VersionReportaje v
+				JOIN Reportaje r ON v.id_reportaje = r.id
+				WHERE r.id_evento = ?
+				ORDER BY v.id DESC
+				""";
+
+		return db.executeQueryPojo(VersionDTO.class, sql, idEvento);
+	}
+
 	public VersionDTO getVersionActual(int idEvento) {
 
 		String sql = """
@@ -197,6 +214,79 @@ public class ReportajeModel {
 			throw new ApplicationException("El evento ya tiene reportaje entregado");
 		}
 
+	}
+
+	public void restaurarVersion(int idEvento,
+			int idReportero,
+			int idVersionSeleccionada,
+			boolean restaurarSubtitulo,
+			boolean restaurarCuerpo) {
+
+		// Obtener reportaje
+		Integer idReportaje = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		// Validar autor
+		Integer autor = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id_reportero_autor FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (autor == null || !autor.equals(idReportero))
+			throw new ApplicationException("Solo el autor puede restaurar versiones");
+
+		VersionDTO actual = getVersionActual(idEvento);
+
+		VersionDTO seleccionada = db.executeQueryPojo(
+				VersionDTO.class,
+				"SELECT subtitulo, cuerpo FROM VersionReportaje WHERE id = ?",
+				idVersionSeleccionada
+				).stream().findFirst().orElse(null);
+
+		if (seleccionada == null)
+			throw new ApplicationException("Versión no encontrada");
+
+		// Determinar contenido final
+		String nuevoSubtitulo = restaurarSubtitulo ?
+				seleccionada.getSubtitulo() :
+					actual.getSubtitulo();
+
+		String nuevoCuerpo = restaurarCuerpo ?
+				seleccionada.getCuerpo() :
+					actual.getCuerpo();
+
+		if (nuevoSubtitulo.equals(actual.getSubtitulo()) &&
+				nuevoCuerpo.equals(actual.getCuerpo())) {
+			throw new ApplicationException("No hay cambios para restaurar");
+		}
+
+		String cambios;
+
+		if (restaurarSubtitulo && restaurarCuerpo)
+			cambios = "Restauración de subtítulo y cuerpo";
+		else if (restaurarSubtitulo)
+			cambios = "Restauración de subtítulo";
+		else
+			cambios = "Restauración de cuerpo";
+
+		String insert = """
+				INSERT INTO VersionReportaje
+				(id_reportaje, subtitulo, cuerpo, fecha_hora,
+				cambios_realizados, id_reportero_modificador)
+				VALUES (?, ?, ?, ?, ?, ?)
+				""";
+
+		db.executeUpdate(insert,
+				idReportaje,
+				nuevoSubtitulo,
+				nuevoCuerpo,
+				LocalDateTime.now().toString(),
+				cambios,
+				idReportero);
 	}
 
 

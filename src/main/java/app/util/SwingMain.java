@@ -21,7 +21,9 @@ import app.model.LoginModel;
 import app.model.AsignacionModel;
 import app.model.ReportajeModel;
 import app.view.ReportajeView;
+import app.view.RestaurarVersionView;
 import app.controller.ReportajeController;
+import app.controller.RestaurarVersionController;
 import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
 import app.model.DistribuirReportajeModel;
 import app.model.OfrecerReportajesModel;
@@ -313,6 +315,8 @@ public class SwingMain {
 			
 			new ReportajeController(model, view, idReportero);
 		}
+		
+		// HU #33545: Modificar entrega
 		else if (buttonText.contains("#33545")){
 			ReportajeModel model = new ReportajeModel();
 			ModificarEntregaView view = new ModificarEntregaView();
@@ -320,6 +324,16 @@ public class SwingMain {
 			new ModificarEntregaController(model, view, reporteroSeleccionado.getId());
 			
 		}
+		
+		// HU #33547: Restaurar version previa
+		else if (buttonText.contains("#33547")) {
+			ReportajeModel model = new ReportajeModel();
+			RestaurarVersionView view = new RestaurarVersionView();
+			
+			new RestaurarVersionController(model, view, reporteroSeleccionado.getId());
+			
+		}
+		
 		else {
 			// HU #33545, #33547 - Por implementar
 			javax.swing.JOptionPane.showMessageDialog(frame, 
