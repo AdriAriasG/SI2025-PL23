@@ -6,7 +6,7 @@ INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
-INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'contacto@puntoprensa.com');
+INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -86,20 +86,20 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (300, 200);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (301, 201);
 
 -- EmpresaComunicacion
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (1, 'TeleCable');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (2, 'El Diario');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (3, 'Radio Voz');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (4, 'Canal Noticias');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (5, 'Prensa Digital');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (6, 'Emisora Central');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (110, 'VozTV');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (111, 'Voz Diario');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (112, 'Voz Radio');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (113, 'Voz Digital');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (114, 'Voz Streaming');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (115, 'Voz Internacional');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (116, 'Voz Deportes');
-INSERT INTO EmpresaComunicacion (id, nombre) VALUES (117, 'Voz Cultura');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (1, 'TeleCable', 'contacto@telecable.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (2, 'El Diario', 'redaccion@eldiario.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (3, 'Radio Voz', 'info@radiovoz.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (4, 'Canal Noticias', 'noticias@canalnoticias.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (5, 'Prensa Digital', 'editorial@prensadigital.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (6, 'Emisora Central', 'contacto@emisoracentral.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (110, 'VozTV', 'contacto@voztv.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (111, 'Voz Diario', 'redaccion@vozdiario.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (112, 'Voz Radio', 'info@vozradio.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (113, 'Voz Digital', 'editor@vozdigital.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (114, 'Voz Streaming', 'streaming@vozstreaming.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacional', 'internacional@vozmedia.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
 
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos

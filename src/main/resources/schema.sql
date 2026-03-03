@@ -61,7 +61,8 @@ CREATE TABLE VersionReportaje (
 
 CREATE TABLE EmpresaComunicacion (
     id INT PRIMARY KEY NOT NULL,
-    nombre VARCHAR(255) NOT NULL
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Ofrecimiento (

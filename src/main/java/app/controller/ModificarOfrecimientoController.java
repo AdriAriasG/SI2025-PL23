@@ -12,6 +12,7 @@ import app.dto.AgenciaDTO;
 import app.dto.EmpresaComunicacionDTO;
 import app.dto.EventoDTO;
 import app.model.ModificarOfrecimientoModel;
+import app.util.EmailService;
 import app.view.ModificarOfrecimientoView;
 
 public class ModificarOfrecimientoController {
@@ -71,8 +72,49 @@ public class ModificarOfrecimientoController {
             model.ofrecerEmpresa(idEventoSeleccionado, id);
         }
 
-        for (Integer id : empresasQuitar) {
-            model.quitarOfrecimiento(idEventoSeleccionado, id);
+        // 2️⃣ Quitar ofrecimientos
+        for (Integer idEmpresa : empresasQuitar) {
+
+            // Comprobar antes de borrar si estaba ACEPTADO sin acceso
+            boolean notificar =
+                model.estabaAceptadoSinAcceso(idEventoSeleccionado, idEmpresa);
+
+            // Borrar ofrecimiento
+            model.quitarOfrecimiento(idEventoSeleccionado, idEmpresa);
+
+            // Si procede → enviar email
+            if (notificar) {
+
+                String emailAgencia =
+                    model.getEmailAgencia(agenciaSeleccionada.getId());
+
+                String emailEmpresa =
+                    model.getEmailEmpresa(idEmpresa);
+
+                String nombreEvento =
+                    model.getNombreEvento(idEventoSeleccionado);
+
+                if (emailEmpresa != null && emailAgencia != null) {
+
+                    EmailService emailService =
+                        new EmailService(emailAgencia, "ehpxhktyjwyfkjmm");
+
+                    String asunto = "Cancelación de ofrecimiento";
+
+                    String cuerpo =
+                        "Estimados,\n\n" +
+                        "La agencia " + agenciaSeleccionada.getNombre() +
+                        " ha cancelado el ofrecimiento del reportaje del evento '" +
+                        nombreEvento + "'.\n\nUn saludo.";
+
+                    emailService.enviarEmail(
+                        emailEmpresa,
+                        asunto,
+                        cuerpo,
+                        emailAgencia
+                    );
+                }
+            }
         }
 
         empresasOfrecer.clear();
