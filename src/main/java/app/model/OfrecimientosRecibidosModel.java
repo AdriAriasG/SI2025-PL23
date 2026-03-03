@@ -9,13 +9,14 @@ public class OfrecimientosRecibidosModel {
 	private Database db = new Database();
 	
 
-	public List<OfrecimientoDTO> getOfrecimientos(){
+	public List<OfrecimientoDTO> getOfrecimientos(int idEmpresa){
 		String sql = "SELECT o.id, e.nombre, e.fecha, o.estado " +
                 "FROM Ofrecimiento o " +
                 "JOIN Evento e ON o.id_evento = e.id " +
+                "WHERE o.id_empresa = ? " +
                 "ORDER BY e.fecha DESC";
 		
-		return db.executeQueryPojo(OfrecimientoDTO.class, sql);
+		return db.executeQueryPojo(OfrecimientoDTO.class, sql, idEmpresa);
 		
 	}
 	

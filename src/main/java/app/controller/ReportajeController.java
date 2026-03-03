@@ -37,16 +37,15 @@ public class ReportajeController {
 	}
 
 	private void cargarEventosPendientes() {
-		String[] columnas = {"id", "nombre", "fecha"};
-		
-		listaEventos = model.getEventosPendientes(idReportero);
-		
-		view.getTablaEventos().setModel(
-				SwingUtil.getTableModelFromPojos(listaEventos, columnas));
-		
-		SwingUtil.autoAdjustColumns(view.getTablaEventos());
+	    String[] columnas = {"id", "nombre", "fecha"};
+	    
+	    listaEventos = model.getEventosAsignados(idReportero, true);
+	    
+	    view.getTablaEventos().setModel(
+	            SwingUtil.getTableModelFromPojos(listaEventos, columnas));
+	    
+	    SwingUtil.autoAdjustColumns(view.getTablaEventos());
 	}
-	
 	
 	private void entregarReportaje() {
 		int fila = view.getTablaEventos().getSelectedRow();

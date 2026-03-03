@@ -22,10 +22,12 @@ public class AccesoReportajeController {
 	private AccesoReportajeView view;
 	private AccesoReportajeModel model;
 	private List<ReportajeDTO> reportajesActuales;
+	private int idEmpresa;
 	
-	public AccesoReportajeController(AccesoReportajeView view, AccesoReportajeModel model){
+	public AccesoReportajeController(AccesoReportajeView view, AccesoReportajeModel model, int idEmpresa){
 		this.view = view;
 		this.model = model;
+		this.idEmpresa = idEmpresa;
 		this.initController();
 	}
 	
@@ -50,20 +52,28 @@ public class AccesoReportajeController {
 	
 	
 	public void cargarTabla(){
-		reportajesActuales = model.getReportajesConAcceso();
+		reportajesActuales = model.getReportajesConAcceso(this.idEmpresa);
 		view.getModel().setRowCount(0);
 		
-		for(ReportajeDTO r: reportajesActuales) {
-			view.getModel().addRow(new Object[] {
-					r.getNombreEvento(),
-					r.getFecha()
-			});
+		if(reportajesActuales.isEmpty()) {
+			view.mostrarMensajeVacio(true);
+		}
+		else {
+			
+			view.mostrarMensajeVacio(false);
+			
+			for(ReportajeDTO r: reportajesActuales) {
+				view.getModel().addRow(new Object[] {
+						r.getNombreEvento(),
+						r.getFecha()
+				});
+			}
 		}
 	}
 	
 	private void actualizarVisor() {
 		int fila = view.getTable().getSelectedRow();
-		if (fila != 1) {
+		if (fila != -1) {
 			ReportajeDTO seleccionado = reportajesActuales.get(fila);
 			view.actualizarReportaje(
 					seleccionado.getTitulo(),

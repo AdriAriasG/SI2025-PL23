@@ -4,9 +4,14 @@
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
+
+INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (16, 'Agencia Estrella', 'contacto@estrella.com');
+
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
+
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
+
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -21,12 +26,17 @@ INSERT INTO Reportero (id, nombre, id_agencia) VALUES (7, 'Javier Torres', 2);
 -- Agencia 3
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (8, 'Sofia Ruiz', 3);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (9, 'Diego Moreno', 3);
+-- Agencia 16
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (16, 'Javier Rodríguez', 16);
+INSERT INTO Reportero (id, nombre, id_agencia) VALUES (17, 'Francisco Pérez', 16);
+
 -- Agencia 39
 INSERT INTO Reportero(id, nombre, id_agencia) VALUES(90, 'Reportero Luis', 39);
 INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
 -- Agencia 40
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (200, 'Luis Castro', 40);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40);
+
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
@@ -42,6 +52,10 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (22, 'Cumbre Empresari
 -- Agencia 3
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (30, 'Exposicion Internacional', '2026-03-12', 3);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (31, 'Campeonato Natacion', '2026-03-18', 3);
+--Agencia 16
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (76, 'Concierto Jazz', '2026-04-10', 16);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (77, 'Concierto Blues', '2026-04-12', 16);
+
 -- Agencia 39
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (92, 'Punto de Partida', '2026-05-08', 39);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (93, 'Impacto Cero', '2026-05-12', 39);
@@ -49,9 +63,13 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (94, 'Impacto Rápido'
 --Agencia 40
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (300, 'Fiesta del Mar', '2026-06-10', 40);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesquero', '2026-06-15', 40);
+
 -- Agencia 41
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (410, 'Foro Digital', '2026-07-01', 41);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (411, 'Cumbre Innovación', '2026-07-10', 41);
+
+
+
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
 -- Evento 10 (Final Copa Local) - tiene 2 reporteros asignados
@@ -75,6 +93,10 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (22, 7);
 -- Agencia 3
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (30, 8);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (31, 9);
+
+-- Agencia 16
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (76,1);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (77,1);
 
 -- Agencia 39
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (92, 90);
@@ -100,6 +122,8 @@ INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (114, 'Voz Streaming'
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacional', 'internacional@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
+
+
 
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos
