@@ -1,5 +1,7 @@
 package app.dto;
 
+import java.util.List;
+
 public class ReportajeDTO {
 	
 	private String titulo;
@@ -8,6 +10,8 @@ public class ReportajeDTO {
 	private int version;
 	private String nombreEvento;
 	private String fecha;
+	private List<String> archivosMultimedia;
+
 	
 	public ReportajeDTO() {}
 	
@@ -28,5 +32,8 @@ public class ReportajeDTO {
 	
 	public String getFecha() {return fecha;}
 	public void setFecha(String fecha) {this.fecha = fecha;}
+
+    public java.util.List<String> getArchivosMultimedia() { return archivosMultimedia; }
+    public void setArchivosMultimedia(java.util.List<String> archivos) { this.archivosMultimedia = archivos; }
 	
 }

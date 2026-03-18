@@ -32,22 +32,23 @@ public class AccesoReportajeController {
 	}
 	
 	public void initController() {
-		cargarTabla();
-		
-		view.getTable().getSelectionModel().addListSelectionListener(e->{
-			if(!e.getValueIsAdjusting()) {
-				actualizarVisor();
-			}
-		});
-		
-		view.getTxtCuerpo().addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 2) {
-					abrirZoom();
-				}
-			}
-		});	
+	    // 1. Cargar los datos iniciales en la tabla
+	    cargarTabla();
+
+	    // 2. Configurar el listener del botón de descarga JSON
+	    configurarBotonDescarga();
+
+	    // 3. Configurar el listener de selección de la tabla
+	    // Este permite que al pinchar en una fila se muestre el contenido a la derecha
+	    view.getTable().getSelectionModel().addListSelectionListener(e -> {
+	        // getValueIsAdjusting() evita que el evento se dispare dos veces (al pulsar y al soltar)
+	        if (!e.getValueIsAdjusting()) {
+	            actualizarVisor();
+	        }
+	    });
+
+	    // 4. Hacer visible la ventana (si no se hace en el SwingMain)
+	    view.getFrame().setVisible(true);
 	}
 	
 	
@@ -72,15 +73,17 @@ public class AccesoReportajeController {
 	}
 	
 	private void actualizarVisor() {
-		int fila = view.getTable().getSelectedRow();
-		if (fila != -1) {
-			ReportajeDTO seleccionado = reportajesActuales.get(fila);
-			view.actualizarReportaje(
-					seleccionado.getTitulo(),
-					seleccionado.getSubtitulo(),
-					seleccionado.getCuerpo());
-		}
-	}
+        int fila = view.getTable().getSelectedRow();
+        if (fila != -1) {
+            ReportajeDTO seleccionado = reportajesActuales.get(fila);
+            // Pasamos los 4 parámetros: titulo, subtitulo, cuerpo y la LISTA de archivos
+            view.actualizarReportaje(
+                    seleccionado.getTitulo(),
+                    seleccionado.getSubtitulo(),
+                    seleccionado.getCuerpo(),
+                    seleccionado.getArchivosMultimedia());
+        }
+    }
 	
 	private void abrirZoom() {
 		int fila = view.getTable().getSelectedRow();
@@ -121,6 +124,62 @@ public class AccesoReportajeController {
 
 	    // 5. Mostrar
 	    dialogZoom.setVisible(true);
+	}
+	
+	
+	private void configurarBotonDescarga() {
+	    view.getBtnDescargarJSON().addActionListener(e -> {
+	        int fila = view.getTable().getSelectedRow();
+	        if (fila == -1) {
+	            JOptionPane.showMessageDialog(view.getFrame(), "Por favor, selecciona un reportaje de la lista.");
+	            return;
+	        }
+
+	        ReportajeDTO sel = reportajesActuales.get(fila);
+	        
+	        // 1. Construcción manual del JSON
+	        StringBuilder json = new StringBuilder();
+	        json.append("{\n");
+	        json.append("  \"evento\": \"").append(sel.getNombreEvento()).append("\",\n");
+	        json.append("  \"fecha\": \"").append(sel.getFecha()).append("\",\n");
+	        json.append("  \"titulo\": \"").append(sel.getTitulo()).append("\",\n");
+	        json.append("  \"subtitulo\": \"").append(sel.getSubtitulo()).append("\",\n");
+	        // Escapamos los saltos de línea del cuerpo para que el JSON sea válido
+	        String cuerpoEscapado = sel.getCuerpo().replace("\"", "\\\"").replace("\n", "\\n");
+	        json.append("  \"cuerpo\": \"").append(cuerpoEscapado).append("\",\n");
+	        
+	        json.append("  \"multimedia\": [\n");
+	        for (int i = 0; i < sel.getArchivosMultimedia().size(); i++) {
+	            json.append("    \"").append(sel.getArchivosMultimedia().get(i)).append("\"");
+	            if (i < sel.getArchivosMultimedia().size() - 1) json.append(",");
+	            json.append("\n");
+	        }
+	        json.append("  ]\n");
+	        json.append("}");
+
+	        // 2. Diálogo para guardar el archivo
+	        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+	        fileChooser.setDialogTitle("Guardar Reportaje como JSON");
+	        // Nombre por defecto sugerido
+	        String nombreSugerido = "reportaje_" + sel.getNombreEvento().replaceAll("\\s+", "_") + ".json";
+	        fileChooser.setSelectedFile(new java.io.File(nombreSugerido));
+
+	        if (fileChooser.showSaveDialog(view.getFrame()) == javax.swing.JFileChooser.APPROVE_OPTION) {
+	            java.io.File archivoDestino = fileChooser.getSelectedFile();
+	            
+	            // Asegurar que tenga extensión .json
+	            if (!archivoDestino.getName().toLowerCase().endsWith(".json")) {
+	                archivoDestino = new java.io.File(archivoDestino.getAbsolutePath() + ".json");
+	            }
+
+	            try (java.io.FileWriter writer = new java.io.FileWriter(archivoDestino)) {
+	                writer.write(json.toString());
+	                JOptionPane.showMessageDialog(view.getFrame(), "Reportaje exportado correctamente en:\n" + archivoDestino.getName());
+	            } catch (java.io.IOException ex) {
+	                JOptionPane.showMessageDialog(view.getFrame(), "Error al escribir el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	            }
+	        }
+	    });
 	}
 	
 	public void mostrarVista() {
