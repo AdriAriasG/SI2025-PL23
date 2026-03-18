@@ -221,30 +221,30 @@ INSERT INTO Tematica (id, nombre) VALUES (4, 'Sociedad');
 INSERT INTO Tematica (id, nombre) VALUES (5, 'Economia');
 
 -- EventoTematica (Asignar temáticas a eventos)
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (10, 1); -- Final Copa Local -> Deportes
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (11, 2); -- Inauguracion Museo Arte -> Cultura
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (12, 3); -- Conferencia Tecnologica -> Tecnologia
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (13, 1); -- Maraton Ciudad -> Deportes
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 2); -- Festival de Cine -> Cultura
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2); -- Concierto Rock -> Cultura
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5); -- Cumbre Empresarial -> Economia
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4); -- Fiesta del Mar -> Sociedad
-INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5); -- Congreso Pesquero -> Economia
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (10, 1);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (11, 2);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (12, 3);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (13, 1);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 2);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5);
 
 -- ReporteroTematica (Asignar temáticas a reporteros)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1); -- Carlos (Deportes)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (2, 1); -- Laura (Deportes)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (3, 2); -- Miguel (Cultura)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (4, 1); -- Ana (Deportes)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (5, 2); -- Pedro (Cultura)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (7, 5); -- Javier (Economia)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (2, 1);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (3, 2);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (4, 1);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (5, 2);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (7, 5);
 
 -- EmpresaTematica (Asignar temáticas a empresas)
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (116, 1); -- Voz Deportes (Deportes)
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (117, 2); -- Voz Cultura (Cultura)
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (1, 1); -- TeleCable (Deportes)
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2); -- El Diario (Cultura)
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3); -- Prensa Digital (Tecnologia)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (116, 1);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (117, 2);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (1, 1);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3);
 
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
@@ -254,8 +254,8 @@ UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 5;
 -- Insertar reporteros Freelance (id_agencia es NULL)
 INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (500, 'Freelance Juan', 'BASE', NULL);
 INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (501, 'Freelance Maria', 'GRAFICO', NULL);
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (500, 1); -- Juan (Deportes)
-INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2); -- Maria (Cultura)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (500, 1);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2);
 
 -- DecisionFreelance (HU #34070)
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 500, 'INTERESADO');
@@ -278,10 +278,10 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (13, 1);
 INSERT INTO RevisionReportaje (id_reportaje, id_reportero, comentario, estado) VALUES (5, 1, 'Falta incluir resultados', 'PENDIENTE');
 
 -- Precios y estado de descarga en Ofrecimientos (HU #34067, #34072, #34073)
-UPDATE Ofrecimiento SET precio = 150.0, descargado = TRUE WHERE id = 2; -- Evento 10, Empresa 2, ACEPTADO
-UPDATE Ofrecimiento SET precio = 200.0, descargado = FALSE WHERE id = 4; -- Evento 10, Empresa 4, ACEPTADO
-UPDATE Ofrecimiento SET precio = 100.0 WHERE id = 1; -- PENDIENTE
-UPDATE Ofrecimiento SET precio = 300.0 WHERE id = 400; -- ACEPTADO, FALSE
-UPDATE Ofrecimiento SET precio = 50.0 WHERE id = 5; -- PENDIENTE
-UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6; -- ACEPTADO
-UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9; -- ACEPTADO
+UPDATE Ofrecimiento SET precio = 150.0, descargado = TRUE WHERE id = 2;
+UPDATE Ofrecimiento SET precio = 200.0, descargado = FALSE WHERE id = 4;
+UPDATE Ofrecimiento SET precio = 100.0 WHERE id = 1;
+UPDATE Ofrecimiento SET precio = 300.0 WHERE id = 400;
+UPDATE Ofrecimiento SET precio = 50.0 WHERE id = 5;
+UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6;
+UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9;

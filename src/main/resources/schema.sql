@@ -26,7 +26,7 @@ CREATE TABLE Reportero (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(255) NOT NULL,
     tipo VARCHAR(20) CHECK (tipo IN ('GRAFICO', 'CAMAROGRAFO', 'BASE')) DEFAULT 'BASE',
-    id_agencia INTEGER, -- Nullable para Freelance
+    id_agencia INTEGER,
     FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id)
 );
 
