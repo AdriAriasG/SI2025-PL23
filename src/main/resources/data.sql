@@ -40,11 +40,11 @@ INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40)
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (11, 'Inauguracion Museo Arte', '2026-03-05', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (12, 'Conferencia Tecnologica', '2026-03-10', 1);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (11, 'Inauguracion Museo Arte', '2026-03-01', 1);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (12, 'Conferencia Tecnologica', '2026-03-01', 1);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (13, 'Maraton Ciudad', '2026-03-15', 1);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (14, 'Festival de Cine', '2026-03-20', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (15, 'Concierto Sinfonico', '2026-04-01', 1);
+INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (15, 'Concierto Sinfonico', '2026-03-01', 1);
 -- Agencia 2
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (20, 'Concierto Rock Festival', '2026-03-01', 2);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (21, 'Feria de Abril', '2026-04-15', 2);
@@ -208,3 +208,80 @@ VALUES (6, 3, 'Celebrities en la alfombra roja', 'Las grandes estrellas del cine
 -- Reportaje 4 - 1 version
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) 
 VALUES (7, 4, 'Mil personas vibraron con el rock', 'El Concierto Rock Festival reunio a mil personas que disfrutaron de una noche inolvidable con las mejores bandas del momento.', '2026-03-02 01:00:00', 'Version inicial', 5);
+
+-- ---------------------------------------------------------
+-- NUEVOS DATOS SPRINT 2
+-- ---------------------------------------------------------
+
+-- Tematicas (HU #34060, #34063, #34064, #34070)
+INSERT INTO Tematica (id, nombre) VALUES (1, 'Deportes');
+INSERT INTO Tematica (id, nombre) VALUES (2, 'Cultura');
+INSERT INTO Tematica (id, nombre) VALUES (3, 'Tecnologia');
+INSERT INTO Tematica (id, nombre) VALUES (4, 'Sociedad');
+INSERT INTO Tematica (id, nombre) VALUES (5, 'Economia');
+
+-- EventoTematica (Asignar temáticas a eventos)
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (10, 1); -- Final Copa Local -> Deportes
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (11, 2); -- Inauguracion Museo Arte -> Cultura
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (12, 3); -- Conferencia Tecnologica -> Tecnologia
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (13, 1); -- Maraton Ciudad -> Deportes
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 2); -- Festival de Cine -> Cultura
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2); -- Concierto Rock -> Cultura
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5); -- Cumbre Empresarial -> Economia
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4); -- Fiesta del Mar -> Sociedad
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5); -- Congreso Pesquero -> Economia
+
+-- ReporteroTematica (Asignar temáticas a reporteros)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1); -- Carlos (Deportes)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (2, 1); -- Laura (Deportes)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (3, 2); -- Miguel (Cultura)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (4, 1); -- Ana (Deportes)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (5, 2); -- Pedro (Cultura)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (7, 5); -- Javier (Economia)
+
+-- EmpresaTematica (Asignar temáticas a empresas)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (116, 1); -- Voz Deportes (Deportes)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (117, 2); -- Voz Cultura (Cultura)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (1, 1); -- TeleCable (Deportes)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2); -- El Diario (Cultura)
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3); -- Prensa Digital (Tecnologia)
+
+-- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
+UPDATE Reportero SET tipo = 'CAMAROGRAFO' WHERE id = 2;
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 5;
+
+-- Insertar reporteros Freelance (id_agencia es NULL)
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (500, 'Freelance Juan', 'BASE', NULL);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (501, 'Freelance Maria', 'GRAFICO', NULL);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (500, 1); -- Juan (Deportes)
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2); -- Maria (Cultura)
+
+-- DecisionFreelance (HU #34070)
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 500, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (11, 501, 'DUDOSO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (12, 500, 'NO_INTERESADO');
+
+-- Multimedia (HU #34061, #34062)
+-- Reportaje 1 (Final Copa Local), autor 1
+INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (1, 1, '/media/copa_foto1.jpg', 'IMAGEN', 'DEFINITIVO');
+INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (1, 1, '/media/copa_video1.mp4', 'VIDEO', 'BORRADOR');
+-- Reportaje 2, autor 3
+INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (2, 3, '/media/museo.jpg', 'IMAGEN', 'DEFINITIVO');
+
+-- RevisionReportaje y Cambio de Estado (HU #34065, #34066)
+-- Creamos un reportaje nuevo en revisión
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado) VALUES (5, 13, 4, 'Maraton en la ciudad', 'EN_REVISION');
+INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (8, 5, 'Gran participacion', 'Miles de corredores', '2026-03-15 14:00:00', 'Version inicial', 4);
+-- Asignamos otro reportero al evento 13 para que lo revise
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (13, 1);
+INSERT INTO RevisionReportaje (id_reportaje, id_reportero, comentario, estado) VALUES (5, 1, 'Falta incluir resultados', 'PENDIENTE');
+
+-- Precios y estado de descarga en Ofrecimientos (HU #34067, #34072, #34073)
+UPDATE Ofrecimiento SET precio = 150.0, descargado = TRUE WHERE id = 2; -- Evento 10, Empresa 2, ACEPTADO
+UPDATE Ofrecimiento SET precio = 200.0, descargado = FALSE WHERE id = 4; -- Evento 10, Empresa 4, ACEPTADO
+UPDATE Ofrecimiento SET precio = 100.0 WHERE id = 1; -- PENDIENTE
+UPDATE Ofrecimiento SET precio = 300.0 WHERE id = 400; -- ACEPTADO, FALSE
+UPDATE Ofrecimiento SET precio = 50.0 WHERE id = 5; -- PENDIENTE
+UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6; -- ACEPTADO
+UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9; -- ACEPTADO

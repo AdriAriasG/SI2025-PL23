@@ -1,0 +1,90 @@
+1.Agencia de Prensa:
+	-id: INTEGER
+	-nombre: VARCHAR(255)
+	-email: VARCHAR(255)
+
+2. Reportero:
+	-id: INTEGER
+	-nombre: VARCHAR(255)
+	-id_agencia: INTEGER (Foreign Key)
+	-tipo: VARCHAR(50) (ej. 'grafico', 'camarografo', 'base')
+	-es_freelance: BOOLEAN
+
+3. Evento:
+	-id: INTEGER (Primary Key)
+	-nombre: VARCHAR(255)
+	-fecha: DATE
+	-id_agencia: INTEGER (Foreign Key)
+
+4. Asignacion:
+	-id_evento: INTEGER (Foreign Key)
+	-id_reportero: INTEGER (Foreign Key)
+
+5. Reportaje:
+	-id: INTEGER (Primary Key)
+	-id_evento: INTEGER (Foreign Key)
+	-id_reportero_autor: INTEGER (Foreign Key)
+	-titulo: VARCHAR(255)
+	-estado: VARCHAR(50) (ej. 'borrador', 'en_revision', 'finalizado')
+
+6. VersionReportaje:
+	-id: INTEGER (Primary Key)
+	-id_reportaje: INTEGER (Foreign Key)
+	-subtitulo: VARCHAR(255)
+	-cuerpo: TEXT
+	-fecha_hora: DATETIME
+	-cambios_realizados: TEXT
+	-id_reportero_modificador: INTEGER (Foreign Key)
+
+7. EmpresaComunicacion:
+	-id: INTEGER (Primary Key)
+	-nombre: VARCHAR(255)
+
+8. Ofrecimiento:
+	-id: INTEGER (Primary Key)
+	-id_evento: INTEGER (Foreign Key)
+	-id_empresa: INTEGER (Foreign Key)
+	-estado: VARCHAR(50) (ej. 'pendiente', 'aceptado', 'rechazado')
+	-acceso_concedido: BOOLEAN
+	-precio: DECIMAL(10,2)
+	-descargado: BOOLEAN
+
+9. Tematica:
+	-id: INTEGER (Primary Key)
+	-nombre: VARCHAR(100) (Unique)
+
+10. EventoTematica:
+	-id_evento: INTEGER (Foreign Key)
+	-id_tematica: INTEGER (Foreign Key)
+
+11. ReporteroTematica:
+	-id_reportero: INTEGER (Foreign Key)
+	-id_tematica: INTEGER (Foreign Key)
+
+12. EmpresaTematica:
+	-id_empresa: INTEGER (Foreign Key)
+	-id_tematica: INTEGER (Foreign Key)
+
+13. RevisionReportaje:
+	-id: INTEGER (Primary Key)
+	-id_reportaje: INTEGER (Foreign Key)
+	-id_reportero_revisor: INTEGER (Foreign Key)
+	-comentario: TEXT
+	-estado: VARCHAR(50) (ej. 'pendiente', 'finalizada')
+	-fecha_revision: DATETIME
+
+14. ElementoMultimedia:
+	-id: INTEGER (Primary Key)
+	-id_reportaje: INTEGER (Foreign Key)
+	-tipo: VARCHAR(50) (ej. 'imagen', 'video')
+	-ruta: VARCHAR(500)
+	-estado: VARCHAR(50) (ej. 'borrador', 'definitivo')
+	-id_reportero_autor: INTEGER (Foreign Key)
+	-fecha_alta: DATETIME
+	-UNIQUE (id_reportaje, ruta)
+
+15. InteresFreelanceEvento:
+	-id_evento: INTEGER (Foreign Key)
+	-id_reportero: INTEGER (Foreign Key)
+	-decision: VARCHAR(50) (ej. 'interesado', 'no_interesado', 'dudoso')
+	-fecha_decision: DATETIME
