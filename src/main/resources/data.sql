@@ -166,6 +166,10 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (500, 410, 1, 'PENDIENTE', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (501, 410, 2, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (600, 410, 3, 'ACEPTADO', TRUE);
+
+-- Evento 411
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (601, 411, 4, 'PENDIENTE', FALSE);
+
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
@@ -230,6 +234,9 @@ INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (410, 3); 
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (411, 5); 	
+
 
 -- ReporteroTematica (Asignar temáticas a reporteros)
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1);
@@ -245,6 +252,9 @@ INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (117, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (1, 1);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (3, 3);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (4, 5);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);   
 
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
