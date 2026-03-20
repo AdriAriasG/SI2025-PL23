@@ -122,6 +122,7 @@ INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (114, 'Voz Streaming'
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacional', 'internacional@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (118, 'Galicia Noticias', 'redaccion@galicianoticias.com');
 
 
 
@@ -155,6 +156,7 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (407, 300, 6, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (401, 300, 2, 'ACEPTADO', TRUE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (402, 300, 3, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, descargado, precio) VALUES (4100, 300, 118, 'ACEPTADO', TRUE, TRUE, 350.0);
 
 -- Evento 301
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (403, 301, 4, 'ACEPTADO', FALSE);

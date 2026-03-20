@@ -106,8 +106,8 @@ public class SwingMain {
 		addButtonAgencia("HU #33543: Modificar asignación (ADRIAN)");
 		addButtonAgencia("HU #33548: Informe de un evento (ADRIAN)");
 		addButtonAgencia("HU #33539: Ofrecer reportajes (IVAN)");
-		addButtonAgencia("HU #33544: Modificar ofrecimiento (IVAN)");
-		addButtonAgencia("HU #33541: Distribuir reportaje (IVAN)");
+		addButtonAgencia("Modificar ofrecimiento (IVAN)");
+		addButtonAgencia("Distribuir reportaje (IVAN)");
 
 		// --- REPORTERO (DIEGO) ---
 		addLabel("REPORTERO (Diego)");
@@ -287,13 +287,13 @@ public class SwingMain {
 			new OfrecerReportajesController(model, view, agenciaSeleccionada);
 		}
 		// HU #33541: Ofrecer reportajes (IVAN)
-		else if (buttonText.contains("#33541")) {
+		else if (buttonText.contains("Distribuir")) {
 			DistribuirReportajeModel model = new DistribuirReportajeModel();
 			DistribuirReportajeView view = new DistribuirReportajeView();
 			new DistribuirReportajeController(model, view, agenciaSeleccionada);
 		}
 		// HU #33544: Modificar ofrecimientos reportajes (IVAN)
-        else if (buttonText.contains("#33544")) {
+        else if (buttonText.contains("Modificar")) {
         	ModificarOfrecimientoModel model = new ModificarOfrecimientoModel();
         	ModificarOfrecimientoView view = new ModificarOfrecimientoView();
         	new ModificarOfrecimientoController(model, view, agenciaSeleccionada);
