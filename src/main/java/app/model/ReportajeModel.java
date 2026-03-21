@@ -198,6 +198,65 @@ public class ReportajeModel {
 				nuevoSubtituloNormalizado, nuevoCuerpoNormalizado, LocalDateTime.now().toString(), cambios, idReportero);
 	}
 
+
+	public void solicitarRevision(int idEvento, int idReportero) {
+
+		// Obtener reportaje
+		Integer idReportaje = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (idReportaje == null)
+			throw new ApplicationException("El evento no tiene reportaje entregado");
+
+		// Validar que es el autor
+		Integer autor = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id_reportero_autor FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (autor == null || !autor.equals(idReportero))
+			throw new ApplicationException("Solo el autor puede solicitar revisión");
+
+		// Validar que existe al menos una versión
+		Long numVersiones = db.executeQueryScalar(
+				Long.class,
+				"SELECT COUNT(*) FROM VersionReportaje WHERE id_reportaje = ?",
+				idReportaje
+				);
+
+		if (numVersiones == null || numVersiones == 0)
+			throw new ApplicationException("Debe existir al menos una versión para solicitar revisión");
+
+		// Comprobar estado actual
+		String estadoActual = db.executeQueryScalar(
+				String.class,
+				"SELECT estado FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if ("EN_REVISION".equals(estadoActual))
+			throw new ApplicationException("El reportaje ya está en revisión");
+
+		// Actualizar estado
+		db.executeUpdate(
+				"UPDATE Reportaje SET estado = 'EN_REVISION' WHERE id_evento = ?",
+				idEvento
+				);
+	}
+
+	public String getEstadoReportaje(int idEvento) {
+
+		return db.executeQueryScalar(
+				String.class,
+				"SELECT estado FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+	}
+
 	private void validarTituloUnico(String titulo) {
 		String sql = "SELECT COUNT(*) FROM Reportaje "
 				+ "WHERE titulo = ?";
@@ -375,25 +434,25 @@ public class ReportajeModel {
 	// eliminarMultimedia (solo si estado es BORRADOR y si el reportero es el autor)
 	public void eliminarMultimedia(int idMultimedia, int idReportero) {
 
-	    MultimediaDTO multimedia = db.executeQueryPojo(
-	            MultimediaDTO.class,
-	            "SELECT id, estado, id_autor AS idAutor FROM Multimedia WHERE id = ?",
-	            idMultimedia
-	    ).stream().findFirst().orElse(null);
+		MultimediaDTO multimedia = db.executeQueryPojo(
+				MultimediaDTO.class,
+				"SELECT id, estado, id_autor AS idAutor FROM Multimedia WHERE id = ?",
+				idMultimedia
+				).stream().findFirst().orElse(null);
 
-	    if (multimedia == null)
-	        throw new ApplicationException("Multimedia no encontrado");
+		if (multimedia == null)
+			throw new ApplicationException("Multimedia no encontrado");
 
-	    if (!multimedia.getIdAutor().equals(idReportero))
-	        throw new ApplicationException("Solo el autor puede eliminar");
+		if (!multimedia.getIdAutor().equals(idReportero))
+			throw new ApplicationException("Solo el autor puede eliminar");
 
-	    if (!multimedia.getEstado().equals("BORRADOR"))
-	        throw new ApplicationException("Solo se puede eliminar en estado BORRADOR");
+		if (!multimedia.getEstado().equals("BORRADOR"))
+			throw new ApplicationException("Solo se puede eliminar en estado BORRADOR");
 
-	    db.executeUpdate(
-	            "DELETE FROM Multimedia WHERE id = ?",
-	            idMultimedia
-	    );
+		db.executeUpdate(
+				"DELETE FROM Multimedia WHERE id = ?",
+				idMultimedia
+				);
 	}
 
 

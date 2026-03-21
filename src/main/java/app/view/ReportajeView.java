@@ -14,6 +14,9 @@ public class ReportajeView {
 
 	private JButton btnEntregar;
 	private JButton btnModificar;
+	
+	private JButton btnSolicitarRevision;
+	private JLabel lblEstado;
 
 	// Multimedia
 	private JTextField txtRuta;
@@ -77,6 +80,10 @@ public class ReportajeView {
 		txtSubtitulo = new JTextField();
 		txtCuerpo = new JTextArea(5, 20);
 
+		lblEstado = new JLabel("Estado: -");
+		lblEstado.setFont(new Font("Arial", Font.BOLD, 13));
+		lblEstado.setAlignmentX(Component.LEFT_ALIGNMENT);
+
 		panelReportaje.add(new JLabel("Título (no editable si existe reportaje)"));
 		panelReportaje.add(txtTitulo);
 
@@ -85,14 +92,21 @@ public class ReportajeView {
 
 		panelReportaje.add(new JLabel("Cuerpo"));
 		panelReportaje.add(new JScrollPane(txtCuerpo));
+		
+		panelReportaje.add(Box.createVerticalStrut(8));
+		panelReportaje.add(lblEstado);
 
 		JPanel panelBotones = new JPanel();
 		btnEntregar = new JButton("Entregar");
 		btnModificar = new JButton("Modificar");
+		btnSolicitarRevision = new JButton("Solicitar revisión");
+
 		btnModificar.setVisible(false);
+		btnSolicitarRevision.setVisible(false);
 
 		panelBotones.add(btnEntregar);
 		panelBotones.add(btnModificar);
+		panelBotones.add(btnSolicitarRevision);
 
 		panelReportaje.add(Box.createVerticalStrut(10));
 		panelReportaje.add(panelBotones);
@@ -173,6 +187,9 @@ public class ReportajeView {
 	public JButton getBtnAñadirMultimedia() { return btnAñadirMultimedia; }
 	public JButton getBtnCambiarEstado() { return btnCambiarEstado; }
 	public JButton getBtnEliminar() { return btnEliminar; }
+	
+	public JButton getBtnSolicitarRevision() { return btnSolicitarRevision; }
+	public JLabel getLblEstado() { return lblEstado; }
 
 	public JRadioButton getRbImagen() { return rbImagen; }
 	public JRadioButton getRbVideo() { return rbVideo; }
@@ -191,5 +208,16 @@ public class ReportajeView {
 		tablaMultimedia.setEnabled(habilitar);
 		btnCambiarEstado.setEnabled(habilitar);
 		btnEliminar.setEnabled(habilitar);
+	}
+	
+	public void actualizarEstado(String estado) {
+
+	    lblEstado.setText("Estado: " + estado);
+
+	    if ("EN_REVISION".equals(estado)) {
+	        lblEstado.setForeground(Color.RED);
+	    } else {
+	        lblEstado.setForeground(new Color(0, 128, 0)); // verde
+	    }
 	}
 }

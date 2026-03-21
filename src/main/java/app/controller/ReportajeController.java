@@ -60,6 +60,11 @@ public class ReportajeController {
 		view.getBtnCambiarEstado().addActionListener(e ->
 		SwingUtil.exceptionWrapper(() -> cambiarEstado())
 				);
+		
+		// Solicitar revisión
+		view.getBtnSolicitarRevision().addActionListener(e ->
+		    SwingUtil.exceptionWrapper(() -> solicitarRevision())
+		);
 
 		// Eliminar multimedia
 		view.getBtnEliminar().addActionListener(e ->
@@ -90,28 +95,45 @@ public class ReportajeController {
 
 		if (existe) {
 
-			VersionDTO version = model.getVersionActual(evento.getId());
+		    VersionDTO version = model.getVersionActual(evento.getId());
 
-			view.getTxtTitulo().setEditable(false);
-			view.getBtnEntregar().setVisible(false);
-			view.getBtnModificar().setVisible(true);
+		    String estado = model.getEstadoReportaje(evento.getId());
+		    view.actualizarEstado(estado);
+		    view.getTxtTitulo().setEditable(false);
+		    view.getBtnEntregar().setVisible(false);
+		    view.getBtnModificar().setVisible(true);
 
-			if (version != null) {
-				view.getTxtSubtitulo().setText(version.getSubtitulo());
-				view.getTxtCuerpo().setText(version.getCuerpo());
-			}
+		    if (version != null) {
+		        view.getTxtSubtitulo().setText(version.getSubtitulo());
+		        view.getTxtCuerpo().setText(version.getCuerpo());
+		    }
 
-			view.habilitarMultimedia(true);
-			cargarMultimedia(evento.getId());
+		    // =============================
+		    // CONTROL SEGÚN ESTADO
+		    // =============================
 
-		} else {
+		    if ("EN_REVISION".equals(estado)) {
 
-			view.getTxtTitulo().setEditable(true);
-			view.getBtnEntregar().setVisible(true);
-			view.getBtnModificar().setVisible(false);
+		        view.getTxtSubtitulo().setEditable(false);
+		        view.getTxtCuerpo().setEditable(false);
 
-			view.limpiarFormulario();
-			view.habilitarMultimedia(false);
+		        view.getBtnModificar().setEnabled(false);
+		        view.getBtnSolicitarRevision().setVisible(false);
+
+		        view.habilitarMultimedia(false);
+
+		    } else {
+
+		        view.getTxtSubtitulo().setEditable(true);
+		        view.getTxtCuerpo().setEditable(true);
+
+		        view.getBtnModificar().setEnabled(true);
+		        view.getBtnSolicitarRevision().setVisible(true);
+
+		        view.habilitarMultimedia(true);
+		    }
+
+		    cargarMultimedia(evento.getId());
 		}
 	}
 
@@ -166,6 +188,25 @@ public class ReportajeController {
 
 		JOptionPane.showMessageDialog(view.getFrame(),
 				"Modificación realizada correctamente");
+	}
+	
+	private void solicitarRevision() {
+
+	    int fila = view.getTablaEventos().getSelectedRow();
+	    if (fila < 0)
+	        throw new IllegalArgumentException("Debe seleccionar un evento");
+
+	    EventoDTO evento = listaEventos.get(fila);
+
+	    model.solicitarRevision(
+	            evento.getId(),
+	            idReportero
+	    );
+
+	    seleccionarEvento();
+
+	    JOptionPane.showMessageDialog(view.getFrame(),
+	            "Revisión solicitada correctamente");
 	}
 
 	// =========================
