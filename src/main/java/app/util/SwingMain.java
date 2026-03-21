@@ -25,7 +25,7 @@ import app.view.ReportajeView;
 import app.view.RestaurarVersionView;
 import app.controller.ReportajeController;
 import app.controller.RestaurarVersionController;
-import app.model.InformeModel;  // HU #33548 - Descomentar cuando implemente - adri
+import app.model.InformeModel;  
 import app.model.DistribuirReportajeModel;
 import app.model.FreelanceDecisionModel;
 import app.model.OfrecerReportajesModel;
@@ -43,6 +43,9 @@ import app.controller.FreelanceDecisionController;
 import app.controller.InformeController;
 import app.controller.ModificarOfrecimientoController;
 import app.controller.OfrecerReportajesController;
+import app.model.RevisionReportajeModel;
+import app.view.RevisionReportajeView;
+import app.controller.RevisionReportajeController;
 
 public class SwingMain {
 
@@ -126,6 +129,7 @@ public class SwingMain {
 
 		addButtonReportero("HU #34061: Gestión de reportaje (DIEGO)");
 		addButtonReportero("HU #33547: Restaurar versión previa (DIEGO)");
+		addButtonReportero("HU #34066: Revisar reportajes (DIEGO)");
 
 		// --- REPORTERO FREELANCE (IVAN) ---
 		addLabel("REPORTERO FREELANCE (Ivan)");
@@ -356,6 +360,19 @@ public class SwingMain {
 
 			new ReportajeController(model, view,
 					reporteroSeleccionado.getId());
+		}
+		
+		// Revisar reportajes
+		else if (buttonText.contains("Revisar reportajes")) {
+
+		    RevisionReportajeModel model = new RevisionReportajeModel();
+		    RevisionReportajeView view = new RevisionReportajeView();
+
+		    new RevisionReportajeController(
+		            model,
+		            view,
+		            reporteroSeleccionado.getId()
+		    );
 		}
 
 		// Restaurar versión
