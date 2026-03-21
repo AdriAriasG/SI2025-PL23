@@ -52,6 +52,8 @@ public class ModificarOfrecimientoController {
 
         view.getComboFiltro().addActionListener(e -> cargarEmpresas());
 
+        view.getComboTematica().addActionListener(e -> cargarEmpresas());
+
         view.getBtnOfrecer().addActionListener(e -> ofrecerEmpresa());
 
         view.getBtnQuitar().addActionListener(e -> quitarEmpresa());
@@ -72,17 +74,13 @@ public class ModificarOfrecimientoController {
             model.ofrecerEmpresa(idEventoSeleccionado, id);
         }
 
-        // 2️⃣ Quitar ofrecimientos
         for (Integer idEmpresa : empresasQuitar) {
 
-            // Comprobar antes de borrar si estaba ACEPTADO sin acceso
             boolean notificar =
                 model.estabaAceptadoSinAcceso(idEventoSeleccionado, idEmpresa);
 
-            // Borrar ofrecimiento
             model.quitarOfrecimiento(idEventoSeleccionado, idEmpresa);
 
-            // Si procede → enviar email
             if (notificar) {
 
                 String emailAgencia =
@@ -131,7 +129,6 @@ public class ModificarOfrecimientoController {
         idEventoSeleccionado =
             (int) view.getTablaEventos().getValueAt(fila, 0);
 
-        // 🔹 Muy importante: resetear estado temporal al cambiar evento
         empresasOfrecer.clear();
         empresasQuitar.clear();
 
@@ -145,13 +142,30 @@ public class ModificarOfrecimientoController {
             return;
         }
 
-        List<EmpresaComunicacionDTO> con =
-            new ArrayList<>(model.getEmpresasConOfrecimiento(idEventoSeleccionado));
+        String opcionTematica = (String) view.getComboTematica().getSelectedItem();
 
-        List<EmpresaComunicacionDTO> sin =
-            new ArrayList<>(model.getEmpresasSinOfrecimiento(idEventoSeleccionado));
+        boolean filtrarPorTematica =
+            opcionTematica != null &&
+            opcionTematica.equals("Con temática coincidente");
 
-        // 🔹 Aplicar movimientos pendientes SIN duplicar
+        List<EmpresaComunicacionDTO> con;
+        List<EmpresaComunicacionDTO> sin;
+
+        if (filtrarPorTematica) {
+            con = new ArrayList<>(
+                model.getEmpresasConOfrecimientoConTematicaCoincidente(idEventoSeleccionado)
+            );
+            sin = new ArrayList<>(
+                model.getEmpresasSinOfrecimientoConTematicaCoincidente(idEventoSeleccionado)
+            );
+        } else {
+            con = new ArrayList<>(
+                model.getEmpresasConOfrecimiento(idEventoSeleccionado)
+            );
+            sin = new ArrayList<>(
+                model.getEmpresasSinOfrecimiento(idEventoSeleccionado)
+            );
+        }
 
         for (Integer id : empresasOfrecer) {
             sin.removeIf(emp -> emp.getId() == id);
@@ -169,8 +183,7 @@ public class ModificarOfrecimientoController {
             }
         }
 
-        String opcion =
-            (String) view.getComboFiltro().getSelectedItem();
+        String opcion = (String) view.getComboFiltro().getSelectedItem();
 
         boolean modoSin =
             opcion != null && opcion.toLowerCase().contains("sin");
@@ -212,7 +225,6 @@ public class ModificarOfrecimientoController {
 
         modelTabla.setRowCount(0);
 
-        // 🔹 Blindaje extra contra duplicados
         Set<Integer> idsPintados = new HashSet<>();
 
         for (EmpresaComunicacionDTO e : datos) {
@@ -230,8 +242,7 @@ public class ModificarOfrecimientoController {
 
         EmpresaComunicacionDTO empresa =
             (EmpresaComunicacionDTO)
-                view.getTablaDisponibles()
-                    .getValueAt(fila, 0);
+                view.getTablaDisponibles().getValueAt(fila, 0);
 
         int idEmpresa = empresa.getId();
 
@@ -248,8 +259,7 @@ public class ModificarOfrecimientoController {
 
         EmpresaComunicacionDTO empresa =
             (EmpresaComunicacionDTO)
-                view.getTablaOfrecidas()
-                    .getValueAt(fila, 0);
+                view.getTablaOfrecidas().getValueAt(fila, 0);
 
         int idEmpresa = empresa.getId();
 

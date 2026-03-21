@@ -122,6 +122,7 @@ INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (114, 'Voz Streaming'
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacional', 'internacional@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
+INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (118, 'Galicia Noticias', 'redaccion@galicianoticias.com');
 
 
 
@@ -155,6 +156,7 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (407, 300, 6, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (401, 300, 2, 'ACEPTADO', TRUE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (402, 300, 3, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, descargado, precio) VALUES (4100, 300, 118, 'ACEPTADO', TRUE, TRUE, 350.0);
 
 -- Evento 301
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (403, 301, 4, 'ACEPTADO', FALSE);
@@ -166,6 +168,10 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (500, 410, 1, 'PENDIENTE', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (501, 410, 2, 'ACEPTADO', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (600, 410, 3, 'ACEPTADO', TRUE);
+
+-- Evento 411
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (601, 411, 4, 'PENDIENTE', FALSE);
+
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
@@ -225,11 +231,15 @@ INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (10, 1);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (11, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (12, 3);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (13, 1);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 1);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (410, 3); 
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (411, 5); 	
+
 
 -- ReporteroTematica (Asignar temáticas a reporteros)
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1);
@@ -245,6 +255,9 @@ INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (117, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (1, 1);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (3, 3);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (4, 5);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);   
 
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
@@ -259,8 +272,9 @@ INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2);
 
 -- DecisionFreelance (HU #34070)
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 500, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (13, 500, 'NO_INTERESADO');
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (11, 501, 'DUDOSO');
-INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (12, 500, 'NO_INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (14, 501, 'INTERESADO');
 
 -- Multimedia (HU #34061, #34062)
 -- Reportaje 1 (Final Copa Local), autor 1

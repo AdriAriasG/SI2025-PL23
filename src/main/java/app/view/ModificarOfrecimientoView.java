@@ -6,13 +6,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
 import javax.swing.JSeparator;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
 
@@ -24,13 +22,12 @@ public class ModificarOfrecimientoView extends JFrame {
 	private JTable table_1;
 	private JTable table_2;
 	private JComboBox<String> comboFiltro;
+	private JComboBox<String> comboTematica;
 	private JButton btnOfrecer;
 	private JButton btnQuitar;
 	private JButton btnAceptar;
 	private JButton btnCancelar;
-	/**
-	 * Launch the application.
-	 */
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -44,9 +41,6 @@ public class ModificarOfrecimientoView extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public ModificarOfrecimientoView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -63,14 +57,29 @@ public class ModificarOfrecimientoView extends JFrame {
 		separator.setBounds(10, 36, 404, 2);
 		contentPane.add(separator);
 		
-		JLabel lblNewLabel_1 = new JLabel("Eventos\r\n");
+		JLabel lblNewLabel_1 = new JLabel("Eventos");
 		lblNewLabel_1.setBounds(10, 82, 46, 14);
 		contentPane.add(lblNewLabel_1);
 		
 		comboFiltro = new JComboBox<>();
-		comboFiltro.setModel(new DefaultComboBoxModel(new String[] {"Empresas de comunicación sin reportajes ofrecidos", "Empresas de comunicación con reportajes ofrecidos"}));
-		comboFiltro.setBounds(107, 49, 216, 22);
+		comboFiltro.setModel(new DefaultComboBoxModel<>(
+			new String[] {
+				"Empresas de comunicación sin reportajes ofrecidos",
+				"Empresas de comunicación con reportajes ofrecidos"
+			}
+		));
+		comboFiltro.setBounds(10, 49, 215, 22);
 		contentPane.add(comboFiltro);
+		
+		comboTematica = new JComboBox<>();
+		comboTematica.setModel(new DefaultComboBoxModel<>(
+			new String[] {
+				"Con temática coincidente",
+				"Todas las empresas"
+			}
+		));
+		comboTematica.setBounds(270, 49, 164, 22);
+		contentPane.add(comboTematica);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 107, 102, 80);
@@ -78,16 +87,13 @@ public class ModificarOfrecimientoView extends JFrame {
 		
 		table = new JTable();
 		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"ID", "Nombre", "Fecha"
-			}
+			new Object[][] {},
+			new String[] {"ID", "Nombre", "Fecha"}
 		));
 		scrollPane.setViewportView(table);
 		
-		JLabel lblNewLabel_2 = new JLabel("Empresas disponibles\r\n");
-		lblNewLabel_2.setBounds(145, 82, 102, 14);
+		JLabel lblNewLabel_2 = new JLabel("Empresas disponibles");
+		lblNewLabel_2.setBounds(145, 82, 120, 14);
 		contentPane.add(lblNewLabel_2);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
@@ -96,15 +102,12 @@ public class ModificarOfrecimientoView extends JFrame {
 		
 		table_1 = new JTable();
 		table_1.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Nombre"
-			}
+			new Object[][] {},
+			new String[] {"Nombre"}
 		));
 		scrollPane_1.setViewportView(table_1);
 		
-		JLabel lblNewLabel_3 = new JLabel("Empresas con ofrecimiento\r\n");
+		JLabel lblNewLabel_3 = new JLabel("Empresas con ofrecimiento");
 		lblNewLabel_3.setBounds(295, 82, 129, 14);
 		contentPane.add(lblNewLabel_3);
 		
@@ -114,31 +117,26 @@ public class ModificarOfrecimientoView extends JFrame {
 		
 		table_2 = new JTable();
 		table_2.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Nombre"
-			}
+			new Object[][] {},
+			new String[] {"Nombre"}
 		));
 		scrollPane_2.setViewportView(table_2);
 		
-		btnOfrecer = new JButton("Ofrecer\r\n");
+		btnOfrecer = new JButton("Ofrecer");
 		btnOfrecer.setBounds(158, 198, 89, 14);
 		contentPane.add(btnOfrecer);
 		
-		btnQuitar = new JButton("Quitar Ofrecimiento\r\n");
+		btnQuitar = new JButton("Quitar Ofrecimiento");
 		btnQuitar.setBounds(295, 198, 129, 14);
 		contentPane.add(btnQuitar);
 		
-		btnAceptar = new JButton("Aceptar\r\n");
+		btnAceptar = new JButton("Aceptar");
 		btnAceptar.setBounds(217, 227, 89, 23);
 		contentPane.add(btnAceptar);
 		
 		btnCancelar = new JButton("Cancelar");
 		btnCancelar.setBounds(325, 227, 89, 23);
 		contentPane.add(btnCancelar);
-		
-
 	}
 	
 	public JTable getTablaEventos() {
@@ -157,6 +155,10 @@ public class ModificarOfrecimientoView extends JFrame {
 	    return comboFiltro;
 	}
 
+	public JComboBox<String> getComboTematica() {
+	    return comboTematica;
+	}
+
 	public JButton getBtnOfrecer() {
 	    return btnOfrecer;
 	}
@@ -172,6 +174,4 @@ public class ModificarOfrecimientoView extends JFrame {
 	public JButton getBtnCancelar() {
 	    return btnCancelar;
 	}
-	
-	
 }

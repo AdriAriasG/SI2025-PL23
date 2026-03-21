@@ -25,6 +25,20 @@ public class ModificarOfrecimientoModel {
         return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento);
     }
 
+    public List<EmpresaComunicacionDTO> getEmpresasConOfrecimientoConTematicaCoincidente(int idEvento) {
+        String sql = """
+            SELECT DISTINCT e.id, e.nombre
+            FROM EmpresaComunicacion e
+            JOIN Ofrecimiento o ON e.id = o.id_empresa
+            JOIN EmpresaTematica et ON et.id_empresa = e.id
+            JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
+            WHERE o.id_evento = ?
+              AND evt.id_evento = ?
+            ORDER BY e.nombre
+        """;
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, idEvento);
+    }
+
     public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimiento(int idEvento) {
         String sql = """
             SELECT e.id, e.nombre
@@ -37,6 +51,24 @@ public class ModificarOfrecimientoModel {
             ORDER BY e.nombre
         """;
         return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento);
+    }
+
+    public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimientoConTematicaCoincidente(int idEvento) {
+        String sql = """
+            SELECT DISTINCT e.id, e.nombre
+            FROM EmpresaComunicacion e
+            JOIN EmpresaTematica et ON et.id_empresa = e.id
+            JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
+            WHERE evt.id_evento = ?
+              AND e.id NOT IN (
+                  SELECT id_empresa
+                  FROM Ofrecimiento
+                  WHERE id_evento = ?
+              )
+            ORDER BY e.nombre
+        """;
+
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, idEvento);
     }
 
     // ================================
