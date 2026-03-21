@@ -157,9 +157,8 @@ public class SwingMain {
 		panelEmpresa.add(cbEmpresas);
 		frame.getContentPane().add(panelEmpresa);
 
-		addButtonEmpresa("HU #33540: Gestionar ofrecimientos (IRENE)");
-		addButtonEmpresa("HU #33542: Acceder al reportaje (IRENE)");
-		addButtonEmpresa("HU #33546: Modificar decisión (IRENE)");
+		addButtonEmpresa("Acceso a reportajes");
+		addButtonEmpresa("Gestionar Ofrecimientos");
 
 		// --- MANTENIMIENTO BD ---
 		addLabel("MANTENIMIENTO BD");
@@ -395,16 +394,8 @@ public class SwingMain {
 			return;
 		}
 
-		// HU #33540: Gestionar ofrecimientos (IRENE)
-		if (buttonText.contains("#33540")) {
-			app.model.OfrecimientosRecibidosModel modelOfr = new app.model.OfrecimientosRecibidosModel();
-			app.view.OfrecimientosRecibidosView viewOfr = new app.view.OfrecimientosRecibidosView();
-			app.controller.OfrecimientosRecibidosController controllerOfr =
-					new app.controller.OfrecimientosRecibidosController(modelOfr, viewOfr, empresaSeleccionada.getId());
-			controllerOfr.initController();
-		}
 		// HU #33542: Acceder al reportaje (IRENE)
-		else if (buttonText.contains("#33542")) {
+		else if (buttonText.contains("Acceso a reportajes")) {
 			app.model.AccesoReportajeModel modelRep = new app.model.AccesoReportajeModel();
 			app.view.AccesoReportajeView viewRep = new app.view.AccesoReportajeView();
 			app.controller.AccesoReportajeController controllerRep = 
@@ -412,7 +403,7 @@ public class SwingMain {
 			controllerRep.mostrarVista();
 		}
 		// HU #33546 y otros no implementados
-		else if (buttonText.contains("#33546")) {
+		else if (buttonText.contains("Gestionar Ofrecimientos")) {
 			app.model.ModificacionOfrecimientosRecibidosModel modelMod = new app.model.ModificacionOfrecimientosRecibidosModel();
 			app.view.ModificacionOfrecimientosRecibidosView viewMod = new app.view.ModificacionOfrecimientosRecibidosView();
 			app.controller.ModificacionOfrecimientosRecibidosController controllerMod = 
