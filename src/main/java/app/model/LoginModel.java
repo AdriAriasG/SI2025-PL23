@@ -23,4 +23,15 @@ public class LoginModel {
         String sql = "SELECT id, nombre FROM EmpresaComunicacion ORDER BY nombre";
         return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql);
     }
+    
+    public List<ReporteroDTO> getReporterosFreelance() {
+		String sql = """
+				SELECT id, nombre
+				FROM Reportero
+				WHERE id_agencia IS NULL
+				ORDER BY nombre
+				""";
+		return db.executeQueryPojo(ReporteroDTO.class, sql);
+	}
+
 }

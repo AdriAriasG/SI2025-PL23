@@ -231,6 +231,7 @@ INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (10, 1);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (11, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (12, 3);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (13, 1);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 1);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (14, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (20, 2);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (22, 5);
@@ -271,8 +272,9 @@ INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2);
 
 -- DecisionFreelance (HU #34070)
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 500, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (13, 500, 'NO_INTERESADO');
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (11, 501, 'DUDOSO');
-INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (12, 500, 'NO_INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (14, 501, 'INTERESADO');
 
 -- Multimedia (HU #34061, #34062)
 -- Reportaje 1 (Final Copa Local), autor 1
