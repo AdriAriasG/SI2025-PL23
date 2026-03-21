@@ -36,14 +36,12 @@ import app.view.AsignacionEdicionView;
 import app.view.InformeView;
 import app.view.ModificarOfrecimientoView;
 import app.view.OfrecerReportajesView;
-import app.view.ModificarEntregaView;
 import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
 import app.controller.DistribuirReportajeController;
 import app.controller.FreelanceDecisionController;
 import app.controller.InformeController;
 import app.controller.ModificarOfrecimientoController;
-import app.controller.ModificarEntregaController;
 import app.controller.OfrecerReportajesController;
 
 public class SwingMain {
@@ -126,8 +124,7 @@ public class SwingMain {
 		panelReportero.add(cbReporteros);
 		frame.getContentPane().add(panelReportero);
 
-		addButtonReportero("HU #33538: Entrega de reportaje (DIEGO)");
-		addButtonReportero("HU #33545: Modificar entrega (DIEGO)");
+		addButtonReportero("HU #34061: Gestión de reportaje (DIEGO)");
 		addButtonReportero("HU #33547: Restaurar versión previa (DIEGO)");
 
 		// --- REPORTERO FREELANCE (IVAN) ---
@@ -324,11 +321,11 @@ public class SwingMain {
 			new DistribuirReportajeController(model, view, agenciaSeleccionada);
 		}
 		// HU #33544: Modificar ofrecimientos reportajes (IVAN)
-        else if (buttonText.contains("Modificar")) {
-        	ModificarOfrecimientoModel model = new ModificarOfrecimientoModel();
-        	ModificarOfrecimientoView view = new ModificarOfrecimientoView();
-        	new ModificarOfrecimientoController(model, view, agenciaSeleccionada);
-        }
+		else if (buttonText.contains("Modificar")) {
+			ModificarOfrecimientoModel model = new ModificarOfrecimientoModel();
+			ModificarOfrecimientoView view = new ModificarOfrecimientoView();
+			new ModificarOfrecimientoController(model, view, agenciaSeleccionada);
+		}
 		// Resto de botones no implementados
 		else {
 			javax.swing.JOptionPane.showMessageDialog(frame, "Acción no implementada: " + buttonText);
@@ -339,46 +336,41 @@ public class SwingMain {
 	 * Maneja las acciones de los botones de Reportero
 	 */
 	private void handleReporteroButtonAction(String buttonText) {
-		ReporteroDTO reporteroSeleccionado = (ReporteroDTO) cbReporteros.getSelectedItem();
+
+		ReporteroDTO reporteroSeleccionado =
+				(ReporteroDTO) cbReporteros.getSelectedItem();
+
 		if (reporteroSeleccionado == null) {
-			javax.swing.JOptionPane.showMessageDialog(frame, 
-					"Debe seleccionar un reportero para continuar.", 
-					"Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+			javax.swing.JOptionPane.showMessageDialog(frame,
+					"Debe seleccionar un reportero para continuar.",
+					"Aviso",
+					javax.swing.JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
-		// HU #33538: Entrega de reportaje
-		if (buttonText.contains("#33538")) {
+		// Gestión unificada (entrega + modificación + multimedia)
+		if (buttonText.contains("Gestión de reportaje")) {
+
 			ReportajeModel model = new ReportajeModel();
 			ReportajeView view = new ReportajeView();
 
-			int idReportero = reporteroSeleccionado.getId();
-			
-			new ReportajeController(model, view, idReportero);
+			new ReportajeController(model, view,
+					reporteroSeleccionado.getId());
 		}
-		
-		// HU #33545: Modificar entrega
-		else if (buttonText.contains("#33545")){
-			ReportajeModel model = new ReportajeModel();
-			ModificarEntregaView view = new ModificarEntregaView();
-			
-			new ModificarEntregaController(model, view, reporteroSeleccionado.getId());
-			
-		}
-		
-		// HU #33547: Restaurar version previa
+
+		// Restaurar versión
 		else if (buttonText.contains("#33547")) {
+
 			ReportajeModel model = new ReportajeModel();
 			RestaurarVersionView view = new RestaurarVersionView();
-			
-			new RestaurarVersionController(model, view, reporteroSeleccionado.getId());
-			
+
+			new RestaurarVersionController(model, view,
+					reporteroSeleccionado.getId());
 		}
-		
+
 		else {
-			// HU #33545, #33547 - Por implementar
-			javax.swing.JOptionPane.showMessageDialog(frame, 
-					"Acción no implementada: " + buttonText + "\nReportero seleccionado: " + reporteroSeleccionado.getNombre());
+			javax.swing.JOptionPane.showMessageDialog(frame,
+					"Acción no implementada: " + buttonText);
 		}
 	}
 
@@ -415,7 +407,7 @@ public class SwingMain {
 					"Acción no implementada: " + buttonText + "\nEmpresa seleccionada: " + empresaSeleccionada.getNombre());
 		}
 	}
-	
+
 	private void handleReporteroFreelanceButtonAction(String buttonText) {
 		ReporteroDTO reporteroSeleccionado = (ReporteroDTO) cbReporterosFreelance.getSelectedItem();
 		if (reporteroSeleccionado == null) {

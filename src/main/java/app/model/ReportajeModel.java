@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import app.dto.EventoDTO;
+import app.dto.MultimediaDTO;
 import app.util.ApplicationException;
 import app.util.Database;
 
@@ -113,6 +114,15 @@ public class ReportajeModel {
 				"Versión inicial",
 				idReportero
 				);
+	}
+
+	public boolean existeReportaje(int idEvento) {
+		Long count = db.executeQueryScalar(
+				Long.class,
+				"SELECT COUNT(*) FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+		return count != null && count > 0;
 	}
 
 	public void modificarReportaje(int idEvento,
@@ -291,6 +301,99 @@ public class ReportajeModel {
 				cambios,
 				idReportero);
 
+	}
+
+	// Metodos para contenido multimedia
+
+	public List<MultimediaDTO> getMultimedia(int idEvento) {
+
+		String sql = """
+				SELECT m.id, m.ruta, m.tipo, m.estado, m.id_autor AS idAutor
+				FROM Multimedia m
+				JOIN Reportaje r ON m.id_reportaje = r.id
+				WHERE r.id_evento = ?
+				ORDER BY m.id DESC
+				""";
+
+		return db.executeQueryPojo(MultimediaDTO.class, sql, idEvento);
+	}
+
+	// Añadir multimedia (estado BORRADOR por defecto)
+	public void añadirMultimedia(int idEvento,
+			int idAutor,
+			String ruta,
+			String tipo) {
+
+		Integer idReportaje = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (idReportaje == null)
+			throw new ApplicationException("Debe existir un reportaje");
+
+		String insert = """
+				INSERT INTO Multimedia
+				(id_reportaje, id_autor, ruta, tipo)
+				VALUES (?, ?, ?, ?)
+				""";
+
+		db.executeUpdate(insert,
+				idReportaje,
+				idAutor,
+				ruta.trim(),
+				tipo
+				);
+	}
+
+	public void cambiarEstadoMultimedia(int idMultimedia, int idReportero) {
+
+		MultimediaDTO multimedia = db.executeQueryPojo(
+				MultimediaDTO.class,
+				"SELECT id, estado, id_autor AS idAutor FROM Multimedia WHERE id = ?",
+				idMultimedia
+				).stream().findFirst().orElse(null);
+
+		if (multimedia == null)
+			throw new ApplicationException("Multimedia no encontrado");
+
+		if (!multimedia.getIdAutor().equals(idReportero))
+			throw new ApplicationException("Solo el autor puede cambiar el estado");
+
+		String nuevoEstado = multimedia.getEstado().equals("BORRADOR")
+				? "DEFINITIVO"
+						: "BORRADOR";
+
+		db.executeUpdate(
+				"UPDATE Multimedia SET estado = ? WHERE id = ?",
+				nuevoEstado,
+				idMultimedia
+				);
+	}
+
+	// eliminarMultimedia (solo si estado es BORRADOR y si el reportero es el autor)
+	public void eliminarMultimedia(int idMultimedia, int idReportero) {
+
+	    MultimediaDTO multimedia = db.executeQueryPojo(
+	            MultimediaDTO.class,
+	            "SELECT id, estado, id_autor AS idAutor FROM Multimedia WHERE id = ?",
+	            idMultimedia
+	    ).stream().findFirst().orElse(null);
+
+	    if (multimedia == null)
+	        throw new ApplicationException("Multimedia no encontrado");
+
+	    if (!multimedia.getIdAutor().equals(idReportero))
+	        throw new ApplicationException("Solo el autor puede eliminar");
+
+	    if (!multimedia.getEstado().equals("BORRADOR"))
+	        throw new ApplicationException("Solo se puede eliminar en estado BORRADOR");
+
+	    db.executeUpdate(
+	            "DELETE FROM Multimedia WHERE id = ?",
+	            idMultimedia
+	    );
 	}
 
 
