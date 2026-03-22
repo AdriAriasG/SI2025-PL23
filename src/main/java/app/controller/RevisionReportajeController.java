@@ -14,193 +14,201 @@ import giis.demo.util.SwingUtil;
 
 public class RevisionReportajeController {
 
-    private RevisionReportajeModel model;
-    private RevisionReportajeView view;
-    private int idReportero;
+	private RevisionReportajeModel model;
+	private RevisionReportajeView view;
+	private int idReportero;
 
-    private List<ReportajeRevisionResumenDTO> listaReportajes;
-    private List<MultimediaDTO> listaMultimedia;
+	private List<ReportajeRevisionResumenDTO> listaReportajes;
+	private List<MultimediaDTO> listaMultimedia;
 
-    public RevisionReportajeController(
-            RevisionReportajeModel model,
-            RevisionReportajeView view,
-            int idReportero) {
+	public RevisionReportajeController(
+			RevisionReportajeModel model,
+			RevisionReportajeView view,
+			int idReportero) {
 
-        this.model = model;
-        this.view = view;
-        this.idReportero = idReportero;
+		this.model = model;
+		this.view = view;
+		this.idReportero = idReportero;
 
-        initView();
-        initController();
-    }
+		initView();
+		initController();
+	}
 
-    // ======================================================
-    // INICIALIZACIÓN
-    // ======================================================
+	// ======================================================
+			// INICIALIZACIÓN
+	// ======================================================
 
-    private void initView() {
-        cargarReportajesPendientes();
-        view.getFrame().setVisible(true);
-    }
+	private void initView() {
+		cargarReportajesPendientes();
+		view.limpiarDetalle();
+		view.getFrame().setVisible(true);
+	}
 
-    private void initController() {
+	private void initController() {
 
-        view.getTablaReportajes().getSelectionModel()
-            .addListSelectionListener(e ->
-                SwingUtil.exceptionWrapper(() -> seleccionarReportaje())
-            );
+		view.getTablaReportajes().getSelectionModel()
+		.addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				SwingUtil.exceptionWrapper(() -> seleccionarReportaje());
+			}
+		});
 
-        view.getBtnGuardarComentario().addActionListener(e ->
-            SwingUtil.exceptionWrapper(() -> guardarComentario())
-        );
+		view.getBtnGuardarComentario().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> guardarComentario())
+				);
 
-        view.getBtnFinalizarRevision().addActionListener(e ->
-            SwingUtil.exceptionWrapper(() -> finalizarRevision())
-        );
-    }
+		view.getBtnFinalizarRevision().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> finalizarRevision())
+				);
+	}
 
-    // ======================================================
-    // CARGAR REPORTAJES
-    // ======================================================
+	// ======================================================
+	// CARGAR REPORTAJES
+	// ======================================================
 
-    private void cargarReportajesPendientes() {
+	private void cargarReportajesPendientes() {
 
-        listaReportajes =
-            model.getReportajesEnRevisionPendientes(idReportero);
+		listaReportajes =
+				model.getReportajesEnRevisionPendientes(idReportero);
 
-        String[] columnas = {
-            "idReportaje",
-            "titulo",
-            "nombreEvento",
-            "fecha"
-        };
+		String[] columnas = {
+				"idReportaje",
+				"titulo",
+				"nombreEvento",
+				"fecha"
+		};
 
-        view.getTablaReportajes().setModel(
-            SwingUtil.getTableModelFromPojos(listaReportajes, columnas)
-        );
+		view.getTablaReportajes().setModel(
+				SwingUtil.getTableModelFromPojos(listaReportajes, columnas)
+				);
 
-        SwingUtil.autoAdjustColumns(view.getTablaReportajes());
-    }
+		SwingUtil.autoAdjustColumns(view.getTablaReportajes());
+	}
 
-    // ======================================================
-    // SELECCIONAR REPORTAJE
-    // ======================================================
+	// ======================================================
+	// SELECCIONAR REPORTAJE
+	// ======================================================
 
-    private void seleccionarReportaje() {
+	private void seleccionarReportaje() {
 
-        int fila = view.getTablaReportajes().getSelectedRow();
-        if (fila < 0) return;
+		int fila = view.getTablaReportajes().getSelectedRow();
+		if (fila < 0) {
+		    view.limpiarDetalle();
+		    return;
+		}
 
-        ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
-        int idReportaje = seleccionado.getIdReportaje();
+		ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
+		int idReportaje = seleccionado.getIdReportaje();
 
-        // Cargar versión actual
-        VersionDTO version = model.getVersionActual(idReportaje);
+		// Cargar versión actual
+		VersionDTO version = model.getVersionActual(idReportaje);
 
-        if (version != null) {
-            view.getTxtTitulo().setText(seleccionado.getTitulo());
-            view.getTxtSubtitulo().setText(version.getSubtitulo());
-            view.getTxtCuerpo().setText(version.getCuerpo());
-        }
+		if (version != null) {
+			view.getTxtTitulo().setText(seleccionado.getTitulo());
+			view.getTxtSubtitulo().setText(version.getSubtitulo());
+			view.getTxtCuerpo().setText(version.getCuerpo());
+		}
 
-        view.actualizarEstadoReportaje("EN_REVISION");
+		view.actualizarEstadoReportaje("EN_REVISION");
 
-        // Cargar multimedia
-        listaMultimedia = model.getMultimedia(idReportaje);
+		// Cargar multimedia
+		listaMultimedia = model.getMultimedia(idReportaje);
 
-        String[] columnasMultimedia = {
-            "id",
-            "ruta",
-            "tipo",
-            "estado"
-        };
+		String[] columnasMultimedia = {
+				"id",
+				"ruta",
+				"tipo",
+				"estado"
+		};
 
-        view.getTablaMultimedia().setModel(
-            SwingUtil.getTableModelFromPojos(
-                listaMultimedia,
-                columnasMultimedia)
-        );
+		view.getTablaMultimedia().setModel(
+				SwingUtil.getTableModelFromPojos(
+						listaMultimedia,
+						columnasMultimedia)
+				);
 
-        SwingUtil.autoAdjustColumns(view.getTablaMultimedia());
+		SwingUtil.autoAdjustColumns(view.getTablaMultimedia());
 
-        // Cargar revisión del reportero
-        RevisionDTO revision =
-            model.getRevision(idReportaje, idReportero);
+		// Cargar revisión del reportero
+		RevisionDTO revision =
+				model.getRevision(idReportaje, idReportero);
 
-        if (revision == null) {
-            view.getTxtComentario().setText("");
-            view.mostrarRevisionPendiente();
-        } else {
-            view.getTxtComentario().setText(revision.getComentario());
+		if (revision == null) {
+			view.getTxtComentario().setText("");
+			view.mostrarRevisionPendiente();
+		} else {
+			view.getTxtComentario().setText(revision.getComentario());
 
-            if (revision.isFinalizada()) {
-                view.mostrarRevisionFinalizada();
-            } else {
-                view.mostrarRevisionPendiente();
-            }
-        }
-    }
+			if (revision.isFinalizada()) {
+				view.mostrarRevisionFinalizada();
+			} else {
+				view.mostrarRevisionPendiente();
+			}
+		}
+	}
+	
 
-    // ======================================================
-    // GUARDAR COMENTARIO
-    // ======================================================
+	// ======================================================
+	// GUARDAR COMENTARIO
+	// ======================================================
 
-    private void guardarComentario() {
+	private void guardarComentario() {
 
-        int fila = view.getTablaReportajes().getSelectedRow();
-        if (fila < 0)
-            throw new IllegalArgumentException(
-                "Debe seleccionar un reportaje");
+		int fila = view.getTablaReportajes().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException(
+					"Debe seleccionar un reportaje");
 
-        ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
-        int idReportaje = seleccionado.getIdReportaje();
+		ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
+		int idReportaje = seleccionado.getIdReportaje();
 
-        String comentario =
-            view.getTxtComentario().getText().trim();
+		String comentario =
+				view.getTxtComentario().getText().trim();
 
-        if (comentario.isEmpty())
-            throw new IllegalArgumentException(
-                "El comentario no puede estar vacío");
+		if (comentario.isEmpty())
+			throw new IllegalArgumentException(
+					"El comentario no puede estar vacío");
 
-        model.guardarComentario(
-            idReportaje,
-            idReportero,
-            comentario
-        );
+		model.guardarComentario(
+				idReportaje,
+				idReportero,
+				comentario
+				);
 
-        JOptionPane.showMessageDialog(
-            view.getFrame(),
-            "Comentario guardado correctamente"
-        );
-    }
+		JOptionPane.showMessageDialog(
+				view.getFrame(),
+				"Comentario guardado correctamente"
+				);
+	}
 
-    // ======================================================
-    // FINALIZAR REVISIÓN
-    // ======================================================
+	// ======================================================
+	// FINALIZAR REVISIÓN
+	// ======================================================
 
-    private void finalizarRevision() {
+	private void finalizarRevision() {
 
-        int fila = view.getTablaReportajes().getSelectedRow();
-        if (fila < 0)
-            throw new IllegalArgumentException(
-                "Debe seleccionar un reportaje");
+		int fila = view.getTablaReportajes().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException(
+					"Debe seleccionar un reportaje");
 
-        ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
-        int idReportaje = seleccionado.getIdReportaje();
+		ReportajeRevisionResumenDTO seleccionado = listaReportajes.get(fila);
+		int idReportaje = seleccionado.getIdReportaje();
 
-        model.finalizarRevision(
-            idReportaje,
-            idReportero
-        );
+		model.finalizarRevision(
+				idReportaje,
+				idReportero
+				);
 
-        view.mostrarRevisionFinalizada();
+		view.mostrarRevisionFinalizada();
 
-        JOptionPane.showMessageDialog(
-            view.getFrame(),
-            "Revisión finalizada correctamente"
-        );
+		JOptionPane.showMessageDialog(
+				view.getFrame(),
+				"Revisión finalizada correctamente"
+				);
 
-        // Recargar tabla para eliminarlo de pendientes
-        cargarReportajesPendientes();
-    }
+		// Recargar tabla para eliminarlo de pendientes
+		cargarReportajesPendientes();
+		view.limpiarDetalle();	
+	}
 }

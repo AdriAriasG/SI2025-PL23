@@ -11,167 +11,269 @@ import app.util.Database;
 
 public class RevisionReportajeModel {
 
-    private Database db = new Database();
+	private Database db = new Database();
 
-    // ======================================================
-    // 1️⃣ Reportajes en revisión pendientes para el reportero
-    // ======================================================
-    public List<ReportajeRevisionResumenDTO> getReportajesEnRevisionPendientes(int idReportero){
+	// ======================================================
+	// 1️⃣ Reportajes en revisión pendientes para el reportero
+	// ======================================================
+	public List<ReportajeRevisionResumenDTO> getReportajesEnRevisionPendientes(int idReportero){
 
-        String sql = """
-            SELECT r.id AS idReportaje,
-                   r.titulo,
-                   e.nombre AS nombreEvento,
-                   e.fecha
-            FROM Reportaje r
-            JOIN Evento e ON r.id_evento = e.id
-            JOIN Asignacion a ON a.id_evento = e.id
-            LEFT JOIN RevisionReportaje rev
-                ON rev.id_reportaje = r.id
-                AND rev.id_reportero = ?
-            WHERE r.estado = 'EN_REVISION'
-              AND a.id_reportero = ?
-              AND (rev.estado IS NULL OR rev.estado = 'PENDIENTE')
-            ORDER BY e.fecha
-            """;
+		String sql = """
+				SELECT r.id AS idReportaje,
+				       r.titulo,
+				       e.nombre AS nombreEvento,
+				       e.fecha
+				FROM Reportaje r
+				JOIN Evento e ON r.id_evento = e.id
+				JOIN Asignacion a ON a.id_evento = e.id
+				LEFT JOIN RevisionReportaje rev
+				    ON rev.id_reportaje = r.id
+				    AND rev.id_reportero = ?
+				WHERE r.estado = 'EN_REVISION'
+				  AND a.id_reportero = ?
+				  AND (rev.estado IS NULL OR rev.estado = 'PENDIENTE')
+				ORDER BY e.fecha
+				""";
 
-        return db.executeQueryPojo(
-                ReportajeRevisionResumenDTO.class,
-                sql,
-                idReportero,
-                idReportero
-        );
-    }
+		return db.executeQueryPojo(
+				ReportajeRevisionResumenDTO.class,
+				sql,
+				idReportero,
+				idReportero
+				);
+	}
 
-    // ======================================================
-    // 2️⃣ Obtener versión actual del reportaje
-    // ======================================================
-    public VersionDTO getVersionActual(int idReportaje) {
+	// ======================================================
+	// 2️⃣ Obtener versión actual del reportaje
+	// ======================================================
+	public VersionDTO getVersionActual(int idReportaje) {
 
-        String sql = """
-            SELECT subtitulo,
-                   cuerpo
-            FROM VersionReportaje
-            WHERE id_reportaje = ?
-            ORDER BY id DESC
-            LIMIT 1
-            """;
+		String sql = """
+				SELECT subtitulo,
+				       cuerpo
+				FROM VersionReportaje
+				WHERE id_reportaje = ?
+				ORDER BY id DESC
+				LIMIT 1
+				""";
 
-        return db.executeQueryPojo(VersionDTO.class, sql, idReportaje)
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
+		return db.executeQueryPojo(VersionDTO.class, sql, idReportaje)
+				.stream()
+				.findFirst()
+				.orElse(null);
+	}
 
-    // ======================================================
-    // 3️⃣ Obtener multimedia
-    // ======================================================
-    public List<MultimediaDTO> getMultimedia(int idReportaje) {
+	// ======================================================
+	// 3️⃣ Obtener multimedia
+	// ======================================================
+	public List<MultimediaDTO> getMultimedia(int idReportaje) {
 
-        String sql = """
-            SELECT id,
-                   ruta,
-                   tipo,
-                   estado
-            FROM Multimedia
-            WHERE id_reportaje = ?
-            ORDER BY id DESC
-            """;
+		String sql = """
+				SELECT id,
+				       ruta,
+				       tipo,
+				       estado
+				FROM Multimedia
+				WHERE id_reportaje = ?
+				ORDER BY id DESC
+				""";
 
-        return db.executeQueryPojo(MultimediaDTO.class, sql, idReportaje);
-    }
+		return db.executeQueryPojo(MultimediaDTO.class, sql, idReportaje);
+	}
 
-    // ======================================================
-    // 4️⃣ Obtener revisión del reportero
-    // ======================================================
-    public RevisionDTO getRevision(int idReportaje, int idReportero) {
+	// ======================================================
+	// 4️⃣ Obtener revisión del reportero
+	// ======================================================
+	public RevisionDTO getRevision(int idReportaje, int idReportero) {
 
-        String sql = """
-            SELECT id_reportaje AS idReportaje,
-                   id_reportero AS idReportero,
-                   comentario,
-                   estado
-            FROM RevisionReportaje
-            WHERE id_reportaje = ?
-              AND id_reportero = ?
-            """;
+		String sql = """
+				SELECT id_reportaje AS idReportaje,
+				       id_reportero AS idReportero,
+				       comentario,
+				       estado
+				FROM RevisionReportaje
+				WHERE id_reportaje = ?
+				  AND id_reportero = ?
+				""";
 
-        return db.executeQueryPojo(
-                RevisionDTO.class,
-                sql,
-                idReportaje,
-                idReportero
-        )
-        .stream()
-        .findFirst()
-        .orElse(null);
-    }
+		return db.executeQueryPojo(
+				RevisionDTO.class,
+				sql,
+				idReportaje,
+				idReportero
+				)
+				.stream()
+				.findFirst()
+				.orElse(null);
+	}
 
-    // ======================================================
-    // 5️⃣ Guardar o actualizar comentario
-    // ======================================================
-    public void guardarComentario(int idReportaje,
-                                  int idReportero,
-                                  String comentario) {
+	// ======================================================
+	// 5️⃣ Guardar o actualizar comentario
+	// ======================================================
+	public void guardarComentario(int idReportaje,
+			int idReportero,
+			String comentario) {
 
-        RevisionDTO revision = getRevision(idReportaje, idReportero);
+		RevisionDTO revision = getRevision(idReportaje, idReportero);
 
-        if (revision == null) {
+		if (revision == null) {
 
-            String insert = """
-                INSERT INTO RevisionReportaje
-                (id_reportaje, id_reportero, comentario, estado)
-                VALUES (?, ?, ?, 'PENDIENTE')
-                """;
+			String insert = """
+					INSERT INTO RevisionReportaje
+					(id_reportaje, id_reportero, comentario, estado)
+					VALUES (?, ?, ?, 'PENDIENTE')
+					""";
 
-            db.executeUpdate(
-                    insert,
-                    idReportaje,
-                    idReportero,
-                    comentario
-            );
+			db.executeUpdate(
+					insert,
+					idReportaje,
+					idReportero,
+					comentario
+					);
 
-        } else {
+		} else {
 
-            if (revision.isFinalizada())
-                throw new ApplicationException("La revisión ya está finalizada");
+			if (revision.isFinalizada())
+				throw new ApplicationException("La revisión ya está finalizada");
 
-            String update = """
-                UPDATE RevisionReportaje
-                SET comentario = ?
-                WHERE id_reportaje = ?
-                  AND id_reportero = ?
-                """;
+			String update = """
+					UPDATE RevisionReportaje
+					SET comentario = ?
+					WHERE id_reportaje = ?
+					  AND id_reportero = ?
+					""";
 
-            db.executeUpdate(
-                    update,
-                    comentario,
-                    idReportaje,
-                    idReportero
-            );
-        }
-    }
+			db.executeUpdate(
+					update,
+					comentario,
+					idReportaje,
+					idReportero
+					);
+		}
+	}
 
-    // ======================================================
-    // 6️⃣ Finalizar revisión
-    // ======================================================
-    public void finalizarRevision(int idReportaje, int idReportero) {
+	// ======================================================
+	// 6️⃣ Finalizar revisión
+	// ======================================================
+	public void finalizarRevision(int idReportaje, int idReportero) {
 
-        RevisionDTO revision = getRevision(idReportaje, idReportero);
+	    RevisionDTO revision = getRevision(idReportaje, idReportero);
 
-        if (revision == null)
-            throw new ApplicationException("Debe guardar un comentario antes de finalizar");
+	    if (revision == null) {
 
-        if (revision.isFinalizada())
-            throw new ApplicationException("La revisión ya está finalizada");
+	        // No existía revisión → crearla ya finalizada
+	        String insert = """
+	            INSERT INTO RevisionReportaje
+	            (id_reportaje, id_reportero, comentario, estado)
+	            VALUES (?, ?, ?, 'FINALIZADA')
+	            """;
 
-        String update = """
-            UPDATE RevisionReportaje
-            SET estado = 'FINALIZADA'
-            WHERE id_reportaje = ?
-              AND id_reportero = ?
-            """;
+	        db.executeUpdate(insert,
+	                idReportaje,
+	                idReportero,
+	                ""
+	        );
 
-        db.executeUpdate(update, idReportaje, idReportero);
-    }
+	    } else {
+
+	        if (revision.isFinalizada())
+	            throw new ApplicationException(
+	                "La revisión ya está finalizada"
+	            );
+
+	        String update = """
+	            UPDATE RevisionReportaje
+	            SET estado = 'FINALIZADA'
+	            WHERE id_reportaje = ?
+	              AND id_reportero = ?
+	            """;
+
+	        db.executeUpdate(update,
+	                idReportaje,
+	                idReportero
+	        );
+	    }
+
+	    // 🔎 Comprobar si todos han finalizado
+	    Integer idEvento = getEventoDeReportaje(idReportaje);
+
+	    int totalAsignados = contarReporterosAsignados(idEvento);
+	    int totalFinalizadas = contarRevisionesFinalizadas(idReportaje);
+
+	    if (totalAsignados == totalFinalizadas) {
+
+	        String updateReportaje = """
+	            UPDATE Reportaje
+	            SET estado = 'NORMAL'
+	            WHERE id = ?
+	            """;
+
+	        db.executeUpdate(updateReportaje, idReportaje);
+	    }
+	}
+
+	private Integer getAutorReportaje(int idReportaje) {
+
+		String sql = """
+				SELECT id_reportero_autor
+				FROM Reportaje
+				WHERE id = ?
+				""";
+
+		return db.executeQueryScalar(
+				Integer.class,
+				sql,
+				idReportaje
+				);
+	}
+
+	private Integer getEventoDeReportaje(int idReportaje) {
+
+		String sql = """
+				SELECT id_evento
+				FROM Reportaje
+				WHERE id = ?
+				""";
+
+		return db.executeQueryScalar(
+				Integer.class,
+				sql,
+				idReportaje
+				);
+	}
+
+	private int contarReporterosAsignados(int idEvento) {
+
+		String sql = """
+				SELECT COUNT(*)
+				FROM Asignacion
+				WHERE id_evento = ?
+				""";
+
+		Long count = db.executeQueryScalar(
+				Long.class,
+				sql,
+				idEvento
+				);
+
+		return count.intValue();
+	}
+
+	private int contarRevisionesFinalizadas(int idReportaje) {
+
+		String sql = """
+				SELECT COUNT(*)
+				FROM RevisionReportaje
+				WHERE id_reportaje = ?
+				  AND estado = 'FINALIZADA'
+				""";
+
+		Long count = db.executeQueryScalar(
+				Long.class,
+				sql,
+				idReportaje
+				);
+
+		return count.intValue();
+	}
 }

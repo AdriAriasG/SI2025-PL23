@@ -1,6 +1,8 @@
 package app.view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 
 public class RevisionReportajeView {
@@ -181,6 +183,15 @@ public class RevisionReportajeView {
         txtComentario.setEditable(true);
         btnGuardarComentario.setEnabled(true);
         btnFinalizarRevision.setEnabled(true);
+    }
+    
+    public void limpiarDetalle() {
+        txtTitulo.setText("");
+        txtSubtitulo.setText("");
+        txtCuerpo.setText("");
+        txtComentario.setText("");
+        actualizarEstadoReportaje("");
+        tablaMultimedia.setModel(new DefaultTableModel());
     }
 
     // ===============================
