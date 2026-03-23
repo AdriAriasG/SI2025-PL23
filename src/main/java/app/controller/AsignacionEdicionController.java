@@ -79,6 +79,9 @@ public class AsignacionEdicionController {
 
         // Evento: cambio de filtro de temática
         view.getChkFiltroTematica().addActionListener(e -> onFiltroTematicaCambiado());
+
+        // Evento: cambio de filtro de tipo
+        view.getCbFiltroTipo().addActionListener(e -> onFiltroTipoCambiado());
         }
 
         /**
@@ -128,17 +131,34 @@ public class AsignacionEdicionController {
     }
 
     /**
-     * Carga los reporteros disponibles según el estado del filtro de temática
+     * Carga los reporteros disponibles según el estado de los filtros (temática y tipo)
      */
     private void cargarReporterosDisponibles() {
         if (idEventoSeleccionado == -1) return;
 
+        boolean filtrarTematica = view.getChkFiltroTematica().isSelected();
+        String tipo = view.getSelectedTipo();
+
         List<ReporteroDTO> disponibles;
-        if (view.getChkFiltroTematica().isSelected()) {
-            disponibles = model.getReporterosDisponiblesPorTematica(idEventoSeleccionado, agencia.getId());
+
+        if (filtrarTematica && tipo != null) {
+            // Ambos filtros activos
+            disponibles = model.getReporterosDisponiblesPorTematicaYTipo(
+                idEventoSeleccionado, agencia.getId(), tipo);
+        } else if (filtrarTematica) {
+            // Solo filtro temática
+            disponibles = model.getReporterosDisponiblesPorTematica(
+                idEventoSeleccionado, agencia.getId());
+        } else if (tipo != null) {
+            // Solo filtro tipo
+            disponibles = model.getReporterosDisponiblesPorTipo(
+                idEventoSeleccionado, agencia.getId(), tipo);
         } else {
-            disponibles = model.getReporterosDisponibles(idEventoSeleccionado, agencia.getId());
+            // Sin filtros
+            disponibles = model.getReporterosDisponibles(
+                idEventoSeleccionado, agencia.getId());
         }
+
         view.setDisponibles(disponibles);
     }
 
@@ -146,6 +166,13 @@ public class AsignacionEdicionController {
      * Maneja el cambio en el checkbox de filtro por temática
      */
     private void onFiltroTematicaCambiado() {
+        cargarReporterosDisponibles();
+    }
+
+    /**
+     * Maneja el cambio en el combo de filtro por tipo
+     */
+    private void onFiltroTipoCambiado() {
         cargarReporterosDisponibles();
     }
 
@@ -205,8 +232,9 @@ public class AsignacionEdicionController {
         for (int id : idsSeleccionados) {
             if (!pendientesActuales.contains(id)) {
                 String nombre = view.getNombreDisponible(id);
+                String tipo = view.getTipoDisponible(id);
                 if (nombre != null) {
-                    view.addPendiente(id, nombre);
+                    view.addPendiente(id, nombre, tipo);
                 }
             }
         }

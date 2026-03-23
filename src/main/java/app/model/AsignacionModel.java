@@ -92,6 +92,52 @@ public class AsignacionModel {
     }
 
     /**
+     * Obtiene los reporteros disponibles filtrados por tipo.
+     */
+    public List<ReporteroDTO> getReporterosDisponiblesPorTipo(int idEvento, int idAgencia, String tipo) {
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia FROM Reportero r " +
+                     "WHERE r.id_agencia = ? " +
+                     "AND r.tipo = ? " +
+                     "AND r.id NOT IN (" +
+                     "    SELECT a.id_reportero FROM Asignacion a " +
+                     "    JOIN Evento e ON a.id_evento = e.id " +
+                     "    WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "    AND a.id_evento != ?" +
+                     ") " +
+                     "AND r.id NOT IN (" +
+                     "    SELECT a2.id_reportero FROM Asignacion a2 " +
+                     "    WHERE a2.id_evento = ?" +
+                     ") " +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, tipo, idEvento, idEvento, idEvento);
+    }
+
+    /**
+     * Obtiene los reporteros disponibles filtrados por temática y tipo simultáneamente.
+     */
+    public List<ReporteroDTO> getReporterosDisponiblesPorTematicaYTipo(int idEvento, int idAgencia, String tipo) {
+        String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia " +
+                     "FROM Reportero r " +
+                     "JOIN ReporteroTematica rt ON r.id = rt.id_reportero " +
+                     "JOIN EventoTematica et ON rt.id_tematica = et.id_tematica " +
+                     "WHERE r.id_agencia = ? " +
+                     "  AND et.id_evento = ? " +
+                     "  AND r.tipo = ? " +
+                     "  AND r.id NOT IN (" +
+                     "      SELECT a.id_reportero FROM Asignacion a " +
+                     "      JOIN Evento e ON a.id_evento = e.id " +
+                     "      WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "      AND a.id_evento != ?" +
+                     "  ) " +
+                     "  AND r.id NOT IN (" +
+                     "      SELECT a2.id_reportero FROM Asignacion a2 " +
+                     "      WHERE a2.id_evento = ?" +
+                     "  ) " +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, tipo, idEvento, idEvento, idEvento);
+    }
+
+    /**
      * Obtiene los reporteros ya asignados a un evento
      */
     public List<ReporteroDTO> getReporterosAsignados(int idEvento) {

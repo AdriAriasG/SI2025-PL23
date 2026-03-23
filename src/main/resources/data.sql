@@ -262,7 +262,19 @@ INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
 UPDATE Reportero SET tipo = 'CAMAROGRAFO' WHERE id = 2;
+UPDATE Reportero SET tipo = 'BASE' WHERE id = 3;
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 4;
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 5;
+UPDATE Reportero SET tipo = 'CAMAROGRAFO' WHERE id = 6;
+UPDATE Reportero SET tipo = 'BASE' WHERE id = 7;
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 8;
+UPDATE Reportero SET tipo = 'BASE' WHERE id = 9;
+UPDATE Reportero SET tipo = 'CAMAROGRAFO' WHERE id = 16;
+UPDATE Reportero SET tipo = 'BASE' WHERE id = 17;
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 90;
+UPDATE Reportero SET tipo = 'CAMAROGRAFO' WHERE id = 91;
+UPDATE Reportero SET tipo = 'BASE' WHERE id = 200;
+UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 201;
 
 -- Insertar reporteros Freelance (id_agencia es NULL)
 INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (500, 'Freelance Juan', 'BASE', NULL);
