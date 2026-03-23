@@ -101,9 +101,7 @@ public class SwingMain {
 		panelAgencia.add(lblAgencia);
 		panelAgencia.add(cbAgencias);
 		frame.getContentPane().add(panelAgencia);
-
-		addButtonAgencia("HU #33537: Asignación de reporteros (ADRIAN)");
-		addButtonAgencia("HU #33543: Modificar asignación (ADRIAN)");
+		addButtonAgencia("HU #33543: Asignar/modificar reporteros (ADRIAN)");
 		addButtonAgencia("HU #33548: Informe de un evento (ADRIAN)");
 		addButtonAgencia("HU #33539: Ofrecer reportajes (IVAN)");
 		addButtonAgencia("Modificar ofrecimiento (IVAN)");

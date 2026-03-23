@@ -36,6 +36,8 @@ public class AsignacionView {
     // Componentes para reporteros disponibles
     private JTable tablaDisponibles;
     private DefaultTableModel modeloDisponibles;
+    private JCheckBox chkFiltroTematica;
+    private JLabel lblTematicasEvento;
     
     // Lista de reporteros a asignar
     private DefaultListModel<String> listaParaAsignar;

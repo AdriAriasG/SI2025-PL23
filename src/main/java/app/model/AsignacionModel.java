@@ -51,7 +51,7 @@ public class AsignacionModel {
      * 3. No está ya asignado a este evento
      */
     public List<ReporteroDTO> getReporterosDisponibles(int idEvento, int idAgencia) {
-        String sql = "SELECT r.id, r.nombre, r.id_agencia FROM Reportero r " +
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia FROM Reportero r " +
                      "WHERE r.id_agencia = ? " +
                      "AND r.id NOT IN (" +
                      "    SELECT a.id_reportero FROM Asignacion a " +
@@ -68,14 +68,49 @@ public class AsignacionModel {
     }
 
     /**
+     * Obtiene los reporteros disponibles filtrados por temática del evento.
+     */
+    public List<ReporteroDTO> getReporterosDisponiblesPorTematica(int idEvento, int idAgencia) {
+        String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia " +
+                     "FROM Reportero r " +
+                     "JOIN ReporteroTematica rt ON r.id = rt.id_reportero " +
+                     "JOIN EventoTematica et ON rt.id_tematica = et.id_tematica " +
+                     "WHERE r.id_agencia = ? " +
+                     "  AND et.id_evento = ? " +
+                     "  AND r.id NOT IN (" +
+                     "      SELECT a.id_reportero FROM Asignacion a " +
+                     "      JOIN Evento e ON a.id_evento = e.id " +
+                     "      WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "      AND a.id_evento != ?" +
+                     "  ) " +
+                     "  AND r.id NOT IN (" +
+                     "      SELECT a2.id_reportero FROM Asignacion a2 " +
+                     "      WHERE a2.id_evento = ?" +
+                     "  ) " +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento, idEvento);
+    }
+
+    /**
      * Obtiene los reporteros ya asignados a un evento
      */
     public List<ReporteroDTO> getReporterosAsignados(int idEvento) {
-        String sql = "SELECT r.id, r.nombre, r.id_agencia FROM Reportero r " +
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia FROM Reportero r " +
                      "JOIN Asignacion a ON r.id = a.id_reportero " +
                      "WHERE a.id_evento = ? " +
                      "ORDER BY r.nombre";
         return db.executeQueryPojo(ReporteroDTO.class, sql, idEvento);
+    }
+
+    /**
+     * Obtiene las temáticas de un evento
+     */
+    public List<app.dto.TematicaDTO> getTematicasEvento(int idEvento) {
+        String sql = "SELECT t.id, t.nombre FROM Tematica t " +
+                     "JOIN EventoTematica et ON t.id = et.id_tematica " +
+                     "WHERE et.id_evento = ? " +
+                     "ORDER BY t.nombre";
+        return db.executeQueryPojo(app.dto.TematicaDTO.class, sql, idEvento);
     }
 
     /**

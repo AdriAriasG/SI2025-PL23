@@ -49,6 +49,8 @@ public class AsignacionEdicionView {
     // Componentes para reporteros disponibles
     private JTable tablaDisponibles;
     private DefaultTableModel modeloDisponibles;
+    private JCheckBox chkFiltroTematica;
+    private JLabel lblTematicasEvento;
     
     // Botones
     private JButton btnAsignar;
@@ -168,6 +170,18 @@ public class AsignacionEdicionView {
         panelDisponibles.setLayout(new BoxLayout(panelDisponibles, BoxLayout.Y_AXIS));
         panelDisponibles.setBorder(BorderFactory.createTitledBorder("Reporteros Disponibles (marque para añadir al evento)"));
         
+        // Subpanel para filtros de disponibilidad
+        JPanel panelFiltrosDisp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        chkFiltroTematica = new JCheckBox("Filtrar por temática del evento");
+        panelFiltrosDisp.add(chkFiltroTematica);
+        panelDisponibles.add(panelFiltrosDisp);
+        
+        // Label para temáticas del evento
+        lblTematicasEvento = new JLabel("Temáticas del evento: -");
+        JPanel panelTematicas = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTematicas.add(lblTematicasEvento);
+        panelDisponibles.add(panelTematicas);
+        
         modeloDisponibles = new DefaultTableModel(new String[]{"Añadir", "ID", "Nombre"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -207,8 +221,26 @@ public class AsignacionEdicionView {
     public JButton getBtnEliminar() { return btnEliminar; }
     public JButton getBtnAsignar() { return btnAsignar; }
     public JButton getBtnCancelar() { return btnCancelar; }
+    public JCheckBox getChkFiltroTematica() { return chkFiltroTematica; }
+    public JLabel getLblTematicasEvento() { return lblTematicasEvento; }
     
     // === MÉTODOS PARA POBLAR DATOS ===
+    
+    /**
+     * Establece las temáticas del evento en el label
+     */
+    public void setTematicas(List<app.dto.TematicaDTO> tematicas) {
+        if (tematicas == null || tematicas.isEmpty()) {
+            lblTematicasEvento.setText("Temáticas del evento: Ninguna");
+        } else {
+            StringBuilder sb = new StringBuilder("Temáticas del evento: ");
+            for (int i = 0; i < tematicas.size(); i++) {
+                sb.append(tematicas.get(i).getNombre());
+                if (i < tematicas.size() - 1) sb.append(", ");
+            }
+            lblTematicasEvento.setText(sb.toString());
+        }
+    }
     
     /**
      * Limpia y pobla la tabla de eventos

@@ -74,13 +74,17 @@ public class AsignacionEdicionController {
         // Evento: botón asignar
         view.getBtnAsignar().addActionListener(e -> onAsignar());
 
-        // Evento: botón cerrar
+        // Evento: botón cancelar/cerrar
         view.getBtnCancelar().addActionListener(e -> view.getFrame().dispose());
-    }
 
-    /**
-     * Carga los eventos según el filtro
-     */
+        // Evento: cambio de filtro de temática
+        view.getChkFiltroTematica().addActionListener(e -> onFiltroTematicaCambiado());
+        }
+
+        /**
+        * Carga los eventos según el filtro
+        */
+
     private void cargarEventos() {
         int filtroIndex = view.getCbFiltro().getSelectedIndex();
         List<EventoDTO> eventos;
@@ -105,18 +109,44 @@ public class AsignacionEdicionController {
     private void onEventoSeleccionado() {
         int idEvento = view.getIdEventoSeleccionado();
         if (idEvento == -1) {
+            view.getLblTematicasEvento().setText("Temáticas del evento: -");
             return;
         }
         
         idEventoSeleccionado = idEvento;
 
+        // Cargar y mostrar temáticas del evento
+        List<app.dto.TematicaDTO> tematicas = model.getTematicasEvento(idEvento);
+        view.setTematicas(tematicas);
+
         // Cargar reporteros ya asignados al evento
         List<ReporteroDTO> asignados = model.getReporterosAsignados(idEvento);
         view.setAsignados(asignados);
 
-        // Cargar reporteros disponibles (excluyendo los ya asignados)
-        List<ReporteroDTO> disponibles = model.getReporterosDisponibles(idEvento, agencia.getId());
+        // Cargar reporteros disponibles
+        cargarReporterosDisponibles();
+    }
+
+    /**
+     * Carga los reporteros disponibles según el estado del filtro de temática
+     */
+    private void cargarReporterosDisponibles() {
+        if (idEventoSeleccionado == -1) return;
+
+        List<ReporteroDTO> disponibles;
+        if (view.getChkFiltroTematica().isSelected()) {
+            disponibles = model.getReporterosDisponiblesPorTematica(idEventoSeleccionado, agencia.getId());
+        } else {
+            disponibles = model.getReporterosDisponibles(idEventoSeleccionado, agencia.getId());
+        }
         view.setDisponibles(disponibles);
+    }
+
+    /**
+     * Maneja el cambio en el checkbox de filtro por temática
+     */
+    private void onFiltroTematicaCambiado() {
+        cargarReporterosDisponibles();
     }
 
     /**
@@ -271,8 +301,7 @@ public class AsignacionEdicionController {
             List<ReporteroDTO> asignados = model.getReporterosAsignados(idEventoSeleccionado);
             view.setAsignados(asignados);
             
-            List<ReporteroDTO> disponibles = model.getReporterosDisponibles(idEventoSeleccionado, agencia.getId());
-            view.setDisponibles(disponibles);
+            cargarReporterosDisponibles();
         } else {
             // El evento ya no está en la lista
             idEventoSeleccionado = -1;
