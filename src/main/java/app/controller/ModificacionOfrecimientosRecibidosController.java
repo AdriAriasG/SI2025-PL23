@@ -1,17 +1,20 @@
 package app.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import app.dto.OfrecimientoDTO;
+import app.dto.TematicaDTO;
 import app.model.ModificacionOfrecimientosRecibidosModel;
 import app.view.ModificacionOfrecimientosRecibidosView;
+import app.view.ModificacionOfrecimientosRecibidosView.CheckItem;
 
 public class ModificacionOfrecimientosRecibidosController {
-
 	private ModificacionOfrecimientosRecibidosModel model;
 	private ModificacionOfrecimientosRecibidosView view;
 	private int idEmpresa;
 	private List<OfrecimientoDTO> datosActuales;
+	private boolean cargandoCombo = false;
 
 	public ModificacionOfrecimientosRecibidosController(ModificacionOfrecimientosRecibidosModel model, 
 			ModificacionOfrecimientosRecibidosView view, int idEmpresa) {
@@ -22,87 +25,113 @@ public class ModificacionOfrecimientosRecibidosController {
 	}
 
 	private void initController() {
-		// Evento del botón filtrar
+		actualizarComboTematicas();
+		view.getCbTipoFiltro().addActionListener(e -> actualizarComboTematicas());
 		view.getBtnFiltrar().addActionListener(e -> cargarDatos());
+		
+		// Listener para bloquear botones según el acceso concedido
+		view.getTable().getSelectionModel().addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				gestionarEstadoBotones();
+			}
+		});
 
-		// Eventos de decisión
-		view.getBtnAceptar().addActionListener(e -> procesarCambio("ACEPTADO", true));
-		view.getBtnRechazar().addActionListener(e -> procesarCambio("RECHAZADO", false));
-		view.getBtnEliminar().addActionListener(e -> procesarCambio("PENDIENTE", false));
-
-		// Carga inicial
+		view.getBtnAceptar().addActionListener(e -> procesarCambio("ACEPTADO"));
+		view.getBtnRechazar().addActionListener(e -> procesarCambio("RECHAZADO"));
+		view.getBtnEliminar().addActionListener(e -> procesarCambio("PENDIENTE"));
 		cargarDatos();
 	}
 
+	// ESTE ES EL MÉTODO QUE FALTABA
 	public void mostrarVista() {
 		view.getFrame().setVisible(true);
 	}
 
-	private void cargarDatos() {
-		// Miramos qué opción está seleccionada en el combo (0 = Pendientes, 1 = Decididos)
-		boolean yaDecididos = view.getCbFiltro().getSelectedIndex() == 1;
-
-		datosActuales = model.getOfrecimientosFiltrados(idEmpresa, yaDecididos);
-		view.getModel().setRowCount(0);
-
-		if (datosActuales.isEmpty()) {
-			view.mostrarMensajeVacio(true);
-		} else {
-			view.mostrarMensajeVacio(false);
-			for (OfrecimientoDTO o : datosActuales) {
-				view.getModel().addRow(new Object[]{o.getNombre(), o.getFecha(), o.getEstado()});
-			}
+	private void gestionarEstadoBotones() {
+		int fila = view.getTable().getSelectedRow();
+		if (fila != -1 && datosActuales != null) {
+			OfrecimientoDTO sel = datosActuales.get(fila);
+			boolean bloqueado = (sel.getAccesoConcedido() == 1);
+			
+			view.getBtnAceptar().setEnabled(!bloqueado);
+			view.getBtnRechazar().setEnabled(!bloqueado);
+			view.getBtnEliminar().setEnabled(!bloqueado);
+			
+			String msg = bloqueado ? "No se puede modificar: El acceso ya ha sido concedido." : null;
+			view.getBtnAceptar().setToolTipText(msg);
 		}
 	}
 
-	private void procesarCambio(String nuevoEstado, boolean acceso) {
-		// 1. Obtener la fila seleccionada
-		int fila = view.getTable().getSelectedRow();
+	private void cargarDatos() {
+		if (cargandoCombo) return;
+		Double pMin = parsePrecio(view.getTxtPrecioMin().getText());
+		Double pMax = parsePrecio(view.getTxtPrecioMax().getText());
 
-		if (fila == -1) {
-			JOptionPane.showMessageDialog(view.getFrame(), 
-					"Por favor, seleccione un registro de la tabla.", 
-					"Aviso", 
-					JOptionPane.WARNING_MESSAGE);
+		int seleccion = view.getCbTipoFiltro().getSelectedIndex();
+		Boolean yaDecididos = (seleccion == 2) ? Boolean.TRUE : (seleccion == 0 ? Boolean.FALSE : null);
+
+		List<String> seleccionadas = new ArrayList<>();
+		for (int i = 1; i < view.getCbTematicas().getItemCount(); i++) {
+			CheckItem item = view.getCbTematicas().getItemAt(i);
+			if (item != null && item.isSelected()) seleccionadas.add(item.toString());
+		}
+
+		datosActuales = model.getOfrecimientosFiltrados(idEmpresa, yaDecididos, seleccionadas, pMin, pMax);
+		
+		view.getModel().setRowCount(0);
+		if (datosActuales != null && !datosActuales.isEmpty()) {
+			view.mostrarMensajeVacio(false);
+			for (OfrecimientoDTO o : datosActuales) {
+				view.getModel().addRow(new Object[]{
+					o.getNombre(), 
+					o.getFecha(), 
+					String.format("%.2f €", o.getPrecio()), 
+					o.getEstado()
+				});
+			}
+		} else view.mostrarMensajeVacio(true);
+		
+		gestionarEstadoBotones();
+	}
+
+	private void procesarCambio(String nuevoEstado) {
+		int fila = view.getTable().getSelectedRow();
+		if (fila == -1) return;
+		OfrecimientoDTO sel = datosActuales.get(fila);
+		
+		if (sel.getAccesoConcedido() == 1) {
+			JOptionPane.showMessageDialog(view.getFrame(), "Operación no permitida: Acceso ya concedido.");
 			return;
 		}
 
-		// 2. Obtener el objeto de la lista
-		OfrecimientoDTO seleccionado = datosActuales.get(fila);
-
-		// 3. REGLA DE NEGOCIO: Bloqueo total si ya está ACEPTADO
-		if ("ACEPTADO".equals(seleccionado.getEstado())) {
-			JOptionPane.showMessageDialog(view.getFrame(), 
-					"No se puede modificar la decisión: Los ofrecimientos ya aceptados no admiten cambios.", 
-					"Acción Denegada", 
-					JOptionPane.ERROR_MESSAGE);
-			return; 
-		}
-
-		// 4. Confirmación extra si se va a "Eliminar" (PENDIENTE)
-		if ("PENDIENTE".equals(nuevoEstado)) {
-			int confirmar = JOptionPane.showConfirmDialog(view.getFrame(),
-					"¿Desea eliminar la decisión actual y volver a dejar este evento como PENDIENTE?",
-					"Confirmar eliminación",
-					JOptionPane.YES_NO_OPTION);
-			if (confirmar != JOptionPane.YES_OPTION) return;
-		}
-
-		// 5. Ejecutar la actualización en el Modelo
 		try {
-			model.actualizarEstadoOfrecimiento(seleccionado.getId(), nuevoEstado, acceso);
+			model.actualizarEstadoDecision(sel.getId(), nuevoEstado);
+			cargarDatos();
+		} catch (Exception e) { e.printStackTrace(); }
+	}
 
-			// 6. Mensaje de éxito y refrescar
-			String msg = nuevoEstado.equals("PENDIENTE") ? "Decisión eliminada." : "Estado actualizado a " + nuevoEstado;
-			JOptionPane.showMessageDialog(view.getFrame(), msg);
+	private Double parsePrecio(String texto) {
+		if (texto == null || texto.trim().isEmpty()) return null;
+		try { return Double.parseDouble(texto.replace(",", ".")); } catch (Exception e) { return null; }
+	}
 
-			cargarDatos(); 
-
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(view.getFrame(), 
-					"Error al actualizar la base de datos: " + e.getMessage(), 
-					"Error", 
-					JOptionPane.ERROR_MESSAGE);
+	private void actualizarComboTematicas() {
+		cargandoCombo = true;
+		view.getCbTematicas().removeAllItems();
+		CheckItem todas = new CheckItem("--- Todas ---");
+		todas.setSelected(true);
+		view.getCbTematicas().addItem(todas);
+		List<TematicaDTO> tematicas;
+		int seleccion = view.getCbTipoFiltro().getSelectedIndex();
+		if (seleccion == 1) tematicas = model.getTematicasEmpresa(idEmpresa);
+		else tematicas = model.getTodasTematicas();
+		if (tematicas != null) {
+			for (TematicaDTO t : tematicas) {
+				CheckItem item = new CheckItem(t.getNombre());
+				item.setSelected(true);
+				view.getCbTematicas().addItem(item);
+			}
 		}
+		cargandoCombo = false;
 	}
 }

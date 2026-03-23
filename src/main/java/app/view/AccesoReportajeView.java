@@ -7,8 +7,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
@@ -20,8 +23,13 @@ import javax.swing.JSplitPane;
 public class AccesoReportajeView {
 
     private JFrame frame;
+    private JScrollPane scrollMultimedia;
     private JTable table;
     private DefaultTableModel model;
+    
+    private DefaultListModel<String> modelMultimedia;
+    private JList<String> listMultimedia;
+    private JButton btnDescargarJSON;
     
     //Componentes de la vista previa
     private JLabel lblTitulo;
@@ -29,6 +37,7 @@ public class AccesoReportajeView {
     private JTextPane txtCuerpo;
     private JLabel lblMensajeVacio;
     private JScrollPane scrollTabla;
+    
     
     
 	
@@ -93,7 +102,31 @@ public class AccesoReportajeView {
 	scrollCuerpo.setBorder(null);
 	
 	panelVisor.add(panelCabecera, BorderLayout.NORTH);
-	panelVisor.add(scrollCuerpo, BorderLayout.CENTER);
+	JPanel panelContenido = new JPanel(new GridLayout(2, 1, 0, 10));
+    panelContenido.setBackground(Color.WHITE);
+
+    panelContenido.add(scrollCuerpo); // Añadimos el scroll que ya tenías
+
+    // Nueva Lista Multimedia
+    modelMultimedia = new javax.swing.DefaultListModel<>();
+    listMultimedia = new javax.swing.JList<>(modelMultimedia);
+    scrollMultimedia = new JScrollPane(listMultimedia);
+    scrollMultimedia = new JScrollPane(listMultimedia);
+    scrollMultimedia.setBorder(javax.swing.BorderFactory.createTitledBorder("Elementos Multimedia"));
+    scrollMultimedia.setVisible(false);
+    panelContenido.add(scrollMultimedia);
+
+    panelVisor.add(panelContenido, BorderLayout.CENTER);
+
+    // Botón descargar abajo a la derecha
+    JPanel panelSur = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+    panelSur.setBackground(Color.WHITE);
+    btnDescargarJSON = new javax.swing.JButton("Descargar");
+    btnDescargarJSON.setEnabled(false); 
+    panelSur.add(btnDescargarJSON);
+    panelVisor.add(panelSur, BorderLayout.SOUTH);
+	
+	
 	
 	JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTabla, panelVisor);
 	splitPane.setDividerLocation(300);
@@ -134,11 +167,36 @@ public class AccesoReportajeView {
     	return txtCuerpo;
     }
     
-    public void actualizarReportaje(String titulo, String subtitulo, String cuerpo) {
-    	lblTitulo.setText(titulo);
-    	lblSubtitulo.setText(subtitulo);
-    	txtCuerpo.setText(cuerpo);
-    	txtCuerpo.setCaretPosition(0);
+    public javax.swing.JButton getBtnDescargarJSON() {
+        return btnDescargarJSON;
+    }
+    
+    public void actualizarReportaje(String titulo, String subtitulo, String cuerpo, java.util.List<String> archivos) {
+        // Si por lo que sea scrollMultimedia aún es null, salimos para no romper el programa
+        if (scrollMultimedia == null) return;
+
+        lblTitulo.setText(titulo);
+        lblSubtitulo.setText(subtitulo);
+        txtCuerpo.setText(cuerpo);
+        
+        modelMultimedia.clear();
+        boolean tieneArchivos = (archivos != null && !archivos.isEmpty());
+        
+        if (tieneArchivos) {
+            for (String archivo : archivos) {
+                modelMultimedia.addElement(archivo);
+            }
+        }
+        
+        scrollMultimedia.setVisible(tieneArchivos);
+        
+        // Esto hace que el panel se ajuste al nuevo tamaño
+        if (scrollMultimedia.getParent() != null) {
+            scrollMultimedia.getParent().revalidate();
+            scrollMultimedia.getParent().repaint();
+        }
+        
+        btnDescargarJSON.setEnabled(true);
     }
     
 }

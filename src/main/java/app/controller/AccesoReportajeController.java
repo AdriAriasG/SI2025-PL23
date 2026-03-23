@@ -3,129 +3,115 @@ package app.controller;
 import app.dto.ReportajeDTO;
 import app.model.AccesoReportajeModel;
 import app.view.AccesoReportajeView;
-
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class AccesoReportajeController {
-	
-	private AccesoReportajeView view;
-	private AccesoReportajeModel model;
-	private List<ReportajeDTO> reportajesActuales;
-	private int idEmpresa;
-	
-	public AccesoReportajeController(AccesoReportajeView view, AccesoReportajeModel model, int idEmpresa){
-		this.view = view;
-		this.model = model;
-		this.idEmpresa = idEmpresa;
-		this.initController();
-	}
-	
-	public void initController() {
-		cargarTabla();
-		
-		view.getTable().getSelectionModel().addListSelectionListener(e->{
-			if(!e.getValueIsAdjusting()) {
-				actualizarVisor();
-			}
-		});
-		
-		view.getTxtCuerpo().addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 2) {
-					abrirZoom();
-				}
-			}
-		});	
-	}
-	
-	
-	public void cargarTabla(){
-		reportajesActuales = model.getReportajesConAcceso(this.idEmpresa);
-		view.getModel().setRowCount(0);
-		
-		if(reportajesActuales.isEmpty()) {
-			view.mostrarMensajeVacio(true);
-		}
-		else {
-			
-			view.mostrarMensajeVacio(false);
-			
-			for(ReportajeDTO r: reportajesActuales) {
-				view.getModel().addRow(new Object[] {
-						r.getNombreEvento(),
-						r.getFecha()
-				});
-			}
-		}
-	}
-	
-	private void actualizarVisor() {
-		int fila = view.getTable().getSelectedRow();
-		if (fila != -1) {
-			ReportajeDTO seleccionado = reportajesActuales.get(fila);
-			view.actualizarReportaje(
-					seleccionado.getTitulo(),
-					seleccionado.getSubtitulo(),
-					seleccionado.getCuerpo());
-		}
-	}
-	
-	private void abrirZoom() {
-		int fila = view.getTable().getSelectedRow();
-	    if (fila == -1) return;
+    
+    private AccesoReportajeView view;
+    private AccesoReportajeModel model;
+    private List<ReportajeDTO> reportajesActuales;
+    private int idEmpresa;
+    
+    public AccesoReportajeController(AccesoReportajeView view, AccesoReportajeModel model, int idEmpresa){
+        this.view = view;
+        this.model = model;
+        this.idEmpresa = idEmpresa;
+        this.initController();
+    }
+    
+    public void initController() {
+        cargarTabla();
+        configurarBotonDescarga();
 
-	    ReportajeDTO sel = reportajesActuales.get(fila);
+        view.getTable().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                actualizarVisor();
+            }
+        });
 
-	    // 1. Creamos la ventana de Zoom (JDialog)
-	    JDialog dialogZoom = new JDialog(view.getFrame(), "Vista Ampliada", true);
-	    dialogZoom.setSize(800, 600);
-	    dialogZoom.setLocationRelativeTo(view.getFrame());
-	    dialogZoom.setLayout(new BorderLayout(15, 15));
+        view.getFrame().setVisible(true);
+    }
+    
+    public void cargarTabla(){
+        reportajesActuales = model.getReportajesConAcceso(this.idEmpresa);
+        view.getModel().setRowCount(0);
+        
+        if(reportajesActuales.isEmpty()) {
+            view.mostrarMensajeVacio(true);
+        } else {
+            view.mostrarMensajeVacio(false);
+            for(ReportajeDTO r: reportajesActuales) {
+                view.getModel().addRow(new Object[] { r.getNombreEvento(), r.getFecha() });
+            }
+        }
+    }
+    
+    private void actualizarVisor() {
+        int fila = view.getTable().getSelectedRow();
+        if (fila != -1) {
+            ReportajeDTO seleccionado = reportajesActuales.get(fila);
+            view.actualizarReportaje(
+                    seleccionado.getTitulo(),
+                    seleccionado.getSubtitulo(),
+                    seleccionado.getCuerpo(),
+                    seleccionado.getArchivosMultimedia());
+        }
+    }
+    
+    private void configurarBotonDescarga() {
+        view.getBtnDescargarJSON().addActionListener(e -> {
+            int fila = view.getTable().getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(view.getFrame(), "Por favor, selecciona un reportaje.");
+                return;
+            }
 
-	    // 2. Área de texto configurada para lectura fácil
-	    JTextPane txtZoom = new JTextPane();
-	    txtZoom.setEditable(false);
-	    txtZoom.setMargin(new java.awt.Insets(20, 20, 20, 20));
+            ReportajeDTO sel = reportajesActuales.get(fila);
+            
+            // Generar JSON
+            StringBuilder json = new StringBuilder();
+            json.append("{\n");
+            json.append("  \"evento\": \"").append(sel.getNombreEvento()).append("\",\n");
+            json.append("  \"fecha\": \"").append(sel.getFecha()).append("\",\n");
+            json.append("  \"titulo\": \"").append(sel.getTitulo()).append("\",\n");
+            json.append("  \"subtitulo\": \"").append(sel.getSubtitulo()).append("\",\n");
+            String cuerpoEscapado = sel.getCuerpo().replace("\"", "\\\"").replace("\n", "\\n");
+            json.append("  \"cuerpo\": \"").append(cuerpoEscapado).append("\",\n");
+            json.append("  \"multimedia\": [\n");
+            for (int i = 0; i < sel.getArchivosMultimedia().size(); i++) {
+                json.append("    \"").append(sel.getArchivosMultimedia().get(i)).append("\"");
+                if (i < sel.getArchivosMultimedia().size() - 1) json.append(",");
+                json.append("\n");
+            }
+            json.append("  ]\n}");
 
-	    // 3. Dar formato al texto con HTML para que sea GIGANTE
-	    String htmlText = "<html><body style='font-family: Arial; padding: 10px;'>" +
-	                      "<h1 style='color: #2c3e50; font-size: 26px;'>" + sel.getTitulo() + "</h1>" +
-	                      "<h3 style='color: #7f8c8d; font-size: 18px; font-style: italic;'>" + sel.getSubtitulo() + "</h3>" +
-	                      "<hr><br>" +
-	                      "<p style='font-size: 20px; line-height: 1.5;'>" + sel.getCuerpo() + "</p>" +
-	                      "</body></html>";
-	    
-	    txtZoom.setContentType("text/html");
-	    txtZoom.setText(htmlText);
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar Reportaje JSON");
+            String nombreSugerido = "reportaje_" + sel.getNombreEvento().replaceAll("\\s+", "_") + ".json";
+            fileChooser.setSelectedFile(new java.io.File(nombreSugerido));
 
-	    // 4. Scroll y botón de cerrar
-	    JScrollPane scroll = new JScrollPane(txtZoom);
-	    JButton btnCerrar = new JButton("Cerrar vista ampliada");
-	    btnCerrar.setFont(new Font("Arial", Font.BOLD, 16));
-	    btnCerrar.addActionListener(e -> dialogZoom.dispose());
+            if (fileChooser.showSaveDialog(view.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                java.io.File archivoDestino = fileChooser.getSelectedFile();
+                if (!archivoDestino.getName().toLowerCase().endsWith(".json")) {
+                    archivoDestino = new java.io.File(archivoDestino.getAbsolutePath() + ".json");
+                }
 
-	    dialogZoom.add(scroll, BorderLayout.CENTER);
-	    dialogZoom.add(btnCerrar, BorderLayout.SOUTH);
+                try (java.io.FileWriter writer = new java.io.FileWriter(archivoDestino)) {
+                    writer.write(json.toString());
+                    
+                    // ACTUALIZACIÓN DE BASE DE DATOS
+                    model.marcarComoDescargado(sel.getIdEvento(), this.idEmpresa);
+                    
+                    JOptionPane.showMessageDialog(view.getFrame(), "Descarga completada y registro actualizado.");
+                } catch (java.io.IOException ex) {
+                    JOptionPane.showMessageDialog(view.getFrame(), "Error al guardar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
 
-	    // 5. Mostrar
-	    dialogZoom.setVisible(true);
-	}
-	
-	public void mostrarVista() {
-		view.getFrame().setVisible(true);
-	}
-	
-	
+    public void mostrarVista() { view.getFrame().setVisible(true); }
 }
