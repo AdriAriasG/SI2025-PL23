@@ -158,6 +158,7 @@ public class SwingMain {
 
 		addButtonEmpresa("Acceso a reportajes");
 		addButtonEmpresa("Gestionar Ofrecimientos");
+		addButtonEmpresa("Generar Informe Reportajes Acceso (ADRIAN)");
 
 		// --- MANTENIMIENTO BD ---
 		addLabel("MANTENIMIENTO BD");
@@ -413,11 +414,15 @@ public class SwingMain {
 		else if (buttonText.contains("Gestionar Ofrecimientos")) {
 			app.model.ModificacionOfrecimientosRecibidosModel modelMod = new app.model.ModificacionOfrecimientosRecibidosModel();
 			app.view.ModificacionOfrecimientosRecibidosView viewMod = new app.view.ModificacionOfrecimientosRecibidosView();
-			app.controller.ModificacionOfrecimientosRecibidosController controllerMod = 
-					new app.controller.ModificacionOfrecimientosRecibidosController(modelMod, viewMod, empresaSeleccionada.getId());    
+			app.controller.ModificacionOfrecimientosRecibidosController controllerMod =
+					new app.controller.ModificacionOfrecimientosRecibidosController(modelMod, viewMod, empresaSeleccionada.getId());
 			controllerMod.mostrarVista();
 		}
-		else {
+		else if (buttonText.contains("Generar Informe Reportajes Acceso")) {
+			app.model.InformeReportajeEmpresaModel modelInf = new app.model.InformeReportajeEmpresaModel();
+			app.view.InformeReportajeEmpresaView viewInf = new app.view.InformeReportajeEmpresaView();
+			new app.controller.InformeReportajeEmpresaController(modelInf, viewInf, empresaSeleccionada);
+		}		else {
 			javax.swing.JOptionPane.showMessageDialog(frame, 
 					"Acción no implementada: " + buttonText + "\nEmpresa seleccionada: " + empresaSeleccionada.getNombre());
 		}

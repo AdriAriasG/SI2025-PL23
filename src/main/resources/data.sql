@@ -134,12 +134,14 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (4, 10, 4, 'ACEPTADO', TRUE);
 
 -- Evento 11 (Inauguracion Museo)
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (5, 11, 1, 'PENDIENTE', FALSE);
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (6, 11, 5, 'ACEPTADO', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio) VALUES (5, 11, 1, 'PENDIENTE', FALSE, 50.0);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio) VALUES (6, 11, 5, 'ACEPTADO', FALSE, 400.0);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio) VALUES (1100, 11, 4, 'ACEPTADO', TRUE, 120.0);
 
 -- Evento 14 (Festival de Cine)
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (7, 14, 2, 'PENDIENTE', FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (8, 14, 6, 'PENDIENTE', FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio) VALUES (1400, 14, 4, 'ACEPTADO', TRUE, 300.0);
 
 -- Evento 20 (Concierto Rock Festival)
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (9, 20, 2, 'ACEPTADO', FALSE);
