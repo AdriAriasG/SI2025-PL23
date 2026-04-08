@@ -46,6 +46,8 @@ import app.controller.OfrecerReportajesController;
 import app.model.RevisionReportajeModel;
 import app.view.RevisionReportajeView;
 import app.controller.RevisionReportajeController;
+import app.view.FinalizarReportajeView;
+import app.controller.FinalizarReportajeController;
 
 public class SwingMain {
 
@@ -128,6 +130,7 @@ public class SwingMain {
 		addButtonReportero("HU #34061: Gestión de reportaje (DIEGO)");
 		addButtonReportero("HU #33547: Restaurar versión previa (DIEGO)");
 		addButtonReportero("HU #34066: Revisar reportajes (DIEGO)");
+		addButtonReportero("HU #34427: Finalizar reportaje (DIEGO)");
 
 		// --- REPORTERO FREELANCE (IVAN) ---
 		addLabel("REPORTERO FREELANCE (Ivan)");
@@ -361,6 +364,7 @@ public class SwingMain {
 					reporteroSeleccionado.getId());
 		}
 		
+		
 		// Revisar reportajes
 		else if (buttonText.contains("Revisar reportajes")) {
 
@@ -374,6 +378,18 @@ public class SwingMain {
 		    );
 		}
 
+		// Finalizar reportaje
+		else if (buttonText.contains("Finalizar reportaje")) {
+			
+			ReportajeModel model = new ReportajeModel();
+			FinalizarReportajeView view = new FinalizarReportajeView();
+			
+			new FinalizarReportajeController(
+					model,
+					view,
+					reporteroSeleccionado.getId()
+					);
+		}
 		// Restaurar versión
 		else if (buttonText.contains("#33547")) {
 

@@ -51,7 +51,9 @@ CREATE TABLE Reportaje (
     id_evento INTEGER UNIQUE NOT NULL,
     id_reportero_autor INTEGER NOT NULL,
     titulo VARCHAR(255) UNIQUE NOT NULL,
-    estado VARCHAR(20) CHECK (estado IN ('NORMAL', 'EN_REVISION')) DEFAULT 'NORMAL',
+    estado VARCHAR(20)
+        CHECK (estado IN ('NORMAL', 'EN_REVISION', 'TERMINADO'))
+        DEFAULT 'NORMAL',
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero_autor) REFERENCES Reportero(id)
 );

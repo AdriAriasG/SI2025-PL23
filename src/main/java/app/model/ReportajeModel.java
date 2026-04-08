@@ -5,6 +5,7 @@ import java.util.List;
 
 import app.dto.EventoDTO;
 import app.dto.MultimediaDTO;
+import app.dto.RevisionDTO;
 import app.util.ApplicationException;
 import app.util.Database;
 
@@ -140,6 +141,9 @@ public class ReportajeModel {
 
 		if (autor == null)
 			throw new ApplicationException("Solo el autor puede modificar el reportaje");
+		
+		// Validamos si cumple condiciones para finalizar
+		validarNoTerminado(idEvento);
 
 		// Obtener version actual
 		VersionDTO versionActual = db.executeQueryPojo(
@@ -293,6 +297,9 @@ public class ReportajeModel {
 			int idVersionSeleccionada,
 			boolean restaurarSubtitulo,
 			boolean restaurarCuerpo) {
+		
+		// Validamos si cumple las condiciones para finalizar
+		validarNoTerminado(idEvento);
 
 		// Obtener reportaje
 		Integer idReportaje = db.executeQueryScalar(
@@ -382,7 +389,7 @@ public class ReportajeModel {
 			int idAutor,
 			String ruta,
 			String tipo) {
-
+		
 		Integer idReportaje = db.executeQueryScalar(
 				Integer.class,
 				"SELECT id FROM Reportaje WHERE id_evento = ?",
@@ -391,6 +398,9 @@ public class ReportajeModel {
 
 		if (idReportaje == null)
 			throw new ApplicationException("Debe existir un reportaje");
+		
+		// Validamos si cumple las condiciones para finalizar
+		validarNoTerminado(idEvento);
 
 		String insert = """
 				INSERT INTO Multimedia
@@ -407,6 +417,8 @@ public class ReportajeModel {
 	}
 
 	public void cambiarEstadoMultimedia(int idMultimedia, int idReportero) {
+		// Validamos condiciones para finalizar reportaje
+		validarNoTerminadoPorMultimedia(idMultimedia);
 
 		MultimediaDTO multimedia = db.executeQueryPojo(
 				MultimediaDTO.class,
@@ -433,6 +445,8 @@ public class ReportajeModel {
 
 	// eliminarMultimedia (solo si estado es BORRADOR y si el reportero es el autor)
 	public void eliminarMultimedia(int idMultimedia, int idReportero) {
+		// Validamos condiciones para finalizar reportaje
+		validarNoTerminadoPorMultimedia(idMultimedia);
 
 		MultimediaDTO multimedia = db.executeQueryPojo(
 				MultimediaDTO.class,
@@ -455,6 +469,213 @@ public class ReportajeModel {
 				);
 	}
 
+	/*
+	 * Como reportero, quiero poder marcar un reportaje como finalizado
+	 */
+	public void finalizarReportaje(int idEvento, int idReportero) {
+
+		// Obtener reportaje
+		Integer idReportaje = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (idReportaje == null)
+			throw new ApplicationException("No existe reportaje para este evento");
+
+		// Validar que es el autor
+		Integer autor = db.executeQueryScalar(
+				Integer.class,
+				"SELECT id_reportero_autor FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (!idReporteroEqualsAutor(idReportero, autor))
+			throw new ApplicationException("Solo el autor puede finalizar el reportaje");
+
+		// Validar estado actual
+		String estado = db.executeQueryScalar(
+				String.class,
+				"SELECT estado FROM Reportaje WHERE id_evento = ?",
+				idEvento
+				);
+
+		if (!"EN_REVISION".equals(estado))
+			throw new ApplicationException("El reportaje debe estar EN_REVISION");
+
+		// Validar que TODOS han finalizado revisión
+		Long pendientes = db.executeQueryScalar(
+				Long.class,
+				"""
+				SELECT COUNT(*)
+				FROM Asignacion a
+				LEFT JOIN RevisionReportaje r
+				    ON a.id_evento = ?
+				    AND a.id_reportero = r.id_reportero
+				WHERE a.id_evento = ?
+				  AND (r.estado IS NULL OR r.estado != 'FINALIZADA')
+				""",
+				idEvento,
+				idEvento
+				);
+
+		if (pendientes != null && pendientes > 0)
+			throw new ApplicationException("Todos los reporteros deben finalizar su revisión");
+
+		// Cambiar estado a TERMINADO
+		db.executeUpdate(
+				"UPDATE Reportaje SET estado = 'TERMINADO' WHERE id_evento = ?",
+				idEvento
+				);
+	}
+	
+	private boolean idReporteroEqualsAutor(int idReportero, Integer autor) {
+	    return autor != null && autor.equals(idReportero);
+	}
+	
+	private void validarNoTerminado(int idEvento) {
+
+	    String estado = db.executeQueryScalar(
+	            String.class,
+	            "SELECT estado FROM Reportaje WHERE id_evento = ?",
+	            idEvento
+	    );
+
+	    if ("TERMINADO".equals(estado))
+	        throw new ApplicationException("El reportaje está TERMINADO y no puede modificarse");
+	}
+
+	private void validarNoTerminadoPorMultimedia(int idMultimedia) {
+
+	    String estado = db.executeQueryScalar(
+	        String.class,
+	        """
+	        SELECT r.estado
+	        FROM Multimedia m
+	        JOIN Reportaje r ON m.id_reportaje = r.id
+	        WHERE m.id = ?
+	        """,
+	        idMultimedia
+	    );
+
+	    if ("TERMINADO".equals(estado))
+	        throw new ApplicationException(
+	            "El reportaje está TERMINADO y no puede modificarse"
+	        );
+	}
+	
+	public List<EventoDTO> getReportajesEnRevisionComoAutor(int idReportero) {
+
+	    String sql =
+	        "SELECT e.id, e.nombre, e.fecha, e.id_agencia " +
+	        "FROM Evento e " +
+	        "JOIN Reportaje r ON r.id_evento = e.id " +
+	        "WHERE r.id_reportero_autor = ? " +
+	        "AND r.estado = 'EN_REVISION' " +
+	        "ORDER BY e.fecha, e.nombre";
+
+	    return db.executeQueryPojo(EventoDTO.class, sql, idReportero);
+	}
+	
+	public List<RevisionDTO> getRevisionesReportaje(int idEvento) {
+
+	    String sql =
+	        "SELECT a.id_reportero AS idReportero, " +
+	        "COALESCE(r.estado, 'PENDIENTE') AS estado, " +
+	        "r.comentario AS comentario " +
+	        "FROM Asignacion a " +
+	        "LEFT JOIN RevisionReportaje r " +
+	        "   ON a.id_evento = r.id_reportaje " +
+	        "   AND a.id_reportero = r.id_reportero " +
+	        "WHERE a.id_evento = ?";
+
+	    return db.executeQueryPojo(RevisionDTO.class, sql, idEvento);
+	}
+	
+	public void modificarContenidoFinal(
+	        int idEvento,
+	        int idReportero,
+	        String titulo,
+	        String subtitulo,
+	        String cuerpo) {
+
+	    Integer idReportaje = db.executeQueryScalar(
+	            Integer.class,
+	            "SELECT id FROM Reportaje WHERE id_evento = ?",
+	            idEvento
+	    );
+
+	    if (idReportaje == null)
+	        throw new ApplicationException("No existe reportaje");
+
+	    Integer autor = db.executeQueryScalar(
+	            Integer.class,
+	            "SELECT id_reportero_autor FROM Reportaje WHERE id_evento = ?",
+	            idEvento
+	    );
+
+	    if (!autor.equals(idReportero))
+	        throw new ApplicationException("Solo el autor puede modificar");
+
+	    String estado = db.executeQueryScalar(
+	            String.class,
+	            "SELECT estado FROM Reportaje WHERE id_evento = ?",
+	            idEvento
+	    );
+
+	    if (!"EN_REVISION".equals(estado))
+	        throw new ApplicationException(
+	            "Solo se puede modificar si está EN_REVISION"
+	        );
+
+	    // Actualizar título
+	    db.executeUpdate(
+	            "UPDATE Reportaje SET titulo = ? WHERE id = ?",
+	            titulo,
+	            idReportaje
+	    );
+
+	    // Sobrescribir última versión (la más reciente por fecha)
+	    Integer idVersion = db.executeQueryScalar(
+	            Integer.class,
+	            """
+	            SELECT id
+	            FROM VersionReportaje
+	            WHERE id_reportaje = ?
+	            ORDER BY fecha_hora DESC
+	            LIMIT 1
+	            """,
+	            idReportaje
+	    );
+
+	    if (idVersion == null)
+	        throw new ApplicationException("No existe versión para modificar");
+
+	    db.executeUpdate(
+	            """
+	            UPDATE VersionReportaje
+	            SET subtitulo = ?, cuerpo = ?
+	            WHERE id = ?
+	            """,
+	            subtitulo,
+	            cuerpo,
+	            idVersion
+	    );
+	}
+	
+	public String getTituloReportaje(int idEvento) {
+
+	    return db.executeQueryScalar(
+	        String.class,
+	        """
+	        SELECT titulo
+	        FROM Reportaje
+	        WHERE id_evento = ?
+	        """,
+	        idEvento
+	    );
+	}
 
 
 
