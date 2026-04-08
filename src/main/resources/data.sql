@@ -80,9 +80,10 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (11, 3);
 -- Evento 12 (Conferencia Tecnologica) - SIN asignar (para probar HU #33537)
 -- Evento 13 (Maraton Ciudad) - tiene 1 reportero asignado
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (13, 4);
--- Evento 14 (Festival de Cine) - tiene 2 reporteros asignados
+-- Evento 14 (Festival de Cine) - tiene 3 reporteros asignados (incluye BASE para probar finalización HU #34426)
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 1);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 2);
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 3);
 -- Evento 15 (Concierto Sinfonico) - SIN asignar (misma fecha que evento 22 para probar disponibilidad)
 
 -- Agencia 2

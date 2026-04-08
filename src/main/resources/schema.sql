@@ -35,12 +35,14 @@ CREATE TABLE Evento (
     nombre VARCHAR(255) NOT NULL,
     fecha DATE NOT NULL,
     id_agencia INTEGER NOT NULL,
+    asignacion_finalizada BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id)
 );
 
 CREATE TABLE Asignacion (
     id_evento INTEGER NOT NULL,
     id_reportero INTEGER NOT NULL,
+    es_responsable BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (id_evento, id_reportero),
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero) REFERENCES Reportero(id)

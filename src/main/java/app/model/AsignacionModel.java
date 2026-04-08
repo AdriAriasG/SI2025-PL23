@@ -213,4 +213,107 @@ public class AsignacionModel {
         }
         return (String) result.get(0)[0];
     }
+
+    // ===== HU #34426: Reportero Responsable y Finalización =====
+
+    /**
+     * Designa a un reportero como Reportero Responsable (RR) de un evento.
+     * Primero quita el RR actual (si hay) y luego marca al nuevo.
+     */
+    public void setReporteroResponsable(int idEvento, int idReportero) {
+        String sqlQuitar = "UPDATE Asignacion SET es_responsable = FALSE WHERE id_evento = ?";
+        db.executeUpdate(sqlQuitar, idEvento);
+        String sqlPoner = "UPDATE Asignacion SET es_responsable = TRUE WHERE id_evento = ? AND id_reportero = ?";
+        db.executeUpdate(sqlPoner, idEvento, idReportero);
+    }
+
+    /**
+     * Quita la designación de RR de un evento (ningún reportero es RR).
+     */
+    public void quitarReporteroResponsable(int idEvento) {
+        String sql = "UPDATE Asignacion SET es_responsable = FALSE WHERE id_evento = ?";
+        db.executeUpdate(sql, idEvento);
+    }
+
+    /**
+     * Obtiene el ID del Reportero Responsable de un evento, o -1 si no hay.
+     */
+    public int getReporteroResponsable(int idEvento) {
+        String sql = "SELECT id_reportero FROM Asignacion WHERE id_evento = ? AND es_responsable = TRUE";
+        List<Object[]> result = db.executeQueryArray(sql, idEvento);
+        if (result.isEmpty() || result.get(0)[0] == null) {
+            return -1;
+        }
+        return ((Number) result.get(0)[0]).intValue();
+    }
+
+    /**
+     * Comprueba si un evento tiene al menos un reportero de tipo BASE asignado.
+     */
+    public boolean tieneReporteroBase(int idEvento) {
+        String sql = "SELECT COUNT(*) FROM Asignacion a " +
+                     "JOIN Reportero r ON a.id_reportero = r.id " +
+                     "WHERE a.id_evento = ? AND r.tipo = 'BASE'";
+        List<Object[]> result = db.executeQueryArray(sql, idEvento);
+        if (result.isEmpty() || result.get(0)[0] == null) {
+            return false;
+        }
+        return ((Number) result.get(0)[0]).intValue() > 0;
+    }
+
+    /**
+     * Comprueba si la asignación de un evento está finalizada.
+     */
+    public boolean isAsignacionFinalizada(int idEvento) {
+        String sql = "SELECT asignacion_finalizada FROM Evento WHERE id = ?";
+        List<Object[]> result = db.executeQueryArray(sql, idEvento);
+        if (result.isEmpty() || result.get(0)[0] == null) {
+            return false;
+        }
+        Object val = result.get(0)[0];
+        if (val instanceof Boolean) return (Boolean) val;
+        return ((Number) val).intValue() != 0;
+    }
+
+    /**
+     * Finaliza la asignación de un evento (bloquea cambios).
+     */
+    public void finalizarAsignacion(int idEvento) {
+        String sql = "UPDATE Evento SET asignacion_finalizada = TRUE WHERE id = ?";
+        db.executeUpdate(sql, idEvento);
+    }
+
+    /**
+     * Obtiene los reporteros asignados a un evento, incluyendo si son RR.
+     * Devuelve objetos con: id, nombre, tipo, id_agencia, es_responsable.
+     */
+    public List<Object[]> getReporterosAsignadosConRR(int idEvento) {
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia, a.es_responsable " +
+                     "FROM Reportero r " +
+                     "JOIN Asignacion a ON r.id = a.id_reportero " +
+                     "WHERE a.id_evento = ? " +
+                     "ORDER BY a.es_responsable DESC, r.nombre";
+        return db.executeQueryArray(sql, idEvento);
+    }
+
+    /**
+     * Obtiene todos los eventos de una agencia incluyendo el campo asignacion_finalizada.
+     */
+    public List<EventoDTO> getTodosEventosConEstado(int idAgencia) {
+        String sql = "SELECT id, nombre, fecha, id_agencia, asignacion_finalizada FROM Evento " +
+                     "WHERE id_agencia = ? ORDER BY fecha, nombre";
+        return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
+    }
+
+    /**
+     * Obtiene eventos con asignados incluyendo el campo asignacion_finalizada.
+     */
+    public List<EventoDTO> getEventosConAsignadosConEstado(int idAgencia) {
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.id_agencia, e.asignacion_finalizada " +
+                     "FROM Evento e " +
+                     "JOIN Asignacion a ON e.id = a.id_evento " +
+                     "WHERE e.id_agencia = ? " +
+                     "ORDER BY e.fecha, e.nombre";
+        return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
+    }
 }

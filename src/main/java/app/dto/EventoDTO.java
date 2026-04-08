@@ -5,6 +5,7 @@ public class EventoDTO {
     private String nombre;
     private String fecha;
     private int idAgencia;
+    private boolean asignacionFinalizada;
 
     // Constructor vacío para DbUtils
     public EventoDTO() {}
@@ -27,6 +28,9 @@ public class EventoDTO {
 
     public int getIdAgencia() { return idAgencia; }
     public void setIdAgencia(int idAgencia) { this.idAgencia = idAgencia; }
+
+    public boolean isAsignacionFinalizada() { return asignacionFinalizada; }
+    public void setAsignacionFinalizada(boolean asignacionFinalizada) { this.asignacionFinalizada = asignacionFinalizada; }
 
     @Override
     public String toString() {
