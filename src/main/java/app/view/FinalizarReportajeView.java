@@ -5,127 +5,229 @@ import java.awt.*;
 
 public class FinalizarReportajeView {
 
-    private JFrame frame;
+	private JFrame frame;
 
-    private JTable tablaEventos;
-    private JTable tablaRevisiones;
+	private JTable tablaEventos;
+	private JTable tablaRevisiones;
 
-    private JTextField txtTitulo;
-    private JTextField txtSubtitulo;
-    private JTextArea txtCuerpo;
+	private JTextField txtTitulo;
+	private JTextField txtSubtitulo;
+	private JTextArea txtCuerpo;
 
-    private JButton btnGuardarCambios;
-    private JButton btnFinalizar;
+	private JButton btnGuardarCambios;
+	private JButton btnFinalizar;
 
-    public FinalizarReportajeView() {
-        initialize();
-    }
+	private JTable tablaMultimedia;
 
-    private void initialize() {
+	private JTextField txtRuta;
+	private JRadioButton rbImagen;
+	private JRadioButton rbVideo;
 
-        frame = new JFrame();
-        frame.setTitle("Finalizar Reportaje");
-        frame.setBounds(100, 100, 1100, 600);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.getContentPane().setLayout(new BorderLayout());
+	private JButton btnAñadirMultimedia;
+	private JButton btnCambiarEstado;
+	private JButton btnEliminarMultimedia;
 
-        // =========================
-        // PANEL IZQUIERDO - EVENTOS
-        // =========================
+	public FinalizarReportajeView() {
+		initialize();
+	}
 
-        JPanel panelIzq = new JPanel(new BorderLayout());
-        panelIzq.setBorder(BorderFactory.createTitledBorder("Reportajes en revisión"));
+	private void initialize() {
 
-        tablaEventos = new JTable();
-        panelIzq.add(new JScrollPane(tablaEventos), BorderLayout.CENTER);
+		frame = new JFrame();
+		frame.setTitle("Finalizar Reportaje");
+		frame.setBounds(100, 100, 900, 750);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        frame.getContentPane().add(panelIzq, BorderLayout.WEST);
-        panelIzq.setPreferredSize(new Dimension(300, 600));
+		frame.getContentPane().setLayout(
+				new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS)
+				);
 
-        // =========================
-        // PANEL CENTRAL - CONTENIDO
-        // =========================
+		// =========================
+		// REPORTAJES EN REVISIÓN
+		// =========================
 
-        JPanel panelCentro = new JPanel();
-        panelCentro.setLayout(new BorderLayout());
-        panelCentro.setBorder(BorderFactory.createTitledBorder("Contenido del reportaje"));
+		JPanel panelEventos = new JPanel(new BorderLayout());
+		panelEventos.setBorder(
+				BorderFactory.createTitledBorder(
+						"Reportajes en revisión (Reportero responsable)"
+						)
+				);
 
-        JPanel panelCampos = new JPanel();
-        panelCampos.setLayout(new GridLayout(3, 1));
+		tablaEventos = new JTable();
+		panelEventos.add(new JScrollPane(tablaEventos), BorderLayout.CENTER);
 
-        txtTitulo = new JTextField();
-        txtSubtitulo = new JTextField();
-        txtCuerpo = new JTextArea(10, 20);
+		panelEventos.setPreferredSize(new Dimension(800, 90));
+		panelEventos.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+		frame.add(panelEventos);
 
-        panelCampos.add(crearCampo("Título:", txtTitulo));
-        panelCampos.add(crearCampo("Subtítulo:", txtSubtitulo));
-        panelCampos.add(new JScrollPane(txtCuerpo));
+		// =========================
+		// DATOS DEL REPORTAJE
+		// =========================
 
-        panelCentro.add(panelCampos, BorderLayout.CENTER);
+		JPanel panelDatos = new JPanel();
+		panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
+		panelDatos.setBorder(
+				BorderFactory.createTitledBorder("Datos del reportaje (Editable)")
+				);
 
-        btnGuardarCambios = new JButton("Guardar cambios");
-        panelCentro.add(btnGuardarCambios, BorderLayout.SOUTH);
+		txtTitulo = new JTextField();
+		txtSubtitulo = new JTextField();
+		txtCuerpo = new JTextArea(8, 20);
 
-        frame.getContentPane().add(panelCentro, BorderLayout.CENTER);
+		panelDatos.add(crearCampo("Título:", txtTitulo));
+		panelDatos.add(crearCampo("Subtítulo:", txtSubtitulo));
+		JScrollPane scrollCuerpo = new JScrollPane(txtCuerpo);
+		scrollCuerpo.setPreferredSize(new Dimension(800, 120));
+		panelDatos.add(scrollCuerpo);
+		
+		btnGuardarCambios = new JButton("Guardar cambios");
+		panelDatos.add(btnGuardarCambios);
+		
+		panelDatos.setPreferredSize(new Dimension(800, 220));
+		panelDatos.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
 
-        // =========================
-        // PANEL DERECHO - REVISIONES
-        // =========================
+		frame.add(panelDatos);
 
-        JPanel panelDer = new JPanel(new BorderLayout());
-        panelDer.setBorder(BorderFactory.createTitledBorder("Revisiones"));
+		// =========================
+		// CONTENIDO MULTIMEDIA
+		// =========================
 
-        tablaRevisiones = new JTable();
-        panelDer.add(new JScrollPane(tablaRevisiones), BorderLayout.CENTER);
+		JPanel panelMultimedia = new JPanel(new BorderLayout());
+		panelMultimedia.setBorder(
+				BorderFactory.createTitledBorder("Contenido multimedia (Editable)")
+				);
 
-        btnFinalizar = new JButton("FINALIZAR REPORTAJE");
-        panelDer.add(btnFinalizar, BorderLayout.SOUTH);
+		tablaMultimedia = new JTable();
+		panelMultimedia.add(new JScrollPane(tablaMultimedia),
+				BorderLayout.CENTER);
 
-        frame.getContentPane().add(panelDer, BorderLayout.EAST);
-        panelDer.setPreferredSize(new Dimension(350, 600));
-    }
+		JPanel panelAccionesMulti = new JPanel();
 
-    private JPanel crearCampo(String label, JTextField field) {
+		txtRuta = new JTextField(15);
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JLabel(label), BorderLayout.NORTH);
-        panel.add(field, BorderLayout.CENTER);
-        return panel;
-    }
+		rbImagen = new JRadioButton("Imagen", true);
+		rbVideo = new JRadioButton("Video");
 
-    // =========================
-    // GETTERS (usados por el controlador)
-    // =========================
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(rbImagen);
+		bg.add(rbVideo);
 
-    public JFrame getFrame() {
-        return frame;
-    }
+		btnAñadirMultimedia = new JButton("Añadir");
+		btnCambiarEstado = new JButton("Cambiar estado");
+		btnEliminarMultimedia = new JButton("Eliminar");
 
-    public JTable getTablaEventos() {
-        return tablaEventos;
-    }
+		panelAccionesMulti.add(new JLabel("Ruta:"));
+		panelAccionesMulti.add(txtRuta);
+		panelAccionesMulti.add(rbImagen);
+		panelAccionesMulti.add(rbVideo);
+		panelAccionesMulti.add(btnAñadirMultimedia);
+		panelAccionesMulti.add(btnCambiarEstado);
+		panelAccionesMulti.add(btnEliminarMultimedia);
 
-    public JTable getTablaRevisiones() {
-        return tablaRevisiones;
-    }
+		panelMultimedia.add(panelAccionesMulti, BorderLayout.SOUTH);
 
-    public JTextField getTxtTitulo() {
-        return txtTitulo;
-    }
+		panelMultimedia.setPreferredSize(new Dimension(800, 200));
 
-    public JTextField getTxtSubtitulo() {
-        return txtSubtitulo;
-    }
+		frame.add(panelMultimedia);
 
-    public JTextArea getTxtCuerpo() {
-        return txtCuerpo;
-    }
+		// =========================
+		// REVISIONES
+		// =========================
 
-    public JButton getBtnGuardarCambios() {
-        return btnGuardarCambios;
-    }
+		JPanel panelRevisiones = new JPanel(new BorderLayout());
+		panelRevisiones.setBorder(
+				BorderFactory.createTitledBorder(
+						"Revisiones de reporteros asignados"
+						)
+				);
 
-    public JButton getBtnFinalizar() {
-        return btnFinalizar;
-    }
+		tablaRevisiones = new JTable();
+		panelRevisiones.add(new JScrollPane(tablaRevisiones),
+				BorderLayout.CENTER);
+
+		panelRevisiones.setPreferredSize(new Dimension(800, 150));
+
+		frame.add(panelRevisiones);
+
+		// =========================
+		// BOTÓN FINALIZAR
+		// =========================
+
+		btnFinalizar = new JButton("FINALIZAR REPORTAJE");
+		btnFinalizar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		frame.add(btnFinalizar);
+	}
+
+	private JPanel crearCampo(String label, JTextField field) {
+
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(new JLabel(label), BorderLayout.NORTH);
+		panel.add(field, BorderLayout.CENTER);
+		return panel;
+	}
+
+	// =========================
+	// GETTERS (usados por el controlador)
+	// =========================
+
+	public JFrame getFrame() {
+		return frame;
+	}
+
+	public JTable getTablaEventos() {
+		return tablaEventos;
+	}
+
+	public JTable getTablaRevisiones() {
+		return tablaRevisiones;
+	}
+
+	public JTextField getTxtTitulo() {
+		return txtTitulo;
+	}
+
+	public JTextField getTxtSubtitulo() {
+		return txtSubtitulo;
+	}
+
+	public JTextArea getTxtCuerpo() {
+		return txtCuerpo;
+	}
+
+	public JButton getBtnGuardarCambios() {
+		return btnGuardarCambios;
+	}
+
+	public JButton getBtnFinalizar() {
+		return btnFinalizar;
+	}
+
+	public JTable getTablaMultimedia() { 
+		return tablaMultimedia; 
+	}
+
+	public JTextField getTxtRuta() { 
+		return txtRuta; 
+	}
+
+	public JRadioButton getRbImagen() { 
+		return rbImagen; 
+	}
+
+	public JRadioButton getRbVideo() { 
+		return rbVideo; 
+	}
+
+	public JButton getBtnAñadirMultimedia() { 
+		return btnAñadirMultimedia; 
+	}
+
+	public JButton getBtnCambiarEstado() { 
+		return btnCambiarEstado; 
+	}
+
+	public JButton getBtnEliminarMultimedia() { 
+		return btnEliminarMultimedia; 
+	}
 }

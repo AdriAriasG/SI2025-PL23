@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import app.dto.EventoDTO;
+import app.dto.MultimediaDTO;
 import app.dto.RevisionDTO;
 import app.dto.VersionDTO;
 import app.model.ReportajeModel;
@@ -13,159 +14,242 @@ import giis.demo.util.SwingUtil;
 
 public class FinalizarReportajeController {
 
-    private ReportajeModel model;
-    private FinalizarReportajeView view;
-    private int idReportero;
+	private ReportajeModel model;
+	private FinalizarReportajeView view;
+	private int idReportero;
 
-    private List<EventoDTO> listaEventos;
-    private List<RevisionDTO> listaRevisiones;
+	private List<EventoDTO> listaEventos;
+	private List<RevisionDTO> listaRevisiones;
+	private List<MultimediaDTO> listaMultimedia;
 
-    public FinalizarReportajeController(
-            ReportajeModel model,
-            FinalizarReportajeView view,
-            int idReportero) {
+	public FinalizarReportajeController(
+			ReportajeModel model,
+			FinalizarReportajeView view,
+			int idReportero) {
 
-        this.model = model;
-        this.view = view;
-        this.idReportero = idReportero;
+		this.model = model;
+		this.view = view;
+		this.idReportero = idReportero;
 
-        initView();
-        initController();
-    }
-    
-    private void initView() {
-        cargarEventosEnRevision();
-        view.getFrame().setVisible(true);
-    }
-    
-    private void initController() {
+		initView();
+		initController();
+	}
 
-        view.getTablaEventos().getSelectionModel().addListSelectionListener(e ->
-            SwingUtil.exceptionWrapper(() -> seleccionarEvento())
-        );
+	private void initView() {
+		cargarEventosEnRevision();
+		view.getFrame().setVisible(true);
+	}
 
-        view.getBtnGuardarCambios().addActionListener(e ->
-            SwingUtil.exceptionWrapper(() -> guardarCambios())
-        );
+	private void initController() {
 
-        view.getBtnFinalizar().addActionListener(e ->
-            SwingUtil.exceptionWrapper(() -> finalizarReportaje())
-        );
-    }
-    
-    private void seleccionarEvento() {
+		view.getTablaEventos().getSelectionModel().addListSelectionListener(e ->
+		SwingUtil.exceptionWrapper(() -> seleccionarEvento())
+				);
 
-        int fila = view.getTablaEventos().getSelectedRow();
-        if (fila < 0) return;
+		view.getBtnGuardarCambios().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> guardarCambios())
+				);
 
-        EventoDTO evento = listaEventos.get(fila);
+		view.getBtnFinalizar().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> finalizarReportaje())
+				);
 
-        // Título desde Reportaje
-        String titulo = model.getTituloReportaje(evento.getId());
-        view.getTxtTitulo().setText(titulo != null ? titulo : "");
+		view.getBtnAñadirMultimedia().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> añadirMultimedia())
+				);
 
-        // Subtítulo y cuerpo desde VersionReportaje
-        VersionDTO version = model.getVersionActual(evento.getId());
+		view.getBtnCambiarEstado().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> cambiarEstadoMultimedia())
+				);
 
-        if (version != null) {
-            view.getTxtSubtitulo().setText(version.getSubtitulo());
-            view.getTxtCuerpo().setText(version.getCuerpo());
-        } else {
-            view.getTxtSubtitulo().setText("");
-            view.getTxtCuerpo().setText("");
-        }
+		view.getBtnEliminarMultimedia().addActionListener(e ->
+		SwingUtil.exceptionWrapper(() -> eliminarMultimedia())
+				);
+	}
 
-        cargarRevisiones(evento.getId());
-    }
-    
-    /*
-     * Solo el autor 
-     */
-    private void cargarEventosEnRevision() {
+	private void seleccionarEvento() {
 
-        String[] columnas = {"id", "nombre", "fecha"};
+		int fila = view.getTablaEventos().getSelectedRow();
+		if (fila < 0) return;
 
-        listaEventos = model.getReportajesEnRevisionComoAutor(idReportero);
+		EventoDTO evento = listaEventos.get(fila);
 
-        view.getTablaEventos().setModel(
-            SwingUtil.getTableModelFromPojos(listaEventos, columnas)
-        );
+		// Título desde Reportaje
+		String titulo = model.getTituloReportaje(evento.getId());
+		view.getTxtTitulo().setText(titulo != null ? titulo : "");
 
-        SwingUtil.autoAdjustColumns(view.getTablaEventos());
-    }
-    
-    private void cargarRevisiones(int idEvento) {
+		// Subtítulo y cuerpo desde VersionReportaje
+		VersionDTO version = model.getVersionActual(evento.getId());
 
-        listaRevisiones = model.getRevisionesReportaje(idEvento);
+		if (version != null) {
+			view.getTxtSubtitulo().setText(version.getSubtitulo());
+			view.getTxtCuerpo().setText(version.getCuerpo());
+		} else {
+			view.getTxtSubtitulo().setText("");
+			view.getTxtCuerpo().setText("");
+		}
 
-        String[] columnas = {"idReportero", "estado", "comentario"};
+		cargarRevisiones(evento.getId());
+		cargarMultimedia(evento.getId());
+	}
 
-        view.getTablaRevisiones().setModel(
-            SwingUtil.getTableModelFromPojos(listaRevisiones, columnas)
-        );
+	/*
+	 * Solo el autor 
+	 */
+	private void cargarEventosEnRevision() {
 
-        SwingUtil.autoAdjustColumns(view.getTablaRevisiones());
-    }
-    
-    /*
-     * Guardar cambios (sobrescribe la última versión)
-     */
-    private void guardarCambios() {
+		String[] columnas = {"id", "nombre", "fecha"};
 
-        int fila = view.getTablaEventos().getSelectedRow();
-        if (fila < 0)
-            throw new IllegalArgumentException("Debe seleccionar un evento");
+		listaEventos = model.getReportajesEnRevisionComoAutor(idReportero);
 
-        EventoDTO evento = listaEventos.get(fila);
+		view.getTablaEventos().setModel(
+				SwingUtil.getTableModelFromPojos(listaEventos, columnas)
+				);
 
-        String titulo = view.getTxtTitulo().getText().trim();
-        String subtitulo = view.getTxtSubtitulo().getText().trim();
-        String cuerpo = view.getTxtCuerpo().getText().trim();
+		SwingUtil.autoAdjustColumns(view.getTablaEventos());
+	}
 
-        if (titulo.isEmpty())
-            throw new IllegalArgumentException("El título no puede estar vacío");
+	private void cargarRevisiones(int idEvento) {
 
-        if (cuerpo.isEmpty())
-            throw new IllegalArgumentException("El cuerpo no puede estar vacío");
+		listaRevisiones = model.getRevisionesReportaje(idEvento);
 
-        model.modificarContenidoFinal(
-                evento.getId(),
-                idReportero,
-                titulo,
-                subtitulo,
-                cuerpo
-        );
+		String[] columnas = {"idReportero", "estado", "comentario"};
 
-        JOptionPane.showMessageDialog(view.getFrame(),
-                "Cambios guardados correctamente");
-    }
-    
-    private void finalizarReportaje() {
+		view.getTablaRevisiones().setModel(
+				SwingUtil.getTableModelFromPojos(listaRevisiones, columnas)
+				);
 
-        int fila = view.getTablaEventos().getSelectedRow();
-        if (fila < 0)
-            throw new IllegalArgumentException("Debe seleccionar un evento");
+		SwingUtil.autoAdjustColumns(view.getTablaRevisiones());
+	}
 
-        EventoDTO evento = listaEventos.get(fila);
+	/*
+	 * Guardar cambios (sobrescribe la última versión)
+	 */
+	private void guardarCambios() {
 
-        model.finalizarReportaje(
-                evento.getId(),
-                idReportero
-        );
+		int fila = view.getTablaEventos().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException("Debe seleccionar un evento");
 
-        JOptionPane.showMessageDialog(view.getFrame(),
-                "Reportaje FINALIZADO correctamente");
+		EventoDTO evento = listaEventos.get(fila);
 
-        cargarEventosEnRevision();
-    }
+		String titulo = view.getTxtTitulo().getText().trim();
+		String subtitulo = view.getTxtSubtitulo().getText().trim();
+		String cuerpo = view.getTxtCuerpo().getText().trim();
+
+		if (titulo.isEmpty())
+			throw new IllegalArgumentException("El título no puede estar vacío");
+
+		if (cuerpo.isEmpty())
+			throw new IllegalArgumentException("El cuerpo no puede estar vacío");
+
+		model.modificarContenidoFinal(
+				evento.getId(),
+				idReportero,
+				titulo,
+				subtitulo,
+				cuerpo
+				);
+
+		JOptionPane.showMessageDialog(view.getFrame(),
+				"Cambios guardados correctamente");
+	}
+
+	private void finalizarReportaje() {
+
+		int fila = view.getTablaEventos().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException("Debe seleccionar un evento");
+
+		EventoDTO evento = listaEventos.get(fila);
+
+		model.finalizarReportaje(
+				evento.getId(),
+				idReportero
+				);
+
+		JOptionPane.showMessageDialog(view.getFrame(),
+				"Reportaje FINALIZADO correctamente");
+
+		cargarEventosEnRevision();
+	}
+
+	private void cargarMultimedia(int idEvento) {
+
+		listaMultimedia = model.getMultimedia(idEvento);
+
+		String[] columnas = {"id", "ruta", "tipo", "estado"};
+
+		view.getTablaMultimedia().setModel(
+				SwingUtil.getTableModelFromPojos(listaMultimedia, columnas)
+				);
+
+		SwingUtil.autoAdjustColumns(view.getTablaMultimedia());
+	}
+
+	private void añadirMultimedia() {
+
+		int fila = view.getTablaEventos().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException("Debe seleccionar un evento");
+
+		EventoDTO evento = listaEventos.get(fila);
+
+		String ruta = view.getTxtRuta().getText().trim();
+		if (ruta.isEmpty())
+			throw new IllegalArgumentException("Debe indicar una ruta");
+
+		String tipo = view.getRbImagen().isSelected() ? "IMAGEN" : "VIDEO";
+
+		model.añadirMultimedia(
+				evento.getId(),
+				idReportero,
+				ruta,
+				tipo
+				);
+
+		cargarMultimedia(evento.getId());
+		view.getTxtRuta().setText("");
+	}
+
+	private void cambiarEstadoMultimedia() {
+
+		int fila = view.getTablaMultimedia().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException("Debe seleccionar un multimedia");
+
+		MultimediaDTO multimedia = listaMultimedia.get(fila);
+
+		model.cambiarEstadoMultimedia(
+				multimedia.getId(),
+				idReportero
+				);
+
+		seleccionarEvento();
+	}
+
+	private void eliminarMultimedia() {
+
+		int fila = view.getTablaMultimedia().getSelectedRow();
+		if (fila < 0)
+			throw new IllegalArgumentException("Debe seleccionar un multimedia");
+
+		MultimediaDTO multimedia = listaMultimedia.get(fila);
+
+		model.eliminarMultimedia(
+				multimedia.getId(),
+				idReportero
+				);
+
+		seleccionarEvento();
+	}
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
