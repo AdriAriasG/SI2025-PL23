@@ -1,6 +1,8 @@
 package app.view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 
 public class FinalizarReportajeView {
@@ -229,5 +231,17 @@ public class FinalizarReportajeView {
 
 	public JButton getBtnEliminarMultimedia() { 
 		return btnEliminarMultimedia; 
+	}
+
+	public void limpiarDetalle() {
+
+	    txtTitulo.setText("");
+	    txtSubtitulo.setText("");
+	    txtCuerpo.setText("");
+
+	    txtRuta.setText("");
+
+	    tablaMultimedia.setModel(new DefaultTableModel());
+	    tablaRevisiones.setModel(new DefaultTableModel());
 	}
 }

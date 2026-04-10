@@ -172,6 +172,10 @@ public class FinalizarReportajeController {
 				"Reportaje FINALIZADO correctamente");
 
 		cargarEventosEnRevision();
+		
+		view.getTablaEventos().clearSelection();
+		
+		view.limpiarDetalle();
 	}
 
 	private void cargarMultimedia(int idEvento) {

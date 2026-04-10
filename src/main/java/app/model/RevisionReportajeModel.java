@@ -161,7 +161,6 @@ public class RevisionReportajeModel {
 
 	    if (revision == null) {
 
-	        // No existía revisión → crearla ya finalizada
 	        String insert = """
 	            INSERT INTO RevisionReportaje
 	            (id_reportaje, id_reportero, comentario, estado)
@@ -192,23 +191,6 @@ public class RevisionReportajeModel {
 	                idReportaje,
 	                idReportero
 	        );
-	    }
-
-	    // 🔎 Comprobar si todos han finalizado
-	    Integer idEvento = getEventoDeReportaje(idReportaje);
-
-	    int totalAsignados = contarReporterosAsignados(idEvento);
-	    int totalFinalizadas = contarRevisionesFinalizadas(idReportaje);
-
-	    if (totalAsignados == totalFinalizadas) {
-
-	        String updateReportaje = """
-	            UPDATE Reportaje
-	            SET estado = 'NORMAL'
-	            WHERE id = ?
-	            """;
-
-	        db.executeUpdate(updateReportaje, idReportaje);
 	    }
 	}
 
