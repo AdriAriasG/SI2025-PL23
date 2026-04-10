@@ -14,18 +14,15 @@ import app.model.AsignacionModel;
 import app.view.AsignacionEdicionView;
 
 /**
- * Controlador para la modificación de asignación de reporteros a eventos.
- * Cubre la HU #33543 (modo edición).
- * 
- * En este modo, los reporteros seleccionados se añaden visualmente a la tabla
- * del evento como "pendientes", y solo se guardan en BD cuando el usuario
- * pulsa "Asignar".
+ * Controlador para la asignación/modificación de reporteros a eventos.
+ * Cubre HU #33537, #33543 y #34426 (RR + finalización).
  */
 public class AsignacionEdicionController {
     private AsignacionModel model;
     private AsignacionEdicionView view;
     private AgenciaDTO agencia;
     private int idEventoSeleccionado = -1;
+    private boolean eventoFinalizado = false;
 
     public AsignacionEdicionController(AsignacionModel model, AsignacionEdicionView view, AgenciaDTO agencia) {
         this.model = model;
@@ -35,19 +32,12 @@ public class AsignacionEdicionController {
         this.initController();
     }
 
-    /**
-     * Inicializa la vista con los datos
-     */
     public void initView() {
         cargarEventos();
         view.getFrame().setVisible(true);
     }
 
-    /**
-     * Inicializa los controladores de eventos
-     */
     public void initController() {
-        // Evento: selección de evento en la tabla
         view.getTablaEventos().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -55,86 +45,83 @@ public class AsignacionEdicionController {
             }
         });
 
-        // Evento: cambio de filtro
         view.getCbFiltro().addActionListener(e -> onFiltroCambiado());
-
-        // Evento: eliminar reportero (asignado o pendiente)
         view.getBtnEliminar().addActionListener(e -> onEliminarReportero());
+        view.getBtnDesignarRR().addActionListener(e -> onDesignarRR());
+        view.getBtnFinalizar().addActionListener(e -> onFinalizar());
+        view.getBtnAsignar().addActionListener(e -> onAsignar());
+        view.getBtnCancelar().addActionListener(e -> view.getFrame().dispose());
+        view.getChkFiltroTematica().addActionListener(e -> cargarReporterosDisponibles());
+        view.getCbFiltroTipo().addActionListener(e -> cargarReporterosDisponibles());
 
-        // Evento: cambio en los checkboxes de selección de disponibles
+        // Listener para checkboxes de disponibles
+        registrarListenerDisponibles();
+    }
+
+    private void registrarListenerDisponibles() {
         view.getTablaDisponibles().getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                if (e.getColumn() == 0) { // Solo cuando cambia la columna de selección
+                if (e.getColumn() == 0) {
                     onSeleccionCambiada();
                 }
             }
         });
-
-        // Evento: botón asignar
-        view.getBtnAsignar().addActionListener(e -> onAsignar());
-
-        // Evento: botón cancelar/cerrar
-        view.getBtnCancelar().addActionListener(e -> view.getFrame().dispose());
-
-        // Evento: cambio de filtro de temática
-        view.getChkFiltroTematica().addActionListener(e -> onFiltroTematicaCambiado());
-
-        // Evento: cambio de filtro de tipo
-        view.getCbFiltroTipo().addActionListener(e -> onFiltroTipoCambiado());
-        }
-
-        /**
-        * Carga los eventos según el filtro
-        */
+    }
 
     private void cargarEventos() {
         int filtroIndex = view.getCbFiltro().getSelectedIndex();
         List<EventoDTO> eventos;
-        
+
         if (filtroIndex == 0) {
+            // Sin asignar: no tienen asignaciones, así que nunca están finalizados
             eventos = model.getEventosSinAsignar(agencia.getId());
         } else {
-            eventos = model.getEventosConAsignados(agencia.getId());
+            eventos = model.getEventosConAsignadosConEstado(agencia.getId());
         }
 
         view.setEventos(eventos);
 
-        // Limpiar selección y datos relacionados
         idEventoSeleccionado = -1;
+        eventoFinalizado = false;
         view.setDisponibles(new java.util.ArrayList<>());
-        view.setAsignados(new java.util.ArrayList<>());
+        view.setAsignadosConRR(new java.util.ArrayList<>());
+        view.setEdicionHabilitada(true);
+        registrarListenerDisponibles();
     }
 
-    /**
-     * Maneja la selección de un evento
-     */
     private void onEventoSeleccionado() {
         int idEvento = view.getIdEventoSeleccionado();
         if (idEvento == -1) {
             view.getLblTematicasEvento().setText("Temáticas del evento: -");
             return;
         }
-        
-        idEventoSeleccionado = idEvento;
 
-        // Cargar y mostrar temáticas del evento
+        idEventoSeleccionado = idEvento;
+        eventoFinalizado = model.isAsignacionFinalizada(idEvento);
+
+        // Cargar temáticas
         List<app.dto.TematicaDTO> tematicas = model.getTematicasEvento(idEvento);
         view.setTematicas(tematicas);
 
-        // Cargar reporteros ya asignados al evento
-        List<ReporteroDTO> asignados = model.getReporterosAsignados(idEvento);
-        view.setAsignados(asignados);
+        // Cargar reporteros asignados con info de RR
+        List<Object[]> asignadosConRR = model.getReporterosAsignadosConRR(idEvento);
+        view.setAsignadosConRR(asignadosConRR);
 
-        // Cargar reporteros disponibles
-        cargarReporterosDisponibles();
+        // Habilitar/deshabilitar según estado
+        view.setEdicionHabilitada(!eventoFinalizado);
+        registrarListenerDisponibles();
+
+        // Cargar disponibles
+        if (!eventoFinalizado) {
+            cargarReporterosDisponibles();
+        } else {
+            view.setDisponibles(new java.util.ArrayList<>());
+        }
     }
 
-    /**
-     * Carga los reporteros disponibles según el estado de los filtros (temática y tipo)
-     */
     private void cargarReporterosDisponibles() {
-        if (idEventoSeleccionado == -1) return;
+        if (idEventoSeleccionado == -1 || eventoFinalizado) return;
 
         boolean filtrarTematica = view.getChkFiltroTematica().isSelected();
         String tipo = view.getSelectedTipo();
@@ -142,19 +129,15 @@ public class AsignacionEdicionController {
         List<ReporteroDTO> disponibles;
 
         if (filtrarTematica && tipo != null) {
-            // Ambos filtros activos
             disponibles = model.getReporterosDisponiblesPorTematicaYTipo(
                 idEventoSeleccionado, agencia.getId(), tipo);
         } else if (filtrarTematica) {
-            // Solo filtro temática
             disponibles = model.getReporterosDisponiblesPorTematica(
                 idEventoSeleccionado, agencia.getId());
         } else if (tipo != null) {
-            // Solo filtro tipo
             disponibles = model.getReporterosDisponiblesPorTipo(
                 idEventoSeleccionado, agencia.getId(), tipo);
         } else {
-            // Sin filtros
             disponibles = model.getReporterosDisponibles(
                 idEventoSeleccionado, agencia.getId());
         }
@@ -162,73 +145,113 @@ public class AsignacionEdicionController {
         view.setDisponibles(disponibles);
     }
 
-    /**
-     * Maneja el cambio en el checkbox de filtro por temática
-     */
-    private void onFiltroTematicaCambiado() {
-        cargarReporterosDisponibles();
-    }
-
-    /**
-     * Maneja el cambio en el combo de filtro por tipo
-     */
-    private void onFiltroTipoCambiado() {
-        cargarReporterosDisponibles();
-    }
-
-    /**
-     * Maneja el cambio de filtro
-     */
     private void onFiltroCambiado() {
         cargarEventos();
     }
 
-    /**
-     * Maneja la eliminación de un reportero (asignado o pendiente)
-     */
     private void onEliminarReportero() {
+        if (eventoFinalizado) {
+            view.showError("La asignación está finalizada. No se pueden realizar cambios.");
+            return;
+        }
+
         int idReportero = view.getIdReporteroEventoSeleccionado();
         if (idReportero == -1) {
             view.showError("Debe seleccionar un reportero de la lista del evento.");
             return;
         }
-
         if (idEventoSeleccionado == -1) {
             view.showError("No hay un evento seleccionado.");
             return;
         }
 
         String estado = view.getEstadoReporteroEventoSeleccionado();
-        
+
         if ("Pendiente".equals(estado)) {
-            // Es un pendiente, solo quitarlo de la lista visual
             view.removePendiente(idReportero);
             view.setCheckboxDisponible(idReportero, false);
             view.showInfo("Reportero eliminado de la lista de pendientes.");
         } else if ("Asignado".equals(estado)) {
-            // Es un asignado real, eliminar de la base de datos
             if (view.showConfirm("¿Está seguro de que desea eliminar esta asignación?\nEl cambio será inmediato.")) {
                 model.eliminarAsignacion(idEventoSeleccionado, idReportero);
                 view.showInfo("Asignación eliminada correctamente.");
-                
-                // Recargar datos del evento
                 recargarDatosEvento();
             }
         }
     }
 
     /**
-     * Maneja el cambio en los checkboxes de selección de reporteros disponibles.
-     * Cuando se marca un reportero, se añade como pendiente a la tabla del evento.
-     * Cuando se desmarca, se quita de los pendientes.
+     * Designa al reportero seleccionado como Reportero Responsable (RR).
      */
+    private void onDesignarRR() {
+        if (eventoFinalizado) {
+            view.showError("La asignación está finalizada. No se puede cambiar el RR.");
+            return;
+        }
+
+        int idReportero = view.getIdReporteroEventoSeleccionado();
+        if (idReportero == -1) {
+            view.showError("Debe seleccionar un reportero de la lista del evento.");
+            return;
+        }
+
+        String estado = view.getEstadoReporteroEventoSeleccionado();
+        if (!"Asignado".equals(estado)) {
+            view.showError("Solo se puede designar como RR a un reportero ya asignado.\nPrimero asigne el reportero al evento.");
+            return;
+        }
+
+        model.setReporteroResponsable(idEventoSeleccionado, idReportero);
+        view.showInfo("Reportero designado como Responsable (RR) correctamente.");
+        recargarDatosEvento();
+    }
+
+    /**
+     * Finaliza la asignación del evento seleccionado.
+     * Validación: debe haber un RR designado Y al menos un reportero BASE cubierto.
+     * Si el RR es de tipo BASE, él mismo satisface el requisito y puede ir solo.
+     * Si el RR no es de tipo BASE, debe haber además al menos un BASE adicional.
+     */
+    private void onFinalizar() {
+        if (eventoFinalizado) {
+            view.showError("La asignación ya está finalizada.");
+            return;
+        }
+        if (idEventoSeleccionado == -1) {
+            view.showError("Debe seleccionar un evento primero.");
+            return;
+        }
+
+        // Validar que hay un RR designado
+        int idRR = model.getReporteroResponsable(idEventoSeleccionado);
+        if (idRR == -1) {
+            view.showError("No se puede finalizar: debe designar un Reportero Responsable (RR).");
+            return;
+        }
+
+        // Validar cobertura BASE: si el RR es BASE, es suficiente; si no, debe haber al menos un BASE adicional
+        boolean rrEsBase = model.esReporteroResponsableTipoBase(idEventoSeleccionado);
+        if (!rrEsBase && !model.tieneReporteroBaseNoRR(idEventoSeleccionado)) {
+            view.showError("No se puede finalizar: debe haber al menos un reportero de tipo BASE asignado que no sea el RR.");
+            return;
+        }
+
+        if (view.showConfirm("¿Está seguro de que desea finalizar la asignación?\n" +
+                "Una vez finalizada, no se podrán añadir ni eliminar reporteros\n" +
+                "ni cambiar el Reportero Responsable.")) {
+            model.finalizarAsignacion(idEventoSeleccionado);
+            eventoFinalizado = true;
+            view.showInfo("Asignación finalizada correctamente.");
+            recargarDatosEvento();
+        }
+    }
+
     private void onSeleccionCambiada() {
+        if (eventoFinalizado) return;
+
         List<Integer> idsSeleccionados = view.getIdsSeleccionadosDisponibles();
-        
-        // Obtener los IDs que estaban marcados antes (los pendientes actuales)
         List<Integer> pendientesActuales = view.getIdsPendientes();
-        
-        // Añadir los nuevos seleccionados que no estaban pendientes
+
         for (int id : idsSeleccionados) {
             if (!pendientesActuales.contains(id)) {
                 String nombre = view.getNombreDisponible(id);
@@ -238,8 +261,7 @@ public class AsignacionEdicionController {
                 }
             }
         }
-        
-        // Quitar los que se desmarcaron
+
         for (int id : pendientesActuales) {
             if (!idsSeleccionados.contains(id)) {
                 view.removePendiente(id);
@@ -247,10 +269,12 @@ public class AsignacionEdicionController {
         }
     }
 
-    /**
-     * Maneja la acción de asignar reporteros pendientes
-     */
     private void onAsignar() {
+        if (eventoFinalizado) {
+            view.showError("La asignación está finalizada. No se pueden realizar cambios.");
+            return;
+        }
+
         if (idEventoSeleccionado == -1) {
             view.showError("Debe seleccionar un evento primero.");
             return;
@@ -262,7 +286,6 @@ public class AsignacionEdicionController {
             return;
         }
 
-        // Confirmar asignación
         StringBuilder mensaje = new StringBuilder();
         mensaje.append("¿Desea asignar los siguientes reporteros al evento?\n\n");
         for (int id : idsPendientes) {
@@ -271,14 +294,13 @@ public class AsignacionEdicionController {
         }
 
         if (view.showConfirm(mensaje.toString())) {
-            // Realizar las asignaciones
             int exitosas = 0;
             for (int idReportero : idsPendientes) {
                 try {
                     model.asignarReportero(idEventoSeleccionado, idReportero);
                     exitosas++;
                 } catch (Exception e) {
-                    // Ignorar errores individuales (ya asignado, etc.)
+                    // Ignorar errores individuales
                 }
             }
 
@@ -286,27 +308,23 @@ public class AsignacionEdicionController {
                 view.showInfo("Se asignaron " + exitosas + " reportero(s) correctamente.");
             }
 
-            // Recargar datos del evento para reflejar los cambios
             recargarDatosEvento();
         }
     }
 
-    /**
-     * Recarga los datos del evento actualmente seleccionado.
-     */
     private void recargarDatosEvento() {
         if (idEventoSeleccionado == -1) return;
-        
-        // Recargar la lista de eventos por si cambió el filtro
+
+        // Recargar lista de eventos
         int filtroIndex = view.getCbFiltro().getSelectedIndex();
         List<EventoDTO> eventos;
         if (filtroIndex == 0) {
             eventos = model.getEventosSinAsignar(agencia.getId());
         } else {
-            eventos = model.getEventosConAsignados(agencia.getId());
+            eventos = model.getEventosConAsignadosConEstado(agencia.getId());
         }
         view.setEventos(eventos);
-        
+
         // Verificar si el evento sigue en la lista
         boolean eventoEncontrado = false;
         for (EventoDTO e : eventos) {
@@ -315,26 +333,37 @@ public class AsignacionEdicionController {
                 break;
             }
         }
-        
+
         if (eventoEncontrado) {
             // Reseleccionar el evento en la tabla
             for (int i = 0; i < view.getTablaEventos().getRowCount(); i++) {
-                if ((int) view.getTablaEventos().getValueAt(i, 0) == idEventoSeleccionado) {
+                if (((Number) view.getTablaEventos().getValueAt(i, 0)).intValue() == idEventoSeleccionado) {
                     view.getTablaEventos().setRowSelectionInterval(i, i);
                     break;
                 }
             }
-            
-            // Recargar reporteros
-            List<ReporteroDTO> asignados = model.getReporterosAsignados(idEventoSeleccionado);
-            view.setAsignados(asignados);
-            
-            cargarReporterosDisponibles();
+
+            eventoFinalizado = model.isAsignacionFinalizada(idEventoSeleccionado);
+
+            // Recargar reporteros con RR
+            List<Object[]> asignadosConRR = model.getReporterosAsignadosConRR(idEventoSeleccionado);
+            view.setAsignadosConRR(asignadosConRR);
+
+            view.setEdicionHabilitada(!eventoFinalizado);
+            registrarListenerDisponibles();
+
+            if (!eventoFinalizado) {
+                cargarReporterosDisponibles();
+            } else {
+                view.setDisponibles(new java.util.ArrayList<>());
+            }
         } else {
-            // El evento ya no está en la lista
             idEventoSeleccionado = -1;
-            view.setAsignados(new java.util.ArrayList<>());
+            eventoFinalizado = false;
+            view.setAsignadosConRR(new java.util.ArrayList<>());
             view.setDisponibles(new java.util.ArrayList<>());
+            view.setEdicionHabilitada(true);
+            registrarListenerDisponibles();
         }
     }
 }

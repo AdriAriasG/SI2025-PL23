@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,60 +20,58 @@ import app.dto.EventoDTO;
 import app.dto.ReporteroDTO;
 
 /**
- * Vista para la modificación de asignación de reporteros a eventos.
- * Cubre la HU #33543 (modo edición).
- * 
- * En esta vista, los reporteros seleccionados se añaden directamente a la tabla
- * de reporteros del evento (diferenciados visualmente), y solo se guardan en BD
- * cuando el usuario pulsa "Asignar".
+ * Vista para la asignación/modificación de reporteros a eventos.
+ * Cubre HU #33537, #33543 y #34426.
  */
 public class AsignacionEdicionView {
     private JFrame frame;
-    
+
     // Componentes para eventos
     private JComboBox<String> cbFiltro;
     private JTable tablaEventos;
     private DefaultTableModel modeloEventos;
-    
-    // Componentes para reporteros del evento (asignados + pendientes de asignar)
+
+    // Componentes para reporteros del evento (asignados + pendientes)
     private JTable tablaReporterosEvento;
     private DefaultTableModel modeloReporterosEvento;
     private JButton btnEliminar;
+    private JButton btnDesignarRR;
+    private JButton btnFinalizar;
     private JScrollPane scrollReporterosEvento;
-    
+
     // IDs de reporteros ya asignados (cargados de BD)
     private Set<Integer> idsAsignados = new HashSet<>();
-    
+
     // IDs de reporteros pendientes de asignar (seleccionados pero no guardados)
     private Set<Integer> idsPendientes = new HashSet<>();
-    
+
     // Componentes para reporteros disponibles
     private JTable tablaDisponibles;
     private DefaultTableModel modeloDisponibles;
     private JCheckBox chkFiltroTematica;
     private JComboBox<String> cbFiltroTipo;
     private JLabel lblTematicasEvento;
-    
+
     // Botones
     private JButton btnAsignar;
     private JButton btnCancelar;
-    
+
     public AsignacionEdicionView() {
         initialize();
     }
-    
+
     private void initialize() {
         frame = new JFrame();
-        frame.setTitle("Modificar Asignación de Reporteros");
-        frame.setBounds(100, 100, 750, 600);
+        frame.setTitle("Asignar / Modificar Reporteros");
+        frame.setBounds(100, 100, 780, 680);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        
+
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         frame.getContentPane().add(mainPanel, BorderLayout.CENTER);
-        
+
         // === PANEL FILTRO ===
         JPanel panelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelFiltro.add(new JLabel("Filtro:"));
@@ -80,13 +79,13 @@ public class AsignacionEdicionView {
         cbFiltro.setSelectedIndex(0);
         panelFiltro.add(cbFiltro);
         mainPanel.add(panelFiltro);
-        
+
         // === PANEL EVENTOS ===
         JPanel panelEventos = new JPanel();
         panelEventos.setLayout(new BoxLayout(panelEventos, BoxLayout.Y_AXIS));
         panelEventos.setBorder(BorderFactory.createTitledBorder("Eventos"));
-        
-        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Fecha"}, 0) {
+
+        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Fecha", "Estado"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -96,31 +95,58 @@ public class AsignacionEdicionView {
         tablaEventos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaEventos.getColumnModel().getColumn(0).setPreferredWidth(40);
         tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(100);
-        
+        tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tablaEventos.getColumnModel().getColumn(3).setPreferredWidth(100);
+
+        // Renderer para colorear eventos finalizados
+        tablaEventos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String estado = (String) table.getValueAt(row, 3);
+                if (!isSelected) {
+                    if ("FINALIZADA".equals(estado)) {
+                        c.setBackground(new Color(220, 220, 240));
+                        c.setForeground(new Color(100, 100, 140));
+                        if (c instanceof JLabel) {
+                            ((JLabel) c).setFont(c.getFont().deriveFont(Font.ITALIC));
+                        }
+                    } else {
+                        c.setBackground(table.getBackground());
+                        c.setForeground(table.getForeground());
+                        if (c instanceof JLabel) {
+                            ((JLabel) c).setFont(c.getFont().deriveFont(Font.PLAIN));
+                        }
+                    }
+                }
+                return c;
+            }
+        });
+
         JScrollPane scrollEventos = new JScrollPane(tablaEventos);
-        scrollEventos.setPreferredSize(new Dimension(700, 120));
+        scrollEventos.setPreferredSize(new Dimension(740, 120));
         panelEventos.add(scrollEventos);
         mainPanel.add(panelEventos);
-        
-        // === PANEL REPORTEROS DEL EVENTO (ASIGNADOS + PENDIENTES) ===
+
+        // === PANEL REPORTEROS DEL EVENTO ===
         JPanel panelReporterosEvento = new JPanel();
         panelReporterosEvento.setLayout(new BoxLayout(panelReporterosEvento, BoxLayout.Y_AXIS));
         panelReporterosEvento.setBorder(BorderFactory.createTitledBorder("Reporteros del Evento"));
-        
-        // Añadir leyenda
+
+        // Leyenda
         JPanel panelLeyenda = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblLeyenda = new JLabel("Leyenda: ");
         JLabel lblAsignado = new JLabel("■ Asignado");
         lblAsignado.setForeground(new Color(0, 100, 0));
-        JLabel lblPendiente = new JLabel("    ■ Pendiente de asignar");
+        JLabel lblPendiente = new JLabel("    ■ Pendiente");
         lblPendiente.setForeground(new Color(200, 100, 0));
-        panelLeyenda.add(lblLeyenda);
+        JLabel lblRR = new JLabel("    ★ Responsable (RR)");
+        lblRR.setForeground(new Color(0, 0, 180));
         panelLeyenda.add(lblAsignado);
         panelLeyenda.add(lblPendiente);
+        panelLeyenda.add(lblRR);
         panelReporterosEvento.add(panelLeyenda);
-        
-        modeloReporterosEvento = new DefaultTableModel(new String[]{"Estado", "ID", "Nombre", "Tipo"}, 0) {
+
+        modeloReporterosEvento = new DefaultTableModel(new String[]{"Estado", "ID", "Nombre", "Tipo", "RR"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -128,24 +154,32 @@ public class AsignacionEdicionView {
         };
         tablaReporterosEvento = new JTable(modeloReporterosEvento);
         tablaReporterosEvento.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tablaReporterosEvento.getColumnModel().getColumn(0).setPreferredWidth(100);
+        tablaReporterosEvento.getColumnModel().getColumn(0).setPreferredWidth(80);
         tablaReporterosEvento.getColumnModel().getColumn(1).setPreferredWidth(40);
         tablaReporterosEvento.getColumnModel().getColumn(2).setPreferredWidth(200);
         tablaReporterosEvento.getColumnModel().getColumn(3).setPreferredWidth(100);
-        
-        // Renderer para colorear las filas según estado
+        tablaReporterosEvento.getColumnModel().getColumn(4).setPreferredWidth(50);
+
+        // Renderer para colorear filas según estado y RR
         tablaReporterosEvento.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String estado = (String) table.getValueAt(row, 0);
                 if (!isSelected) {
-                    if ("Asignado".equals(estado)) {
-                        c.setBackground(new Color(220, 255, 220)); // Verde claro
+                    String estado = (String) table.getValueAt(row, 0);
+                    String rr = (String) table.getValueAt(row, 4);
+                    if ("★ RR".equals(rr)) {
+                        c.setBackground(new Color(210, 220, 255));
+                        c.setForeground(new Color(0, 0, 180));
+                    } else if ("Asignado".equals(estado)) {
+                        c.setBackground(new Color(220, 255, 220));
                         c.setForeground(new Color(0, 100, 0));
                     } else if ("Pendiente".equals(estado)) {
-                        c.setBackground(new Color(255, 250, 220)); // Amarillo claro
+                        c.setBackground(new Color(255, 250, 220));
                         c.setForeground(new Color(200, 100, 0));
+                    } else {
+                        c.setBackground(table.getBackground());
+                        c.setForeground(table.getForeground());
                     }
                 } else {
                     c.setBackground(table.getSelectionBackground());
@@ -154,42 +188,43 @@ public class AsignacionEdicionView {
                 return c;
             }
         });
-        
+
         scrollReporterosEvento = new JScrollPane(tablaReporterosEvento);
-        scrollReporterosEvento.setPreferredSize(new Dimension(700, 120));
+        scrollReporterosEvento.setPreferredSize(new Dimension(740, 120));
         panelReporterosEvento.add(scrollReporterosEvento);
-        
-        // Botón eliminar
-        JPanel panelBtnEliminar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        // Botones de reporteros del evento
+        JPanel panelBtnReporteros = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnDesignarRR = new JButton("Designar como RR");
         btnEliminar = new JButton("Eliminar Seleccionado");
-        panelBtnEliminar.add(btnEliminar);
-        panelReporterosEvento.add(panelBtnEliminar);
-        
+        btnFinalizar = new JButton("Finalizar Asignación");
+        panelBtnReporteros.add(btnDesignarRR);
+        panelBtnReporteros.add(btnEliminar);
+        panelBtnReporteros.add(btnFinalizar);
+        panelReporterosEvento.add(panelBtnReporteros);
+
         mainPanel.add(panelReporterosEvento);
-        
+
         // === PANEL REPORTEROS DISPONIBLES ===
         JPanel panelDisponibles = new JPanel();
         panelDisponibles.setLayout(new BoxLayout(panelDisponibles, BoxLayout.Y_AXIS));
         panelDisponibles.setBorder(BorderFactory.createTitledBorder("Reporteros Disponibles (marque para añadir al evento)"));
-        
-        // Subpanel para filtros de disponibilidad
+
+        // Filtros
         JPanel panelFiltrosDisp = new JPanel(new FlowLayout(FlowLayout.LEFT));
         chkFiltroTematica = new JCheckBox("Filtrar por temática del evento");
         panelFiltrosDisp.add(chkFiltroTematica);
-        
         panelFiltrosDisp.add(new JLabel("  Tipo:"));
         cbFiltroTipo = new JComboBox<>(new String[]{"Todos", "GRAFICO", "CAMAROGRAFO", "BASE"});
-        cbFiltroTipo.setSelectedIndex(0); // "Todos" por defecto
+        cbFiltroTipo.setSelectedIndex(0);
         panelFiltrosDisp.add(cbFiltroTipo);
-        
         panelDisponibles.add(panelFiltrosDisp);
-        
-        // Label para temáticas del evento
+
         lblTematicasEvento = new JLabel("Temáticas del evento: -");
         JPanel panelTematicas = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTematicas.add(lblTematicasEvento);
         panelDisponibles.add(panelTematicas);
-        
+
         modeloDisponibles = new DefaultTableModel(new String[]{"Añadir", "ID", "Nombre", "Tipo"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -198,7 +233,7 @@ public class AsignacionEdicionView {
             }
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 0; // Solo la columna de selección es editable
+                return column == 0;
             }
         };
         tablaDisponibles = new JTable(modeloDisponibles);
@@ -206,12 +241,12 @@ public class AsignacionEdicionView {
         tablaDisponibles.getColumnModel().getColumn(1).setPreferredWidth(40);
         tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(200);
         tablaDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
-        
+
         JScrollPane scrollDisponibles = new JScrollPane(tablaDisponibles);
-        scrollDisponibles.setPreferredSize(new Dimension(700, 150));
+        scrollDisponibles.setPreferredSize(new Dimension(740, 130));
         panelDisponibles.add(scrollDisponibles);
         mainPanel.add(panelDisponibles);
-        
+
         // === PANEL BOTONES ===
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnAsignar = new JButton("Asignar");
@@ -220,7 +255,7 @@ public class AsignacionEdicionView {
         panelBotones.add(btnCancelar);
         mainPanel.add(panelBotones);
     }
-    
+
     // === GETTERS ===
     public JFrame getFrame() { return frame; }
     public JComboBox<String> getCbFiltro() { return cbFiltro; }
@@ -228,17 +263,16 @@ public class AsignacionEdicionView {
     public JTable getTablaReporterosEvento() { return tablaReporterosEvento; }
     public JTable getTablaDisponibles() { return tablaDisponibles; }
     public JButton getBtnEliminar() { return btnEliminar; }
+    public JButton getBtnDesignarRR() { return btnDesignarRR; }
+    public JButton getBtnFinalizar() { return btnFinalizar; }
     public JButton getBtnAsignar() { return btnAsignar; }
     public JButton getBtnCancelar() { return btnCancelar; }
     public JCheckBox getChkFiltroTematica() { return chkFiltroTematica; }
     public JComboBox<String> getCbFiltroTipo() { return cbFiltroTipo; }
     public JLabel getLblTematicasEvento() { return lblTematicasEvento; }
-    
+
     // === MÉTODOS PARA POBLAR DATOS ===
-    
-    /**
-     * Establece las temáticas del evento en el label
-     */
+
     public void setTematicas(List<app.dto.TematicaDTO> tematicas) {
         if (tematicas == null || tematicas.isEmpty()) {
             lblTematicasEvento.setText("Temáticas del evento: Ninguna");
@@ -251,120 +285,98 @@ public class AsignacionEdicionView {
             lblTematicasEvento.setText(sb.toString());
         }
     }
-    
+
     /**
-     * Limpia y pobla la tabla de eventos
+     * Limpia y pobla la tabla de eventos. Muestra el estado de finalización.
      */
     public void setEventos(List<EventoDTO> eventos) {
         modeloEventos.setRowCount(0);
         for (EventoDTO e : eventos) {
-            modeloEventos.addRow(new Object[]{e.getId(), e.getNombre(), e.getFecha()});
+            String estado = e.isAsignacionFinalizada() ? "FINALIZADA" : "Abierta";
+            modeloEventos.addRow(new Object[]{e.getId(), e.getNombre(), e.getFecha(), estado});
         }
     }
-    
+
     /**
-     * Establece los reporteros ya asignados al evento.
-     * Esto limpia tanto los asignados como los pendientes.
+     * Establece los reporteros asignados al evento, con info de RR.
+     * @param datos lista de Object[] con: id, nombre, tipo, id_agencia, es_responsable
      */
-    public void setAsignados(List<ReporteroDTO> reporteros) {
+    public void setAsignadosConRR(List<Object[]> datos) {
         idsAsignados.clear();
         idsPendientes.clear();
         modeloReporterosEvento.setRowCount(0);
-        
-        for (ReporteroDTO r : reporteros) {
-            idsAsignados.add(r.getId());
-            modeloReporterosEvento.addRow(new Object[]{"Asignado", r.getId(), r.getNombre(), r.getTipo()});
+
+        for (Object[] row : datos) {
+            int id = ((Number) row[0]).intValue();
+            String nombre = (String) row[1];
+            String tipo = (String) row[2];
+            boolean esRR = row[4] != null && (row[4] instanceof Boolean ? (Boolean) row[4] : ((Number) row[4]).intValue() != 0);
+
+            idsAsignados.add(id);
+            modeloReporterosEvento.addRow(new Object[]{
+                "Asignado", id, nombre, tipo, esRR ? "★ RR" : ""
+            });
         }
     }
-    
-    /**
-     * Añade un reportero como pendiente de asignar a la tabla del evento.
-     * @return true si se añadió, false si ya estaba
-     */
+
     public boolean addPendiente(int id, String nombre, String tipo) {
-        // Verificar si ya está en asignados o pendientes
         if (idsAsignados.contains(id) || idsPendientes.contains(id)) {
             return false;
         }
-        
         idsPendientes.add(id);
-        modeloReporterosEvento.addRow(new Object[]{"Pendiente", id, nombre, tipo});
+        modeloReporterosEvento.addRow(new Object[]{"Pendiente", id, nombre, tipo, ""});
         return true;
     }
-    
-    /**
-     * Elimina un reportero pendiente de la tabla del evento.
-     * @return true si se eliminó, false si no era pendiente
-     */
+
     public boolean removePendiente(int id) {
         if (!idsPendientes.contains(id)) {
             return false;
         }
-        
         idsPendientes.remove(id);
-        
-        // Buscar y eliminar la fila
         for (int i = 0; i < modeloReporterosEvento.getRowCount(); i++) {
-            if ((int) modeloReporterosEvento.getValueAt(i, 1) == id) {
+            if (((Number) modeloReporterosEvento.getValueAt(i, 1)).intValue() == id) {
                 modeloReporterosEvento.removeRow(i);
                 break;
             }
         }
         return true;
     }
-    
-    /**
-     * Verifica si un ID está en los asignados
-     */
-    public boolean isAsignado(int id) {
-        return idsAsignados.contains(id);
-    }
-    
-    /**
-     * Verifica si un ID está en los pendientes
-     */
-    public boolean isPendiente(int id) {
-        return idsPendientes.contains(id);
-    }
-    
-    /**
-     * Limpia y pobla la tabla de reporteros disponibles.
-     * Marca con check los que están pendientes.
-     */
+
+    public boolean isAsignado(int id) { return idsAsignados.contains(id); }
+    public boolean isPendiente(int id) { return idsPendientes.contains(id); }
+
     public void setDisponibles(List<ReporteroDTO> reporteros) {
         modeloDisponibles.setRowCount(0);
         for (ReporteroDTO r : reporteros) {
-            // Marcar si está en pendientes
             boolean marcado = idsPendientes.contains(r.getId());
             modeloDisponibles.addRow(new Object[]{marcado, r.getId(), r.getNombre(), r.getTipo()});
         }
     }
-    
-    /**
-     * Obtiene el ID del evento seleccionado, o -1 si no hay selección
-     */
+
     public int getIdEventoSeleccionado() {
         int row = tablaEventos.getSelectedRow();
         if (row >= 0) {
-            return (int) modeloEventos.getValueAt(row, 0);
+            return ((Number) modeloEventos.getValueAt(row, 0)).intValue();
         }
         return -1;
     }
-    
-    /**
-     * Obtiene el ID del reportero seleccionado en la tabla del evento, o -1 si no hay selección
-     */
+
+    public String getEstadoEventoSeleccionado() {
+        int row = tablaEventos.getSelectedRow();
+        if (row >= 0) {
+            return (String) modeloEventos.getValueAt(row, 3);
+        }
+        return null;
+    }
+
     public int getIdReporteroEventoSeleccionado() {
         int row = tablaReporterosEvento.getSelectedRow();
         if (row >= 0) {
-            return (int) modeloReporterosEvento.getValueAt(row, 1);
+            return ((Number) modeloReporterosEvento.getValueAt(row, 1)).intValue();
         }
         return -1;
     }
-    
-    /**
-     * Obtiene el estado del reportero seleccionado en la tabla del evento
-     */
+
     public String getEstadoReporteroEventoSeleccionado() {
         int row = tablaReporterosEvento.getSelectedRow();
         if (row >= 0) {
@@ -372,103 +384,103 @@ public class AsignacionEdicionView {
         }
         return null;
     }
-    
-    /**
-     * Obtiene los IDs de los reporteros marcados como seleccionados en disponibles
-     */
+
     public List<Integer> getIdsSeleccionadosDisponibles() {
         List<Integer> ids = new ArrayList<>();
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
             Boolean seleccionado = (Boolean) modeloDisponibles.getValueAt(i, 0);
             if (seleccionado != null && seleccionado) {
-                ids.add((int) modeloDisponibles.getValueAt(i, 1));
+                ids.add(((Number) modeloDisponibles.getValueAt(i, 1)).intValue());
             }
         }
         return ids;
     }
-    
-    /**
-     * Obtiene el nombre de un reportero por su ID en la tabla de disponibles
-     */
+
     public String getNombreDisponible(int id) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
-            if ((int) modeloDisponibles.getValueAt(i, 1) == id) {
+            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id) {
                 return (String) modeloDisponibles.getValueAt(i, 2);
             }
         }
         return null;
     }
-    
-    /**
-     * Obtiene el tipo de un reportero por su ID en la tabla de disponibles
-     */
+
     public String getTipoDisponible(int id) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
-            if ((int) modeloDisponibles.getValueAt(i, 1) == id) {
+            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id) {
                 return (String) modeloDisponibles.getValueAt(i, 3);
             }
         }
         return null;
     }
 
-    /**
-     * Obtiene el tipo seleccionado en el combo de filtro
-     */
     public String getSelectedTipo() {
         String sel = (String) cbFiltroTipo.getSelectedItem();
         return "Todos".equals(sel) ? null : sel;
     }
-    
-    /**
-     * Obtiene los IDs de los reporteros pendientes de asignar
-     */
+
     public List<Integer> getIdsPendientes() {
         return new ArrayList<>(idsPendientes);
     }
-    
-    /**
-     * Obtiene los IDs de los reporteros ya asignados
-     */
+
     public List<Integer> getIdsAsignados() {
         return new ArrayList<>(idsAsignados);
     }
-    
-    /**
-     * Limpia los pendientes (usado al cambiar de evento o guardar)
-     */
+
     public void clearPendientes() {
         idsPendientes.clear();
     }
-    
-    /**
-     * Actualiza el checkbox de un reportero en disponibles
-     */
+
     public void setCheckboxDisponible(int id, boolean marcado) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
-            if ((int) modeloDisponibles.getValueAt(i, 1) == id) {
+            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id) {
                 modeloDisponibles.setValueAt(marcado, i, 0);
                 break;
             }
         }
     }
-    
+
     /**
-     * Muestra un mensaje de error
+     * Habilita/deshabilita los controles de edición.
+     * Cuando un evento está finalizado, se deshabilitan.
      */
+    public void setEdicionHabilitada(boolean habilitada) {
+        btnAsignar.setEnabled(habilitada);
+        btnEliminar.setEnabled(habilitada);
+        btnDesignarRR.setEnabled(habilitada);
+        btnFinalizar.setEnabled(habilitada);
+        chkFiltroTematica.setEnabled(habilitada);
+        cbFiltroTipo.setEnabled(habilitada);
+
+        // Hacer que los checkboxes de disponibles no sean editables
+        modeloDisponibles = new DefaultTableModel(
+            new String[]{"Añadir", "ID", "Nombre", "Tipo"}, 0) {
+            final boolean editable = habilitada;
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) return Boolean.class;
+                return String.class;
+            }
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return editable && column == 0;
+            }
+        };
+        tablaDisponibles.setModel(modeloDisponibles);
+        tablaDisponibles.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tablaDisponibles.getColumnModel().getColumn(1).setPreferredWidth(40);
+        tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tablaDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
+    }
+
     public void showError(String mensaje) {
         JOptionPane.showMessageDialog(frame, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
-    
-    /**
-     * Muestra un mensaje informativo
-     */
+
     public void showInfo(String mensaje) {
         JOptionPane.showMessageDialog(frame, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
     }
-    
-    /**
-     * Muestra un diálogo de confirmación
-     */
+
     public boolean showConfirm(String mensaje) {
         int result = JOptionPane.showConfirmDialog(frame, mensaje, "Confirmar", JOptionPane.YES_NO_OPTION);
         return result == JOptionPane.YES_OPTION;

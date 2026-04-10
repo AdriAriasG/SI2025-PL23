@@ -29,14 +29,12 @@ import app.model.InformeModel;
 import app.model.DistribuirReportajeModel;
 import app.model.FreelanceDecisionModel;
 import app.model.OfrecerReportajesModel;
-import app.view.AsignacionView;
 import app.view.DistribuirReportajeView;
 import app.view.FreelanceDecisionView;
 import app.view.AsignacionEdicionView;
 import app.view.InformeView;
 import app.view.ModificarOfrecimientoView;
 import app.view.OfrecerReportajesView;
-import app.controller.AsignacionController;
 import app.controller.AsignacionEdicionController;
 import app.controller.DistribuirReportajeController;
 import app.controller.FreelanceDecisionController;
@@ -301,16 +299,9 @@ public class SwingMain {
 			return;
 		}
 
-		// HU #33537: Asignación de reporteros (ADRIAN)
-		if (buttonText.contains("#33537")) {
+		if (buttonText.contains("#33543")) {
 			AsignacionModel model = new AsignacionModel();
-			AsignacionView view = new AsignacionView(false);
-			new AsignacionController(model, view, agenciaSeleccionada);
-		}
-		// HU #33543: Modificar asignación (ADRIAN)
-		else if (buttonText.contains("#33543")) {
-			AsignacionModel model = new AsignacionModel();
-			AsignacionEdicionView view = new AsignacionEdicionView();
+			AsignacionEdicionView view = new AsignacionEdicionView(); // NO se llama AsignacionView, es de la HU anterior q quedo el view de duplicado
 			new AsignacionEdicionController(model, view, agenciaSeleccionada);
 		}
 		// HU #33548: Informe de un evento (ADRIAN)
