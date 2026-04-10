@@ -306,6 +306,14 @@ INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, c
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (13, 1);
 INSERT INTO RevisionReportaje (id_reportaje, id_reportero, comentario, estado) VALUES (5, 1, 'Falta incluir resultados', 'PENDIENTE');
 
+-- Embargo en Reportajes (HU #34062)
+-- Escenario 1 → Reportaje 1 (evento 10, empresa 4): sin embargo → acceso completo
+-- Escenario 2 → Reportaje 2 (evento 11, empresa 4): embargo vigente, sin acceso especial → solo mensaje
+UPDATE Reportaje SET fecha_fin_embargo = '2030-01-01' WHERE id = 2;
+-- Escenario 3 → Reportaje 3 (evento 14, empresa 4): embargo vigente, con acceso especial → texto sin multimedia
+UPDATE Reportaje SET fecha_fin_embargo = '2030-01-01' WHERE id = 3;
+UPDATE Ofrecimiento SET acceso_especial = TRUE WHERE id = 1400;
+
 -- Precios y estado de descarga en Ofrecimientos (HU #34067, #34072, #34073)
 UPDATE Ofrecimiento SET precio = 150.0, descargado = TRUE WHERE id = 2;
 UPDATE Ofrecimiento SET precio = 200.0, descargado = FALSE WHERE id = 4;

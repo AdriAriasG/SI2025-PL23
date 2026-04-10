@@ -8,7 +8,7 @@ ADRIÁN
 
 - Modificación de las HU #33537, #33543, #34060 y #34068
 - En la pantalla de asignación, para los eventos que ya tienen al menos un reportero asignado, se debe poder designar a uno de ellos como Reportero Responsable (RR).
-- Cada asignación debe tener un RR y un Reportero Base asignados para poder finalizar la asignación.
+- Cada asignación debe tener un RR y un Reportero Base asignados para poder finalizar la asignación. El RR puede ser el Reportero Base.
 - El RR puede cambiarse mientras la asignación no esté finalizada.
 - Una vez finalizada la asignación, no se podrá añadir ni eliminar reporteros, ni cambiar el Reportero Responsable.
 - Los eventos con asignación finalizada se distinguen visualmente (en el listado) de los que no la tienen.
@@ -54,12 +54,12 @@ Antes de empezar, pulsar **"Cargar Datos Iniciales para Pruebas"** para partir d
 4. Pulsar **"Finalizar Asignación"**
 5. **Esperado:** Error → "debe haber al menos un reportero de tipo BASE asignado que no sea el RR"
 
-#### TEST 5 — Intentar finalizar con RR de tipo BASE pero sin otro BASE adicional
+#### TEST 5 — Finalizar con RR de tipo BASE sin otro BASE adicional (caso válido)
 1. Reiniciar datos. Filtro → **"Con asignados"**
 2. Seleccionar **Ev.11 Inauguracion Museo** (solo tiene Miguel Fernandez, BASE)
 3. Designar a **Miguel Fernandez** (BASE) como RR
-4. Pulsar **"Finalizar Asignación"**
-5. **Esperado:** Error → "debe haber al menos un reportero de tipo BASE asignado que no sea el RR". Aunque el RR sea BASE, se necesita al menos un BASE adicional.
+4. Pulsar **"Finalizar Asignación"** → Confirmar
+5. **Esperado:** Mensaje de éxito. El RR es de tipo BASE, por lo que él solo satisface el requisito de cobertura BASE. No se necesita otro BASE adicional.
 
 #### TEST 5b — Finalizar con RR y BASE (caso válido)
 1. Reiniciar datos. Filtro → **"Con asignados"**

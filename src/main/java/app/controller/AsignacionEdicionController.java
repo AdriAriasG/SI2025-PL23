@@ -208,8 +208,9 @@ public class AsignacionEdicionController {
 
     /**
      * Finaliza la asignación del evento seleccionado.
-     * Validación: debe haber un RR designado Y al menos un reportero BASE
-     * que NO sea el RR (incluso si el RR es de tipo BASE).
+     * Validación: debe haber un RR designado Y al menos un reportero BASE cubierto.
+     * Si el RR es de tipo BASE, él mismo satisface el requisito y puede ir solo.
+     * Si el RR no es de tipo BASE, debe haber además al menos un BASE adicional.
      */
     private void onFinalizar() {
         if (eventoFinalizado) {
@@ -228,8 +229,9 @@ public class AsignacionEdicionController {
             return;
         }
 
-        // Validar que hay al menos un reportero BASE que NO sea el RR
-        if (!model.tieneReporteroBaseNoRR(idEventoSeleccionado)) {
+        // Validar cobertura BASE: si el RR es BASE, es suficiente; si no, debe haber al menos un BASE adicional
+        boolean rrEsBase = model.esReporteroResponsableTipoBase(idEventoSeleccionado);
+        if (!rrEsBase && !model.tieneReporteroBaseNoRR(idEventoSeleccionado)) {
             view.showError("No se puede finalizar: debe haber al menos un reportero de tipo BASE asignado que no sea el RR.");
             return;
         }

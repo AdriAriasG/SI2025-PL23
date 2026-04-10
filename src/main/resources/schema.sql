@@ -54,6 +54,7 @@ CREATE TABLE Reportaje (
     id_reportero_autor INTEGER NOT NULL,
     titulo VARCHAR(255) UNIQUE NOT NULL,
     estado VARCHAR(20) CHECK (estado IN ('NORMAL', 'EN_REVISION')) DEFAULT 'NORMAL',
+    fecha_fin_embargo DATE DEFAULT NULL,
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero_autor) REFERENCES Reportero(id)
 );
@@ -84,6 +85,7 @@ CREATE TABLE Ofrecimiento (
     acceso_concedido BOOLEAN DEFAULT FALSE,
     precio REAL DEFAULT 0.0,
     descargado BOOLEAN DEFAULT FALSE,
+    acceso_especial BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_empresa) REFERENCES EmpresaComunicacion(id)
 );

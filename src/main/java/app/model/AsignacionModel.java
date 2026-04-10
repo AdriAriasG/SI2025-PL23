@@ -264,12 +264,26 @@ public class AsignacionModel {
     /**
      * Comprueba si un evento tiene al menos un reportero de tipo BASE asignado
      * que NO sea el Reportero Responsable (RR).
-     * Necesario para la validación de cierre: debe haber un RR + mínimo 1 BASE adicional.
      */
     public boolean tieneReporteroBaseNoRR(int idEvento) {
         String sql = "SELECT COUNT(*) FROM Asignacion a " +
                      "JOIN Reportero r ON a.id_reportero = r.id " +
                      "WHERE a.id_evento = ? AND r.tipo = 'BASE' AND a.es_responsable = FALSE";
+        List<Object[]> result = db.executeQueryArray(sql, idEvento);
+        if (result.isEmpty() || result.get(0)[0] == null) {
+            return false;
+        }
+        return ((Number) result.get(0)[0]).intValue() > 0;
+    }
+
+    /**
+     * Comprueba si el Reportero Responsable (RR) de un evento es de tipo BASE.
+     * Si lo es, ya satisface por sí solo el requisito de BASE para poder finalizar.
+     */
+    public boolean esReporteroResponsableTipoBase(int idEvento) {
+        String sql = "SELECT COUNT(*) FROM Asignacion a " +
+                     "JOIN Reportero r ON a.id_reportero = r.id " +
+                     "WHERE a.id_evento = ? AND a.es_responsable = TRUE AND r.tipo = 'BASE'";
         List<Object[]> result = db.executeQueryArray(sql, idEvento);
         if (result.isEmpty() || result.get(0)[0] == null) {
             return false;
