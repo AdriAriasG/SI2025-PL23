@@ -53,7 +53,7 @@ CREATE TABLE Reportaje (
     id_evento INTEGER UNIQUE NOT NULL,
     id_reportero_autor INTEGER NOT NULL,
     titulo VARCHAR(255) UNIQUE NOT NULL,
-    estado VARCHAR(20) CHECK (estado IN ('NORMAL', 'EN_REVISION')) DEFAULT 'NORMAL',
+    estado VARCHAR(20) CHECK (estado IN ('NORMAL', 'EN_REVISION', 'TERMINADO')) DEFAULT 'NORMAL',
     fecha_fin_embargo DATE DEFAULT NULL,
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero_autor) REFERENCES Reportero(id)
@@ -74,7 +74,9 @@ CREATE TABLE VersionReportaje (
 CREATE TABLE EmpresaComunicacion (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    email VARCHAR(255) NOT NULL,
+    tiene_tarifa_plana BOOLEAN NOT NULL DEFAULT FALSE,
+    al_corriente_pago BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE Ofrecimiento (
@@ -86,6 +88,8 @@ CREATE TABLE Ofrecimiento (
     precio REAL DEFAULT 0.0,
     descargado BOOLEAN DEFAULT FALSE,
     acceso_especial BOOLEAN DEFAULT FALSE,
+    pagado BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE(id_evento, id_empresa),
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_empresa) REFERENCES EmpresaComunicacion(id)
 );
