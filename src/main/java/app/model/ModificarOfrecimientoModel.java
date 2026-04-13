@@ -4,71 +4,104 @@ import java.util.List;
 
 import app.dto.EmpresaComunicacionDTO;
 import app.dto.EventoDTO;
-import giis.demo.util.Database;
+import app.util.ApplicationException;
+import app.util.Database;
 
 public class ModificarOfrecimientoModel {
 
-    private Database db = new Database();
+    private final Database db = new Database();
 
     // ================================
     // CONSULTAS DE EMPRESAS
     // ================================
 
     public List<EmpresaComunicacionDTO> getEmpresasConOfrecimiento(int idEvento) {
+        return getEmpresasConOfrecimiento(idEvento, false);
+    }
+
+    public List<EmpresaComunicacionDTO> getEmpresasConOfrecimiento(int idEvento, boolean soloTarifaPlana) {
         String sql = """
-            SELECT e.id, e.nombre
-            FROM EmpresaComunicacion e
-            JOIN Ofrecimiento o ON e.id = o.id_empresa
-            WHERE o.id_evento = ?
-            ORDER BY e.nombre
-        """;
-        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento);
+                SELECT e.id, e.nombre
+                FROM EmpresaComunicacion e
+                JOIN Ofrecimiento o ON e.id = o.id_empresa
+                WHERE o.id_evento = ?
+                  AND (? = 0 OR e.tiene_tarifa_plana = 1)
+                ORDER BY e.nombre
+                """;
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, soloTarifaPlana);
     }
 
     public List<EmpresaComunicacionDTO> getEmpresasConOfrecimientoConTematicaCoincidente(int idEvento) {
+        return getEmpresasConOfrecimientoConTematicaCoincidente(idEvento, false);
+    }
+
+    public List<EmpresaComunicacionDTO> getEmpresasConOfrecimientoConTematicaCoincidente(int idEvento,
+            boolean soloTarifaPlana) {
         String sql = """
-            SELECT DISTINCT e.id, e.nombre
-            FROM EmpresaComunicacion e
-            JOIN Ofrecimiento o ON e.id = o.id_empresa
-            JOIN EmpresaTematica et ON et.id_empresa = e.id
-            JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
-            WHERE o.id_evento = ?
-              AND evt.id_evento = ?
-            ORDER BY e.nombre
-        """;
-        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, idEvento);
+                SELECT DISTINCT e.id, e.nombre
+                FROM EmpresaComunicacion e
+                JOIN Ofrecimiento o ON e.id = o.id_empresa
+                JOIN EmpresaTematica et ON et.id_empresa = e.id
+                JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
+                WHERE o.id_evento = ?
+                  AND evt.id_evento = ?
+                  AND (? = 0 OR e.tiene_tarifa_plana = 1)
+                ORDER BY e.nombre
+                """;
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, idEvento, soloTarifaPlana);
     }
 
     public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimiento(int idEvento) {
+        return getEmpresasSinOfrecimiento(idEvento, false);
+    }
+
+    public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimiento(int idEvento, boolean soloTarifaPlana) {
         String sql = """
             SELECT e.id, e.nombre
             FROM EmpresaComunicacion e
             WHERE e.id NOT IN (
-                SELECT id_empresa
-                FROM Ofrecimiento
-                WHERE id_evento = ?
-            )
-            ORDER BY e.nombre
-        """;
-        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento);
-    }
-
-    public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimientoConTematicaCoincidente(int idEvento) {
-        String sql = """
-            SELECT DISTINCT e.id, e.nombre
-            FROM EmpresaComunicacion e
-            JOIN EmpresaTematica et ON et.id_empresa = e.id
-            JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
-            WHERE evt.id_evento = ?
-              AND e.id NOT IN (
                   SELECT id_empresa
                   FROM Ofrecimiento
                   WHERE id_evento = ?
               )
+              AND (? = 0 OR e.tiene_tarifa_plana = 1)
+              AND (
+                    e.tiene_tarifa_plana = 0
+                    OR (e.tiene_tarifa_plana = 1 AND e.al_corriente_pago = 1)
+                  )
             ORDER BY e.nombre
         """;
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, soloTarifaPlana);
+    }
 
-        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEvento, idEvento);
+    public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimientoConTematicaCoincidente(int idEvento) {
+        return getEmpresasSinOfrecimientoConTematicaCoincidente(idEvento, false);
+    }
+
+    public List<EmpresaComunicacionDTO> getEmpresasSinOfrecimientoConTematicaCoincidente(int idEvento,
+            boolean soloTarifaPlana) {
+        String sql = """
+                SELECT DISTINCT e.id, e.nombre
+                FROM EmpresaComunicacion e
+                JOIN EmpresaTematica et ON et.id_empresa = e.id
+                JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
+                JOIN Evento ev ON ev.id = ?
+                WHERE evt.id_evento = ?
+                  AND ev.asignacion_finalizada = 1
+                  AND e.id NOT IN (
+                      SELECT id_empresa
+                      FROM Ofrecimiento
+                      WHERE id_evento = ?
+                  )
+                  AND (? = 0 OR e.tiene_tarifa_plana = 1)
+                  AND (
+                      e.tiene_tarifa_plana = 0
+                      OR (e.tiene_tarifa_plana = 1 AND e.al_corriente_pago = 1)
+                  )
+                ORDER BY e.nombre
+                """;
+        return db.executeQueryPojo(EmpresaComunicacionDTO.class, sql,
+                idEvento, idEvento, idEvento, soloTarifaPlana);
     }
 
     // ================================
@@ -76,59 +109,139 @@ public class ModificarOfrecimientoModel {
     // ================================
 
     public void ofrecerEmpresa(int idEvento, int idEmpresa) {
+        validarPuedeOfrecer(idEvento, idEmpresa);
 
         String sql = """
-            INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido)
-            VALUES (
-                (SELECT COALESCE(MAX(id),0)+1 FROM Ofrecimiento),
-                ?, ?, 'PENDIENTE', 0
-            )
-        """;
-
+                INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, acceso_concedido)
+                VALUES (?, ?, 'PENDIENTE', 0)
+                """;
         db.executeUpdate(sql, idEvento, idEmpresa);
     }
 
-    public void quitarOfrecimiento(int idEvento, int idEmpresa) {
+    public boolean quitarOfrecimiento(int idEvento, int idEmpresa) {
+        validarPuedeQuitar(idEvento, idEmpresa);
+
+        boolean notificar = estabaAceptadoSinAcceso(idEvento, idEmpresa);
+
         String sql = """
-            DELETE FROM Ofrecimiento
-            WHERE id_evento = ? AND id_empresa = ?
-        """;
+                DELETE FROM Ofrecimiento
+                WHERE id_evento = ? AND id_empresa = ?
+                """;
         db.executeUpdate(sql, idEvento, idEmpresa);
+
+        return notificar;
     }
 
     // ================================
     // VALIDACIONES DE NEGOCIO
     // ================================
 
+    public void validarPuedeOfrecer(int idEvento, int idEmpresa) {
+        if (!asignacionFinalizada(idEvento)) {
+            throw new ApplicationException(
+                    "No se puede ofrecer el reportaje.\nLa asignación de reporteros del evento no está finalizada.");
+        }
+
+        if (tieneTarifaPlana(idEmpresa) && !estaAlCorrientePago(idEmpresa)) {
+            throw new ApplicationException(
+                    "No se puede ofrecer el reportaje.\nLa empresa tiene tarifa plana y no está al corriente de pago.");
+        }
+
+        if (existeOfrecimiento(idEvento, idEmpresa)) {
+            throw new ApplicationException("La empresa ya tiene un ofrecimiento para este evento.");
+        }
+    }
+
+    public void validarPuedeQuitar(int idEvento, int idEmpresa) {
+        if (!existeOfrecimiento(idEvento, idEmpresa)) {
+            throw new ApplicationException("No existe un ofrecimiento para esa empresa en el evento seleccionado.");
+        }
+
+        if (tieneAccesoConcedido(idEvento, idEmpresa)) {
+            throw new ApplicationException(
+                    "No se puede quitar el ofrecimiento.\nLa empresa ya tiene acceso concedido al reportaje.");
+        }
+    }
+
     public boolean tieneAccesoConcedido(int idEvento, int idEmpresa) {
-
         String sql = """
-            SELECT COUNT(*)
-            FROM Ofrecimiento
-            WHERE id_evento = ?
-              AND id_empresa = ?
-              AND acceso_concedido = 1
-        """;
-
-        List<Object[]> res = db.executeQueryArray(sql, idEvento, idEmpresa);
-        Number count = (Number) res.get(0)[0];
-        return count.longValue() > 0;
+                SELECT COUNT(*)
+                FROM Ofrecimiento
+                WHERE id_evento = ?
+                  AND id_empresa = ?
+                  AND acceso_concedido = 1
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEvento, idEmpresa);
+        return count != null && count > 0;
     }
 
     public boolean estabaAceptadoSinAcceso(int idEvento, int idEmpresa) {
-
         String sql = """
-            SELECT COUNT(*)
-            FROM Ofrecimiento
-            WHERE id_evento = ?
-              AND id_empresa = ?
-              AND estado = 'ACEPTADO'
-              AND acceso_concedido = 0
-        """;
+                SELECT COUNT(*)
+                FROM Ofrecimiento
+                WHERE id_evento = ?
+                  AND id_empresa = ?
+                  AND estado = 'ACEPTADO'
+                  AND acceso_concedido = 0
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEvento, idEmpresa);
+        return count != null && count > 0;
+    }
 
-        List<Object[]> res = db.executeQueryArray(sql, idEvento, idEmpresa);
-        Number count = (Number) res.get(0)[0];
-        return count.longValue() > 0;
+    public boolean tieneTarifaPlana(int idEmpresa) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM EmpresaComunicacion
+                WHERE id = ?
+                  AND tiene_tarifa_plana = 1
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEmpresa);
+        return count != null && count > 0;
+    }
+
+    public boolean estaAlCorrientePago(int idEmpresa) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM EmpresaComunicacion
+                WHERE id = ?
+                  AND al_corriente_pago = 1
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEmpresa);
+        return count != null && count > 0;
+    }
+
+    public boolean asignacionFinalizada(int idEvento) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM Evento
+                WHERE id = ?
+                  AND asignacion_finalizada = 1
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEvento);
+        return count != null && count > 0;
+    }
+
+    public boolean empresaTieneTematicaCoincidente(int idEvento, int idEmpresa) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM EmpresaTematica et
+                JOIN EventoTematica evt ON evt.id_tematica = et.id_tematica
+                WHERE et.id_empresa = ?
+                  AND evt.id_evento = ?
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEmpresa, idEvento);
+        return count != null && count > 0;
+    }
+
+    private boolean existeOfrecimiento(int idEvento, int idEmpresa) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM Ofrecimiento
+                WHERE id_evento = ?
+                  AND id_empresa = ?
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEvento, idEmpresa);
+        return count != null && count > 0;
     }
 
     // ================================
@@ -136,14 +249,12 @@ public class ModificarOfrecimientoModel {
     // ================================
 
     public List<EventoDTO> getEventosByAgencia(int idAgencia) {
-
         String sql = """
-            SELECT id, nombre, fecha
-            FROM Evento
-            WHERE id_agencia = ?
-            ORDER BY fecha
-        """;
-
+                SELECT id, nombre, fecha
+                FROM Evento
+                WHERE id_agencia = ?
+                ORDER BY fecha
+                """;
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
 
@@ -159,14 +270,11 @@ public class ModificarOfrecimientoModel {
 
     public EmpresaComunicacionDTO getEmpresaById(int idEmpresa) {
         String sql = """
-            SELECT id, nombre
-            FROM EmpresaComunicacion
-            WHERE id = ?
-        """;
-
-        List<EmpresaComunicacionDTO> res =
-            db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEmpresa);
-
+                SELECT id, nombre
+                FROM EmpresaComunicacion
+                WHERE id = ?
+                """;
+        List<EmpresaComunicacionDTO> res = db.executeQueryPojo(EmpresaComunicacionDTO.class, sql, idEmpresa);
         return res.isEmpty() ? null : res.get(0);
     }
 

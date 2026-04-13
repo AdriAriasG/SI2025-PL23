@@ -11,7 +11,7 @@ INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agen
 
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
-
+INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (42, 'Agencia Catalana', 'contacto@agenciacatalana.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -36,7 +36,9 @@ INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
 -- Agencia 40
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (200, 'Luis Castro', 40);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40);
-
+-- Agencia 42
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (420, 'Lucia Prueba', 'GRAFICO', 42);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (421, 'Mario Prueba', 'CAMAROGRAFO', 42);
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
@@ -68,7 +70,9 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesque
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (410, 'Foro Digital', '2026-07-01', 41);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (411, 'Cumbre Innovación', '2026-07-10', 41);
 
-
+-- Agencia 42
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (420, 'Evento F', '2026-08-01', 42, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (421, 'EventoNF', '2026-08-02', 42, FALSE);
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -85,6 +89,12 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 1);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 2);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 3);
 -- Evento 15 (Concierto Sinfonico) - SIN asignar (misma fecha que evento 22 para probar disponibilidad)
+
+-- Evento 420
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (420, 420, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (420, 421, FALSE);
+-- Evento 421
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (421, 420, TRUE);
 
 -- Agencia 2
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (20, 5);
@@ -124,7 +134,12 @@ INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacio
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (118, 'Galicia Noticias', 'redaccion@galicianoticias.com');
-
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (119, 'Diario Metropolitano', 'redaccion@diariometropolitano.com', FALSE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (120, 'Canal Actual 24', 'contacto@canalactual24.com', TRUE, TRUE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (121, 'Tecnologia al Dia', 'info@tecnologiaaldia.com', TRUE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (122, 'Radio Mediterranea', 'programacion@radiomediterranea.com', FALSE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (123, 'Noticias Urbanas', 'redaccion@noticiasurbanas.com', TRUE, TRUE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (124, 'Prensa del Litoral', 'editorial@prensadellitoral.com', FALSE, FALSE);
 
 
 -- Ofrecimientos (HU #33539, #33540)
@@ -174,6 +189,12 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 
 -- Evento 411
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (601, 411, 4, 'PENDIENTE', FALSE);
+
+-- Evento 420
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (700, 420, 123, 'PENDIENTE', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (701, 420, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+
 
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
@@ -260,7 +281,13 @@ INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (3, 3);   
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (4, 5);   
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);  
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (119, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (120, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (121, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (123, 3); 
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (122, 5);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (124, 5);
 
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;

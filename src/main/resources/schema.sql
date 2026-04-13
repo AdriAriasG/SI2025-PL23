@@ -77,6 +77,7 @@ CREATE TABLE EmpresaComunicacion (
     email VARCHAR(255) NOT NULL,
     tiene_tarifa_plana BOOLEAN NOT NULL DEFAULT FALSE,
     al_corriente_pago BOOLEAN NOT NULL DEFAULT FALSE
+    acepta_embargo BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE Ofrecimiento (
