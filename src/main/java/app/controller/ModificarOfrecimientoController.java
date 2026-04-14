@@ -81,7 +81,6 @@ public class ModificarOfrecimientoController {
             throw new ApplicationException("Debes seleccionar un evento.");
         }
 
-        // Prevalidar todo para evitar guardar cambios parciales por reglas de negocio.
         for (Integer idEmpresa : empresasOfrecer) {
             model.validarPuedeOfrecer(idEventoSeleccionado, idEmpresa);
         }
@@ -243,6 +242,9 @@ public class ModificarOfrecimientoController {
         if (model.tieneTarifaPlana(idEmpresa) && !model.estaAlCorrientePago(idEmpresa)) {
             return false;
         }
+        if (!model.puedeOfrecerSegunEmbargo(idEventoSeleccionado, idEmpresa)) {
+            return false;
+        }
         return true;
     }
 
@@ -272,7 +274,6 @@ public class ModificarOfrecimientoController {
                 (EmpresaComunicacionDTO) view.getTablaDisponibles().getValueAt(fila, 0);
         int idEmpresa = empresa.getId();
 
-        // Si estaba pendiente de quitar, simplemente se deshace el cambio temporal.
         if (empresasQuitar.contains(idEmpresa)) {
             empresasQuitar.remove(idEmpresa);
             cargarEmpresas();
@@ -299,7 +300,6 @@ public class ModificarOfrecimientoController {
                 (EmpresaComunicacionDTO) view.getTablaOfrecidas().getValueAt(fila, 0);
         int idEmpresa = empresa.getId();
 
-        // Si era un ofrecimiento pendiente, simplemente se deshace.
         if (empresasOfrecer.contains(idEmpresa)) {
             empresasOfrecer.remove(idEmpresa);
             cargarEmpresas();

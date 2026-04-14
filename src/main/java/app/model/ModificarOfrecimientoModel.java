@@ -147,6 +147,11 @@ public class ModificarOfrecimientoModel {
                     "No se puede ofrecer el reportaje.\nLa empresa tiene tarifa plana y no está al corriente de pago.");
         }
 
+        if (tieneEmbargoVigente(idEvento) && !aceptaEmbargo(idEmpresa)) {
+            throw new ApplicationException(
+                    "No se puede ofrecer el reportaje.\nLa empresa no acepta reportajes con fecha de embargo vigente.");
+        }
+
         if (existeOfrecimiento(idEvento, idEmpresa)) {
             throw new ApplicationException("La empresa ya tiene un ofrecimiento para este evento.");
         }
@@ -210,6 +215,17 @@ public class ModificarOfrecimientoModel {
         return count != null && count > 0;
     }
 
+    public boolean aceptaEmbargo(int idEmpresa) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM EmpresaComunicacion
+                WHERE id = ?
+                  AND acepta_embargo = 1
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEmpresa);
+        return count != null && count > 0;
+    }
+
     public boolean asignacionFinalizada(int idEvento) {
         String sql = """
                 SELECT COUNT(*)
@@ -231,6 +247,22 @@ public class ModificarOfrecimientoModel {
                 """;
         Long count = db.executeQueryScalar(Long.class, sql, idEmpresa, idEvento);
         return count != null && count > 0;
+    }
+
+    public boolean tieneEmbargoVigente(int idEvento) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM Reportaje
+                WHERE id_evento = ?
+                  AND fecha_fin_embargo IS NOT NULL
+                  AND DATE(fecha_fin_embargo) >= DATE('now')
+                """;
+        Long count = db.executeQueryScalar(Long.class, sql, idEvento);
+        return count != null && count > 0;
+    }
+
+    public boolean puedeOfrecerSegunEmbargo(int idEvento, int idEmpresa) {
+        return !tieneEmbargoVigente(idEvento) || aceptaEmbargo(idEmpresa);
     }
 
     private boolean existeOfrecimiento(int idEvento, int idEmpresa) {
