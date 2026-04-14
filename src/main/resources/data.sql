@@ -371,3 +371,25 @@ UPDATE Ofrecimiento SET precio = 300.0 WHERE id = 400;
 UPDATE Ofrecimiento SET precio = 50.0 WHERE id = 5;
 UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6;
 UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9;
+
+-- Nuevos Eventos para pruebas de embargo
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (500, 'Descubrimiento Arqueológico', '2026-04-10', 1, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (501, 'Filtración Tecnológica', '2026-04-05', 2, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (502, 'Sentencia Judicial', '2026-04-14', 3, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (503, 'Adelanto Editorial', '2026-04-12', 1, TRUE);
+
+-- Asignaciones correspondientes
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (500, 1, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (501, 5, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (502, 8, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (503, 2, TRUE);
+
+-- Reportajes con distintos estados de embargo
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (70, 500, 1, 'Tesoros Ocultos en el Norte', '2027-01-01');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (71, 501, 5, 'El nuevo chip cuántico', '2026-04-10');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (72, 502, 8, 'Veredicto Final Caso X', '2026-04-14');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (73, 503, 2, 'Biografía no autorizada', '2026-04-20');
+
+-- Ofrecimientos para probar lógica de acceso
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5000, 500, 1, 'ACEPTADO', TRUE, TRUE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5001, 503, 120, 'ACEPTADO', TRUE, FALSE);
