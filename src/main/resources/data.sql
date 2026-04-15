@@ -11,7 +11,7 @@ INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agen
 
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
-
+INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (42, 'Agencia Catalana', 'contacto@agenciacatalana.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -36,7 +36,9 @@ INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
 -- Agencia 40
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (200, 'Luis Castro', 40);
 INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40);
-
+-- Agencia 42
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (420, 'Lucia Prueba', 'GRAFICO', 42);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (421, 'Mario Prueba', 'CAMAROGRAFO', 42);
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
@@ -68,7 +70,12 @@ INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesque
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (410, 'Foro Digital', '2026-07-01', 41);
 INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (411, 'Cumbre Innovación', '2026-07-10', 41);
 
-
+-- Agencia 42
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (420, 'Evento F', '2026-08-01', 42, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (421, 'EventoNF', '2026-08-02', 42, FALSE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (422, 'Evento Embargo Vigente', '2026-08-03', 42, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (423, 'Evento Embargo Caducado', '2026-08-04', 42, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (424, 'Evento Sin Embargo', '2026-08-05', 42, TRUE);
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -86,6 +93,17 @@ INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 2);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (14, 3);
 -- Evento 15 (Concierto Sinfonico) - SIN asignar (misma fecha que evento 22 para probar disponibilidad)
 
+-- Evento 420
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (420, 420, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (420, 421, FALSE);
+-- Evento 421
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (421, 420, TRUE);
+-- Evento 422
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (422, 420, TRUE);
+-- Evento 423
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (423, 420, TRUE);
+-- Evento 424
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (424, 420, TRUE);
 -- Agencia 2
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (20, 5);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (20, 6);
@@ -124,7 +142,14 @@ INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (115, 'Voz Internacio
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (116, 'Voz Deportes', 'deportes@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (117, 'Voz Cultura', 'cultura@vozmedia.com');
 INSERT INTO EmpresaComunicacion (id, nombre, email) VALUES (118, 'Galicia Noticias', 'redaccion@galicianoticias.com');
-
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (119, 'Diario Metropolitano', 'redaccion@diariometropolitano.com', FALSE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (120, 'Canal Actual 24', 'contacto@canalactual24.com', TRUE, TRUE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (121, 'Tecnologia al Dia', 'info@tecnologiaaldia.com', TRUE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (122, 'Radio Mediterranea', 'programacion@radiomediterranea.com', FALSE, FALSE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (123, 'Noticias Urbanas', 'redaccion@noticiasurbanas.com', TRUE, TRUE);
+INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corriente_pago) VALUES (124, 'Prensa del Litoral', 'editorial@prensadellitoral.com', FALSE, FALSE);
+UPDATE EmpresaComunicacion SET acepta_embargo = TRUE  WHERE id IN (120, 123);
+UPDATE EmpresaComunicacion SET acepta_embargo = FALSE WHERE id IN (119, 121, 122, 124);
 
 
 -- Ofrecimientos (HU #33539, #33540)
@@ -175,6 +200,12 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 -- Evento 411
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (601, 411, 4, 'PENDIENTE', FALSE);
 
+-- Evento 420
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (700, 420, 123, 'PENDIENTE', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (701, 420, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+
+
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
@@ -218,6 +249,16 @@ VALUES (6, 3, 'Celebrities en la alfombra roja', 'Las grandes estrellas del cine
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) 
 VALUES (7, 4, 'Mil personas vibraron con el rock', 'El Concierto Rock Festival reunio a mil personas que disfrutaron de una noche inolvidable con las mejores bandas del momento.', '2026-03-02 01:00:00', 'Version inicial', 5);
 
+-- Reportajes con fecha de embargo
+-- Evento 422: Embargo vigente
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (60, 422, 420, 'Reportaje con embargo vigente', '2026-12-31');
+
+-- Evento 423: Embargo caducado
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (61, 423, 420, 'Reportaje con embargo caducado', '2026-01-01');
+
+-- Evento 424: Sin embargo
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (62, 424, 420, 'Reportaje sin embargo', NULL);
+
 -- ---------------------------------------------------------
 -- NUEVOS DATOS SPRINT 2
 -- ---------------------------------------------------------
@@ -242,7 +283,9 @@ INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (300, 4);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (301, 5);
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (410, 3); 
 INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (411, 5); 	
-
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (422, 3);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (423, 3);
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (424, 3);
 
 -- ReporteroTematica (Asignar temáticas a reporteros)
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (1, 1);
@@ -260,7 +303,13 @@ INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (2, 2);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (5, 3);
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (3, 3);   
 INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (4, 5);   
-INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);   
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (6, 5);  
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (119, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (120, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (121, 3);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (123, 3); 
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (122, 5);
+INSERT INTO EmpresaTematica (id_empresa, id_tematica) VALUES (124, 5);
 
 -- Actualizar reporteros con tipos y Reporteros Freelance (HU #34068, #34070)
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 1;
@@ -322,3 +371,25 @@ UPDATE Ofrecimiento SET precio = 300.0 WHERE id = 400;
 UPDATE Ofrecimiento SET precio = 50.0 WHERE id = 5;
 UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6;
 UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9;
+
+-- Nuevos Eventos para pruebas de embargo
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (500, 'Descubrimiento Arqueológico', '2026-04-10', 1, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (501, 'Filtración Tecnológica', '2026-04-05', 2, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (502, 'Sentencia Judicial', '2026-04-14', 3, TRUE);
+INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (503, 'Adelanto Editorial', '2026-04-12', 1, TRUE);
+
+-- Asignaciones correspondientes
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (500, 1, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (501, 5, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (502, 8, TRUE);
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (503, 2, TRUE);
+
+-- Reportajes con distintos estados de embargo
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (70, 500, 1, 'Tesoros Ocultos en el Norte', '2027-01-01');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (71, 501, 5, 'El nuevo chip cuántico', '2026-04-10');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (72, 502, 8, 'Veredicto Final Caso X', '2026-04-14');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (73, 503, 2, 'Biografía no autorizada', '2026-04-20');
+
+-- Ofrecimientos para probar lógica de acceso
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5000, 500, 1, 'ACEPTADO', TRUE, TRUE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5001, 503, 120, 'ACEPTADO', TRUE, FALSE);
