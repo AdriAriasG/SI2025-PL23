@@ -204,7 +204,12 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) V
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (700, 420, 123, 'PENDIENTE', FALSE, 0.0, FALSE, FALSE, FALSE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (701, 420, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
-
+--Evento 119
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, acceso_concedido, pagado) VALUES (13, 119, 'ACEPTADO', FALSE, TRUE);
+--Evento 120
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, acceso_concedido, pagado) VALUES (13, 120, 'ACEPTADO', FALSE, FALSE);
+--Evento 121
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, acceso_concedido, pagado) VALUES (13, 121, 'ACEPTADO', FALSE, FALSE);
 
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje

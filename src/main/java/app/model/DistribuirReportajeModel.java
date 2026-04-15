@@ -4,6 +4,7 @@ import java.util.List;
 
 import app.dto.EmpresaComunicacionDTO;
 import app.dto.EventoDTO;
+import app.util.ApplicationException;
 import app.util.Database;
 
 public class DistribuirReportajeModel {
@@ -52,14 +53,83 @@ public class DistribuirReportajeModel {
 	}
 
 	public void concederAcceso(int idEvento, int idEmpresa) {
-		String sql =
-				"UPDATE Ofrecimiento " +
-						"SET acceso_concedido = TRUE " +
-						"WHERE id_evento = ? AND id_empresa = ?";
 
-		db.executeUpdate(sql, idEvento, idEmpresa);
+		// Comprobar que el reportaje está TERMINADO
+		String estado = db.executeQueryScalar(
+				String.class,
+				"""
+				SELECT r.estado
+				FROM Reportaje r
+				WHERE r.id_evento = ?
+				""",
+				idEvento
+				);
+
+		if (!"TERMINADO".equals(estado)) {
+			throw new ApplicationException(
+					"Solo pueden distribuirse reportajes TERMINADOS"
+					);
+		}
+
+		// Obtener si tiene tarifa plana (SQLite devuelve 0 o 1)
+		Integer tieneTarifaPlanaInt = db.executeQueryScalar(
+				Integer.class,
+				"SELECT tiene_tarifa_plana FROM EmpresaComunicacion WHERE id = ?",
+				idEmpresa
+				);
+
+		boolean tieneTarifaPlana = tieneTarifaPlanaInt != null && tieneTarifaPlanaInt == 1;
+
+		if (tieneTarifaPlana) {
+
+			Integer alCorrienteInt = db.executeQueryScalar(
+					Integer.class,
+					"SELECT al_corriente_pago FROM EmpresaComunicacion WHERE id = ?",
+					idEmpresa
+					);
+
+			boolean alCorriente = alCorrienteInt != null && alCorrienteInt == 1;
+
+			if (!alCorriente) {
+				throw new ApplicationException(
+						"La empresa no está al corriente de pago de la tarifa plana"
+						);
+			}
+
+		} else {
+
+			Integer pagadoInt = db.executeQueryScalar(
+					Integer.class,
+					"""
+					SELECT pagado
+					FROM Ofrecimiento
+					WHERE id_evento = ?
+					  AND id_empresa = ?
+					""",
+					idEvento,
+					idEmpresa
+					);
+
+			boolean pagado = pagadoInt != null && pagadoInt == 1;
+
+			if (!pagado) {
+				throw new ApplicationException(
+						"El reportaje no está pagado por esta empresa"
+						);
+			}
+		}
+
+		// Conceder acceso
+		db.executeUpdate(
+				"""
+				UPDATE Ofrecimiento
+				SET acceso_concedido = TRUE
+				WHERE id_evento = ? AND id_empresa = ?
+				""",
+				idEvento,
+				idEmpresa
+				);
 	}
-
 	public void quitarAcceso(int idEvento, int idEmpresa) {
 		String sql =
 				"UPDATE Ofrecimiento " +

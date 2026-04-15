@@ -146,7 +146,7 @@ CREATE TABLE RevisionReportaje (
     PRIMARY KEY (id_reportaje, id_reportero),
     FOREIGN KEY (id_reportaje) REFERENCES Reportaje(id),
     FOREIGN KEY (id_reportero) REFERENCES Reportero(id)
-);
+); 	
 
 CREATE TABLE DecisionFreelance (
     id_evento INTEGER NOT NULL,
