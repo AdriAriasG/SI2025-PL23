@@ -9,17 +9,20 @@ public class ModificacionOfrecimientosRecibidosModel {
 	private Database db = new Database();
 
 	public List<OfrecimientoDTO> getOfrecimientosFiltrados(int idEmpresa, Boolean yaDecididos, 
-			List<String> tematicasFiltro, Double pMin, Double pMax) {
+			List<String> tematicasFiltro, Double pMin, Double pMax, boolean soloEmbargados) {
 		
 		StringBuilder sql = new StringBuilder();
 		List<Object> params = new ArrayList<>();
 
-		// Usamos el ALIAS 'accesoConcedido' para que coincida exactamente con el atributo del DTO
-		sql.append("SELECT DISTINCT o.id, e.nombre, e.fecha, o.estado, o.acceso_concedido AS accesoConcedido, o.precio ");
+		// NUEVO: Añadimos acceso_especial y la fecha de fin de embargo a la consulta
+		// Usamos LEFT JOIN con Reportaje por si el evento aún no tiene uno
+		sql.append("SELECT DISTINCT o.id, e.nombre, e.fecha, o.estado, o.acceso_concedido AS accesoConcedido, ");
+		sql.append("o.precio, o.acceso_especial AS accesoEspecial, r.fecha_fin_embargo AS fechaFinEmbargo ");
 		sql.append("FROM Ofrecimiento o ");
 		sql.append("INNER JOIN Evento e ON o.id_evento = e.id ");
 		sql.append("INNER JOIN EventoTematica etm ON e.id = etm.id_evento ");
 		sql.append("INNER JOIN Tematica t ON etm.id_tematica = t.id ");
+		sql.append("LEFT JOIN Reportaje r ON e.id = r.id_evento "); // NUEVO
 		sql.append("WHERE o.id_empresa = ? ");
 		params.add(idEmpresa);
 
@@ -36,15 +39,21 @@ public class ModificacionOfrecimientosRecibidosModel {
 			sql.append(" AND t.nombre IN (").append(placeholders).append(") ");
 			params.addAll(tematicasFiltro);
 		}
+		
+		// NUEVO: Filtro de embargo activo (Fecha actual < Fecha fin embargo)
+		if (soloEmbargados) {
+			sql.append(" AND r.fecha_fin_embargo > date('now') ");
+		}
 
 		sql.append(" ORDER BY e.fecha DESC");
 		
 		return db.executeQueryPojo(OfrecimientoDTO.class, sql.toString(), params.toArray());
 	}
 
-	// Nuevo método: Solo cambia el estado, no toca el acceso
-	public void actualizarEstadoDecision(int id, String nuevoEstado) {
-		db.executeUpdate("UPDATE Ofrecimiento SET estado = ? WHERE id = ?", nuevoEstado, id);
+	// NUEVO: Ahora actualizamos estado y acceso_concedido según la lógica del Controller
+	public void actualizarEstadoDecision(int id, String nuevoEstado, boolean accesoConcedido) {
+		db.executeUpdate("UPDATE Ofrecimiento SET estado = ? WHERE id = ?", 
+				nuevoEstado, id);
 	}
 
 	public List<TematicaDTO> getTodasTematicas() {

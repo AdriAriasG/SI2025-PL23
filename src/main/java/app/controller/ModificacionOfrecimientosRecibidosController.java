@@ -29,7 +29,9 @@ public class ModificacionOfrecimientosRecibidosController {
 		view.getCbTipoFiltro().addActionListener(e -> actualizarComboTematicas());
 		view.getBtnFiltrar().addActionListener(e -> cargarDatos());
 		
-		// Listener para bloquear botones según el acceso concedido
+		// NUEVO: Listener para el Checkbox de embargo
+		view.getChkEmbargo().addActionListener(e -> cargarDatos());
+		
 		view.getTable().getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
 				gestionarEstadoBotones();
@@ -42,7 +44,6 @@ public class ModificacionOfrecimientosRecibidosController {
 		cargarDatos();
 	}
 
-	// ESTE ES EL MÉTODO QUE FALTABA
 	public void mostrarVista() {
 		view.getFrame().setVisible(true);
 	}
@@ -51,7 +52,9 @@ public class ModificacionOfrecimientosRecibidosController {
 		int fila = view.getTable().getSelectedRow();
 		if (fila != -1 && datosActuales != null) {
 			OfrecimientoDTO sel = datosActuales.get(fila);
-			boolean bloqueado = (sel.getAccesoConcedido() == 1);
+			
+			// REQUISITO: Se puede modificar si es PENDIENTE o si tiene ACCESO ESPECIAL (embargo)
+			boolean bloqueado = (sel.getAccesoConcedido() == 1 && sel.getAccesoEspecial() == 0);
 			
 			view.getBtnAceptar().setEnabled(!bloqueado);
 			view.getBtnRechazar().setEnabled(!bloqueado);
@@ -70,23 +73,31 @@ public class ModificacionOfrecimientosRecibidosController {
 		int seleccion = view.getCbTipoFiltro().getSelectedIndex();
 		Boolean yaDecididos = (seleccion == 2) ? Boolean.TRUE : (seleccion == 0 ? Boolean.FALSE : null);
 
+		// NUEVO: Leemos el estado del checkbox
+		boolean soloEmbargados = view.getChkEmbargo().isSelected();
+
 		List<String> seleccionadas = new ArrayList<>();
 		for (int i = 1; i < view.getCbTematicas().getItemCount(); i++) {
 			CheckItem item = view.getCbTematicas().getItemAt(i);
 			if (item != null && item.isSelected()) seleccionadas.add(item.toString());
 		}
 
-		datosActuales = model.getOfrecimientosFiltrados(idEmpresa, yaDecididos, seleccionadas, pMin, pMax);
+		// NUEVO: Pasamos el filtro de embargo al modelo
+		datosActuales = model.getOfrecimientosFiltrados(idEmpresa, yaDecididos, seleccionadas, pMin, pMax, soloEmbargados);
 		
 		view.getModel().setRowCount(0);
 		if (datosActuales != null && !datosActuales.isEmpty()) {
 			view.mostrarMensajeVacio(false);
 			for (OfrecimientoDTO o : datosActuales) {
+				// NUEVO: Lógica para la fecha de embargo (guion si es null)
+				String validez = (o.getFechaFinEmbargo() == null) ? "   -" : o.getFechaFinEmbargo();
+				
 				view.getModel().addRow(new Object[]{
 					o.getNombre(), 
 					o.getFecha(), 
 					String.format("%.2f €", o.getPrecio()), 
-					o.getEstado()
+					o.getEstado(),
+					validez // NUEVO: Quinta columna
 				});
 			}
 		} else view.mostrarMensajeVacio(true);
@@ -99,13 +110,16 @@ public class ModificacionOfrecimientosRecibidosController {
 		if (fila == -1) return;
 		OfrecimientoDTO sel = datosActuales.get(fila);
 		
-		if (sel.getAccesoConcedido() == 1) {
+		// REQUISITO: Permitir si es PENDIENTE o tiene ACCESO ESPECIAL
+		if (sel.getAccesoConcedido() == 1 && sel.getAccesoEspecial() == 0) {
 			JOptionPane.showMessageDialog(view.getFrame(), "Operación no permitida: Acceso ya concedido.");
 			return;
 		}
 
 		try {
-			model.actualizarEstadoDecision(sel.getId(), nuevoEstado);
+			// NUEVO: Pasamos si es aceptado para el flag de acceso_concedido
+			boolean acceso = nuevoEstado.equals("ACEPTADO");
+			model.actualizarEstadoDecision(sel.getId(), nuevoEstado, acceso);
 			cargarDatos();
 		} catch (Exception e) { e.printStackTrace(); }
 	}

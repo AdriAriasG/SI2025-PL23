@@ -15,16 +15,12 @@ INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (4, 'Berl
 INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (5, 'Amsterdam', 100.0, 4);
 INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (6, 'Zurich', 140.0, 5);
 
-
 -- AgenciaPrensa
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (3, 'Medios Centro', 'info@medioscentro.com');
-
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (16, 'Agencia Estrella', 'contacto@estrella.com');
-
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agenciavoz.com');
-
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (42, 'Agencia Catalana', 'contacto@agenciacatalana.com');
@@ -108,7 +104,6 @@ INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asig
 INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (701, 'Evento Sin Embargo', '2026-10-02', '2026-10-02', '2026-12-02', 50, TRUE, 2);
 INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (702, 'Evento Embargo Caducado', '2026-10-03', '2026-10-03', '2026-12-03', 50, TRUE, 2);
 
-
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
 -- Evento 10 (Final Copa Local) - tiene 2 reporteros asignados
@@ -190,7 +185,6 @@ INSERT INTO EmpresaComunicacion (id, nombre, email, tiene_tarifa_plana, al_corri
 UPDATE EmpresaComunicacion SET acepta_embargo = TRUE  WHERE id IN (120, 123);
 UPDATE EmpresaComunicacion SET acepta_embargo = FALSE WHERE id IN (119, 121, 122, 124);
 
-
 -- Ofrecimientos (HU #33539, #33540)
 -- Evento 10 (Final Copa Local) - varios ofrecimientos
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido) VALUES (1, 10, 1, 'PENDIENTE', FALSE);
@@ -252,7 +246,7 @@ INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, acceso_concedido, pagad
 
 -- Reportajes (HU #33538)
 -- Evento 10 tiene reportaje
-INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (1, 10, 1, 'Victoria historica en la Final Copa Local','2030-12-31');
 -- Evento 11 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo) VALUES (2, 11, 3, 'Nuevo museo abre sus puertas');
 -- Evento 14 tiene reportaje
@@ -269,9 +263,7 @@ INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo)
 VALUES (51, 301, 201, 'Nuevas medidas en el Congreso Pesquero');
 
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7000, 700, 510, 'Reportaje Sur con embargo vigente', 'TERMINADO', '2030-12-31');
-
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7001, 701, 510, 'Reportaje Sur sin embargo', 'TERMINADO', NULL);
-
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7002, 702, 511, 'Reportaje Sur con embargo caducado', 'TERMINADO', '2020-01-01');
 
 -- Versiones de Reportajes (HU #33545, #33547)
@@ -451,21 +443,28 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, a
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5001, 503, 120, 'ACEPTADO', TRUE, FALSE);
 
 -- Evento 700: embargo vigente
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70000, 700, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70000, 700, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70001, 700, 123, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70001, 700, 123, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70002, 700, 121, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70002, 700, 121, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
 -- Evento 701: sin embargo
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70010, 701, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70010, 701, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70011, 701, 119, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, TRUE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70011, 701, 119, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, TRUE);
 
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70012, 701, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70012, 701, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
 -- Evento 702: embargo caducado
-INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70020, 702, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado)
+VALUES (70020, 702, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
 -- ---------------------------------------------------------
 -- DATOS SPRINT 3 — HU #34430: Eventos multi-día
@@ -484,3 +483,31 @@ VALUES (602, 'Congreso Multi-Dia C', '2026-09-06', '2026-09-06', '2026-09-10', 1
 
 -- Carlos (id=1) asignado al evento 600
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (600, 1);
+
+--Añadimos datos para probar los accesos especiales
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (900, 'La moda de la reventa de ropa', '2026-05-01', '2026-05-01', '2026-05-01', 1, TRUE, 1);
+
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (901, 'El festival de las mariposas', '2026-05-02', '2026-05-02', '2026-05-02', 1, TRUE, 1);
+
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (902, 'La Revolución de los Taxis Voladores en Madrid', '2026-04-10', '2026-04-10', '2026-04-10', 1, TRUE, 1);
+
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (900, 900, 1, 'La reventa de ropa', '2030-12-31');
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (901, 901, 1, 'El festival de las mariposas', '2030-12-31');
+INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (901, 1, '/media/archivo_protegido.mp4', 'VIDEO', 'DEFINITIVO');
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (9000, 900, 120, 'ACEPTADO', TRUE, FALSE);
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (9001, 901, 120, 'ACEPTADO', TRUE, TRUE);
+INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (900, 900, 'La nueva forma de los jovenes para ganar dinero y espacio', 'Buscan una forma fácil de ganar dinero y espacio en sus armarios.', '2026-04-16 10:00:00', 'Versión inicial', 1);
+INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (901, 901, 'El festival triunfa por todo lo alto', 'El pasado viernes se llevo a cabo el festival de las mariposas.', '2026-04-16 10:05:00', 'Versión inicial', 1);
+
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (902, 902, 1, 'La Revolución de los Taxis Voladores en Madrid', '2026-01-01');
+INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (902, 902, 'Las primeras pruebas con drones de pasajeros comenzarán el próximo mes en el entorno de IFEMA', 'El cielo de la capital española está a punto de cambiar para siempre. Tras tres años de negociaciones con la Agencia Estatal de Seguridad Aérea, la empresa tecnológica "SkyGlide" ha obtenido finalmente los permisos necesarios para realizar vuelos experimentales con naves biplaza no tripuladas.', '2026-04-16 12:00:00', 'Versión final', 1);
+INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (902, 1, '/media/foto_libre.jpg', 'IMAGEN', 'DEFINITIVO');
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial, descargado) VALUES (9002, 902, 120, 'ACEPTADO', TRUE, FALSE, FALSE);
+
+-- Ajustes para que los reportajes de distribución estén en TERMINADO
+UPDATE Reportaje
+SET estado = 'TERMINADO'
+WHERE id IN (1,2,3,4,50,51,60,61,62,70,71,72,73,900,901,902,7000,7001,7002);

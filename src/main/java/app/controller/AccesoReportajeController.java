@@ -53,11 +53,18 @@ public class AccesoReportajeController {
         int fila = view.getTable().getSelectedRow();
         if (fila != -1) {
             ReportajeDTO seleccionado = reportajesActuales.get(fila);
+            
+            // Pasamos los parámetros. 
+            // seleccionado.getFechaEmbargo() ahora devuelve un String, 
+            // que es lo que la nueva View espera recibir.
             view.actualizarReportaje(
                     seleccionado.getTitulo(),
                     seleccionado.getSubtitulo(),
                     seleccionado.getCuerpo(),
-                    seleccionado.getArchivosMultimedia());
+                    seleccionado.getArchivosMultimedia(),
+                    seleccionado.getFechaEmbargo(), // Es un String
+                    seleccionado.isAccesoEspecial() // Es un boolean
+            );
         }
     }
     
@@ -78,13 +85,20 @@ public class AccesoReportajeController {
             json.append("  \"fecha\": \"").append(sel.getFecha()).append("\",\n");
             json.append("  \"titulo\": \"").append(sel.getTitulo()).append("\",\n");
             json.append("  \"subtitulo\": \"").append(sel.getSubtitulo()).append("\",\n");
-            String cuerpoEscapado = sel.getCuerpo().replace("\"", "\\\"").replace("\n", "\\n");
+            
+            String cuerpoOriginal = sel.getCuerpo() != null ? sel.getCuerpo() : "";
+            String cuerpoEscapado = cuerpoOriginal.replace("\"", "\\\"").replace("\n", "\\n");
+            
             json.append("  \"cuerpo\": \"").append(cuerpoEscapado).append("\",\n");
             json.append("  \"multimedia\": [\n");
-            for (int i = 0; i < sel.getArchivosMultimedia().size(); i++) {
-                json.append("    \"").append(sel.getArchivosMultimedia().get(i)).append("\"");
-                if (i < sel.getArchivosMultimedia().size() - 1) json.append(",");
-                json.append("\n");
+            
+            List<String> media = sel.getArchivosMultimedia();
+            if (media != null) {
+                for (int i = 0; i < media.size(); i++) {
+                    json.append("    \"").append(media.get(i)).append("\"");
+                    if (i < media.size() - 1) json.append(",");
+                    json.append("\n");
+                }
             }
             json.append("  ]\n}");
 

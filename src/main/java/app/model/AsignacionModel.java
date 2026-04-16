@@ -17,7 +17,7 @@ public class AsignacionModel {
      * Obtiene los eventos de una agencia SIN reporteros asignados (HU #33537)
      */
     public List<EventoDTO> getEventosSinAsignar(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia FROM Evento " +
+        String sql = "SELECT id, nombre, fecha, fecha_inicio AS fechaInicio, fecha_fin AS fechaFin, id_agencia AS idAgencia FROM Evento " +
                      "WHERE id_agencia = ? AND id NOT IN (SELECT DISTINCT id_evento FROM Asignacion) " +
                      "ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
@@ -27,7 +27,7 @@ public class AsignacionModel {
      * Obtiene los eventos de una agencia CON algún reportero asignado (HU #33543)
      */
     public List<EventoDTO> getEventosConAsignados(int idAgencia) {
-        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio, e.fecha_fin, e.id_agencia FROM Evento e " +
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio AS fechaInicio, e.fecha_fin AS fechaFin, e.id_agencia AS idAgencia FROM Evento e " +
                      "JOIN Asignacion a ON e.id = a.id_evento " +
                      "WHERE e.id_agencia = ? " +
                      "ORDER BY e.fecha_inicio, e.nombre";
@@ -38,7 +38,7 @@ public class AsignacionModel {
      * Obtiene TODOS los eventos de una agencia (para el filtro combinado)
      */
     public List<EventoDTO> getTodosEventos(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia FROM Evento " +
+        String sql = "SELECT id, nombre, fecha, fecha_inicio AS fechaInicio, fecha_fin AS fechaFin, id_agencia AS idAgencia FROM Evento " +
                      "WHERE id_agencia = ? ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
@@ -338,7 +338,7 @@ public class AsignacionModel {
      * Obtiene todos los eventos de una agencia incluyendo el campo asignacion_finalizada.
      */
     public List<EventoDTO> getTodosEventosConEstado(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada FROM Evento " +
+        String sql = "SELECT id, nombre, fecha, fecha_inicio AS fechaInicio, fecha_fin AS fechaFin, id_agencia AS idAgencia, asignacion_finalizada AS asignacionFinalizada FROM Evento " +
                      "WHERE id_agencia = ? ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
@@ -347,7 +347,7 @@ public class AsignacionModel {
      * Obtiene eventos con asignados incluyendo el campo asignacion_finalizada.
      */
     public List<EventoDTO> getEventosConAsignadosConEstado(int idAgencia) {
-        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio, e.fecha_fin, e.id_agencia, e.asignacion_finalizada " +
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio AS fechaInicio, e.fecha_fin AS fechaFin, e.id_agencia AS idAgencia, e.asignacion_finalizada AS asignacionFinalizada " +
                      "FROM Evento e " +
                      "JOIN Asignacion a ON e.id = a.id_evento " +
                      "WHERE e.id_agencia = ? " +
@@ -359,7 +359,7 @@ public class AsignacionModel {
      * Obtiene un evento por su ID (HU #34430).
      */
     public EventoDTO getEventoById(int idEvento) {
-        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada FROM Evento WHERE id = ?";
+        String sql = "SELECT id, nombre, fecha, fecha_inicio AS fechaInicio, fecha_fin AS fechaFin, id_agencia AS idAgencia, asignacion_finalizada AS asignacionFinalizada FROM Evento WHERE id = ?";
         List<EventoDTO> result = db.executeQueryPojo(EventoDTO.class, sql, idEvento);
         return result.isEmpty() ? null : result.get(0);
     }
