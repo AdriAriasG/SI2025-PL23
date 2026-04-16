@@ -34,12 +34,14 @@ public class DistribuirReportajeView extends JFrame {
     private JButton btnCancelar;
     private JButton btnConceder;
     private JButton btnQuitar;
+    private JButton btnAccesoEspecial;
 
     private JLabel lblNombreAgencia;
     private JLabel lblEmpresas;
     private JLabel lblSeleccionadas;
 
     private JComboBox<String> comboFiltro;
+    private JComboBox<String> comboFiltroReportajes;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -54,7 +56,7 @@ public class DistribuirReportajeView extends JFrame {
 
     public DistribuirReportajeView() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setBounds(100, 100, 600, 400);
+        setBounds(100, 100, 640, 470);
 
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -70,29 +72,35 @@ public class DistribuirReportajeView extends JFrame {
         panel.add(lblNombreAgencia);
 
         JSeparator separator = new JSeparator();
-        separator.setBounds(10, 40, 560, 2);
+        separator.setBounds(10, 40, 600, 2);
         panel.add(separator);
 
         comboFiltro = new JComboBox<String>();
         comboFiltro.setModel(new DefaultComboBoxModel<String>(
                 new String[] { "Empresas Sin Acceso", "Empresas Con Acceso" }));
-        comboFiltro.setBounds(182, 53, 201, 20);
+        comboFiltro.setBounds(52, 64, 220, 20);
         panel.add(comboFiltro);
 
+        comboFiltroReportajes = new JComboBox<String>();
+        comboFiltroReportajes.setModel(new DefaultComboBoxModel<String>(
+                new String[] { "Todos los reportajes", "Reportajes con embargo" }));
+        comboFiltroReportajes.setBounds(340, 64, 220, 20);
+        panel.add(comboFiltroReportajes);
+
         JLabel lblEventos = new JLabel("Eventos");
-        lblEventos.setBounds(20, 94, 100, 15);
+        lblEventos.setBounds(20, 110, 100, 15);
         panel.add(lblEventos);
 
         lblEmpresas = new JLabel("Empresas Sin Acceso");
-        lblEmpresas.setBounds(220, 94, 150, 15);
+        lblEmpresas.setBounds(220, 110, 150, 15);
         panel.add(lblEmpresas);
 
         lblSeleccionadas = new JLabel("Empresas Con Acceso");
-        lblSeleccionadas.setBounds(400, 94, 160, 15);
+        lblSeleccionadas.setBounds(420, 110, 160, 15);
         panel.add(lblSeleccionadas);
 
         JScrollPane scrollEventos = new JScrollPane();
-        scrollEventos.setBounds(20, 120, 150, 106);
+        scrollEventos.setBounds(20, 135, 170, 140);
         panel.add(scrollEventos);
 
         tableEventos = new JTable();
@@ -103,7 +111,7 @@ public class DistribuirReportajeView extends JFrame {
         scrollEventos.setViewportView(tableEventos);
 
         JScrollPane scrollEmpresas = new JScrollPane();
-        scrollEmpresas.setBounds(220, 120, 150, 100);
+        scrollEmpresas.setBounds(220, 135, 170, 140);
         panel.add(scrollEmpresas);
 
         tableEmpresas = new JTable();
@@ -114,7 +122,7 @@ public class DistribuirReportajeView extends JFrame {
         scrollEmpresas.setViewportView(tableEmpresas);
 
         JScrollPane scrollSeleccionadas = new JScrollPane();
-        scrollSeleccionadas.setBounds(400, 120, 150, 100);
+        scrollSeleccionadas.setBounds(420, 135, 170, 140);
         panel.add(scrollSeleccionadas);
 
         tableSeleccionadas = new JTable();
@@ -128,19 +136,23 @@ public class DistribuirReportajeView extends JFrame {
         ocultarColumnaId(tableSeleccionadas);
 
         btnConceder = new JButton("<html>Conceder<br>Acceso</html>");
-        btnConceder.setBounds(250, 230, 100, 40);
+        btnConceder.setBounds(250, 295, 110, 40);
         panel.add(btnConceder);
 
+        btnAccesoEspecial = new JButton("<html>Acceso<br>Especial</html>");
+        btnAccesoEspecial.setBounds(250, 345, 110, 40);
+        panel.add(btnAccesoEspecial);
+
         btnQuitar = new JButton("<html>Quitar<br>Acceso</html>");
-        btnQuitar.setBounds(423, 231, 100, 39);
+        btnQuitar.setBounds(450, 295, 110, 40);
         panel.add(btnQuitar);
 
         btnAceptar = new JButton("Aceptar");
-        btnAceptar.setBounds(320, 300, 100, 25);
+        btnAceptar.setBounds(350, 405, 100, 25);
         panel.add(btnAceptar);
 
         btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBounds(440, 300, 100, 25);
+        btnCancelar.setBounds(470, 405, 100, 25);
         panel.add(btnCancelar);
     }
 
@@ -182,12 +194,24 @@ public class DistribuirReportajeView extends JFrame {
         return btnQuitar;
     }
 
+    public JButton getBtnAccesoEspecial() {
+        return btnAccesoEspecial;
+    }
+
     public JComboBox<String> getComboFiltro() {
         return comboFiltro;
     }
 
+    public JComboBox<String> getComboFiltroReportajes() {
+        return comboFiltroReportajes;
+    }
+
     public String getFiltroSeleccionado() {
         return (String) comboFiltro.getSelectedItem();
+    }
+
+    public String getFiltroReportajesSeleccionado() {
+        return (String) comboFiltroReportajes.getSelectedItem();
     }
 
     public void setNombreAgencia(String nombre) {

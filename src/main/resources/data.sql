@@ -28,6 +28,7 @@ INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (39, 'Voz Global', 'voz@agen
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (40, 'Agencia Gallega', 'voz@agenciagalleg.com');
 INSERT INTO AgenciaPrensa(id, nombre, email) VALUES (41, 'Punto Prensa', 'puntoprensa.agencia@gmail.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (42, 'Agencia Catalana', 'contacto@agenciacatalana.com');
+INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (50, 'Agencia Sur', 'contacto@agenciasur.com');
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
@@ -55,6 +56,9 @@ INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (201, 'Josef
 -- Agencia 42
 INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (420, 'Lucia Prueba', 'GRAFICO', 42, 6);
 INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (421, 'Mario Prueba', 'CAMAROGRAFO', 42, 6);
+-- Agencia 50
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (510, 'Pablo', 'BASE', 50, 2);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (511, 'Lucia', 'GRAFICO', 50, 2);
 
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
@@ -92,13 +96,18 @@ INSERT INTO Evento VALUES (301, 'Congreso Pesquero', '2026-06-15', '2026-06-15',
 INSERT INTO Evento VALUES (410, 'Foro Digital', '2026-07-01', '2026-07-01', '2026-09-01', 41, FALSE, 1);
 INSERT INTO Evento VALUES (411, 'Cumbre Innovación', '2026-07-10', '2026-07-10', '2026-09-10', 41, FALSE, 2);
 
--- Agencia 42 
 -- Agencia 42
 INSERT INTO Evento VALUES (420, 'Evento F', '2026-08-01', '2026-08-01', '2026-10-01', 42, TRUE, 3);
 INSERT INTO Evento VALUES (421, 'EventoNF', '2026-08-02', '2026-08-02', '2026-10-02', 42, FALSE, 4);
 INSERT INTO Evento VALUES (422, 'Evento Embargo Vigente', '2026-08-03', '2026-08-03', '2026-10-03', 42, TRUE, 5);
 INSERT INTO Evento VALUES (423, 'Evento Embargo Caducado', '2026-08-04', '2026-08-04', '2026-10-04', 42, TRUE, 6);
 INSERT INTO Evento VALUES (424, 'Evento Sin Embargo', '2026-08-05', '2026-08-05', '2026-10-05', 42, TRUE, 1);
+
+-- Agencia 50
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (700, 'Evento Embargo Vigente', '2026-10-01', '2026-10-01', '2026-12-01', 50, TRUE, 2);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (701, 'Evento Sin Embargo', '2026-10-02', '2026-10-02', '2026-12-02', 50, TRUE, 2);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (702, 'Evento Embargo Caducado', '2026-10-03', '2026-10-03', '2026-12-03', 50, TRUE, 2);
+
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -127,6 +136,13 @@ INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (422, 42
 INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (423, 420, TRUE);
 -- Evento 424
 INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (424, 420, TRUE);
+-- Evento 700
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (700, 510, TRUE);
+-- Evento 701
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (701, 510, TRUE);
+-- Evento 702
+INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (702, 511, TRUE);
+
 -- Agencia 2
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (20, 5);
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (20, 6);
@@ -251,6 +267,13 @@ VALUES (50, 300, 200, 'Gran éxito en la Fiesta del Mar');
 -- Evento 301 tiene reportaje
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo)
 VALUES (51, 301, 201, 'Nuevas medidas en el Congreso Pesquero');
+
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7000, 700, 510, 'Reportaje Sur con embargo vigente', 'TERMINADO', '2030-12-31');
+
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7001, 701, 510, 'Reportaje Sur sin embargo', 'TERMINADO', NULL);
+
+INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, estado, fecha_fin_embargo) VALUES (7002, 702, 511, 'Reportaje Sur con embargo caducado', 'TERMINADO', '2020-01-01');
+
 -- Versiones de Reportajes (HU #33545, #33547)
 -- Reportaje 1 - 3 versiones
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) 
@@ -426,6 +449,23 @@ INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_emba
 -- Ofrecimientos para probar lógica de acceso
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5000, 500, 1, 'ACEPTADO', TRUE, TRUE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5001, 503, 120, 'ACEPTADO', TRUE, FALSE);
+
+-- Evento 700: embargo vigente
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70000, 700, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70001, 700, 123, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70002, 700, 121, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+-- Evento 701: sin embargo
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70010, 701, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70011, 701, 119, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, TRUE);
+
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70012, 701, 124, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
+
+-- Evento 702: embargo caducado
+INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, precio, descargado, acceso_especial, pagado) VALUES (70020, 702, 120, 'ACEPTADO', FALSE, 0.0, FALSE, FALSE, FALSE);
 
 -- ---------------------------------------------------------
 -- DATOS SPRINT 3 — HU #34430: Eventos multi-día
