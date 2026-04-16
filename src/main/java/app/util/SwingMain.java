@@ -46,6 +46,9 @@ import app.view.RevisionReportajeView;
 import app.controller.RevisionReportajeController;
 import app.view.FinalizarReportajeView;
 import app.controller.FinalizarReportajeController;
+import app.model.DietasReporteroModel;
+import app.view.DietasReporteroView;
+import app.controller.DietasReporteroController;
 
 public class SwingMain {
 
@@ -129,6 +132,8 @@ public class SwingMain {
 		addButtonReportero("HU #33547: Restaurar versión previa (DIEGO)");
 		addButtonReportero("HU #34066: Revisar reportajes (DIEGO)");
 		addButtonReportero("HU #34427: Finalizar reportaje (DIEGO)");
+		addButtonReportero("HU #34429: Importes de Dietas (DIEGO)");
+
 
 		// --- REPORTERO FREELANCE (IVAN) ---
 		addLabel("REPORTERO FREELANCE (Ivan)");
@@ -389,6 +394,18 @@ public class SwingMain {
 
 			new RestaurarVersionController(model, view,
 					reporteroSeleccionado.getId());
+		}
+		
+		else if (buttonText.contains("Dietas")) {
+
+		    DietasReporteroModel model = new DietasReporteroModel();
+		    DietasReporteroView view = new DietasReporteroView();
+
+		    new DietasReporteroController(
+		            model,
+		            view,
+		            reporteroSeleccionado.getId()
+		    );
 		}
 
 		else {

@@ -1,5 +1,21 @@
 -- Initial data for testing the Report Management System
 
+-- Pais
+INSERT INTO Pais (id, nombre, precio_manutencion) VALUES (1, 'España', 30.0);
+INSERT INTO Pais (id, nombre, precio_manutencion) VALUES (2, 'Francia', 40.0);
+INSERT INTO Pais (id, nombre, precio_manutencion) VALUES (3, 'Alemania', 50.0);
+INSERT INTO Pais (id, nombre, precio_manutencion) VALUES (4, 'Holanda', 60.0);
+INSERT INTO Pais (id, nombre, precio_manutencion) VALUES (5, 'Suiza', 70.0);
+
+-- Provincia
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (1, 'Asturias', 60.0, 1);
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (2, 'Madrid', 80.0, 1);
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (3, 'Paris', 120.0, 2);
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (4, 'Berlin', 110.0, 3);
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (5, 'Amsterdam', 100.0, 4);
+INSERT INTO Provincia (id, nombre, precio_alojamiento, id_pais) VALUES (6, 'Zurich', 140.0, 5);
+
+
 -- AgenciaPrensa
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (1, 'Agencia Norte', 'contacto@agencianorte.com');
 INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (2, 'Prensa Global', 'info@prensaglobal.com');
@@ -15,67 +31,74 @@ INSERT INTO AgenciaPrensa (id, nombre, email) VALUES (42, 'Agencia Catalana', 'c
 
 -- Reporteros (nombres genéricos)
 -- Agencia 1
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (1, 'Carlos Martinez', 1);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (2, 'Laura Garcia', 1);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (3, 'Miguel Fernandez', 1);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (4, 'Ana Rodriguez', 1);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (1, 'Carlos Martinez', 1, 1);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (2, 'Laura Garcia', 1, 1);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (3, 'Miguel Fernandez', 1, 1);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (4, 'Ana Rodriguez', 1, 1);
 -- Agencia 2
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (5, 'Pedro Sanchez', 2);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (6, 'Elena Lopez', 2);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (7, 'Javier Torres', 2);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (5, 'Pedro Sanchez', 3, 2);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (6, 'Elena Lopez', 2, 2);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (7, 'Javier Torres', 2, 2);
 -- Agencia 3
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (8, 'Sofia Ruiz', 3);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (9, 'Diego Moreno', 3);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (8, 'Sofia Ruiz', 3, 3);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (9, 'Diego Moreno', 3, 3);
 -- Agencia 16
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (16, 'Javier Rodríguez', 16);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (17, 'Francisco Pérez', 16);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (16, 'Javier Rodríguez', 16, 4);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (17, 'Francisco Pérez', 16, 4);
 
 -- Agencia 39
-INSERT INTO Reportero(id, nombre, id_agencia) VALUES(90, 'Reportero Luis', 39);
-INSERT INTO Reportero(id, nombre, id_agencia) VALUES(91, 'Reportera Ana', 39);
+INSERT INTO Reportero(id, nombre, id_agencia, id_provincia) VALUES(90, 'Reportero Luis', 39, 4);
+INSERT INTO Reportero(id, nombre, id_agencia, id_provincia) VALUES(91, 'Reportera Ana', 39, 4);
 -- Agencia 40
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (200, 'Luis Castro', 40);
-INSERT INTO Reportero (id, nombre, id_agencia) VALUES (201, 'Josefa Varela', 40);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (200, 'Luis Castro', 40, 5);
+INSERT INTO Reportero (id, nombre, id_agencia, id_provincia) VALUES (201, 'Josefa Varela', 40, 5);
 -- Agencia 42
-INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (420, 'Lucia Prueba', 'GRAFICO', 42);
-INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (421, 'Mario Prueba', 'CAMAROGRAFO', 42);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (420, 'Lucia Prueba', 'GRAFICO', 42, 6);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (421, 'Mario Prueba', 'CAMAROGRAFO', 42, 6);
+
 -- Eventos
 -- Agencia 1: Eventos variados con diferentes estados
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (10, 'Final Copa Local', '2026-03-01', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (11, 'Inauguracion Museo Arte', '2026-03-01', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (12, 'Conferencia Tecnologica', '2026-03-01', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (13, 'Maraton Ciudad', '2026-03-15', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (14, 'Festival de Cine', '2026-03-20', 1);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (15, 'Concierto Sinfonico', '2026-03-01', 1);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+	VALUES (10, 'Final Copa Local', '2026-03-01', '2026-03-01', '2026-05-01', 1, FALSE, 1);
+INSERT INTO Evento VALUES (11, 'Inauguracion Museo Arte', '2026-03-01', '2026-03-01', '2026-05-01', 1, FALSE, 2);
+INSERT INTO Evento VALUES (12, 'Conferencia Tecnologica', '2026-03-01', '2026-03-01', '2026-05-01', 1, FALSE, 3);
+INSERT INTO Evento VALUES (13, 'Maraton Ciudad', '2026-03-15', '2026-03-15', '2026-05-15', 1, FALSE, 4);
+INSERT INTO Evento VALUES (14, 'Festival de Cine', '2026-03-20', '2026-03-20', '2026-05-20', 1, FALSE, 5);
+INSERT INTO Evento VALUES (15, 'Concierto Sinfonico', '2026-03-01', '2026-03-01', '2026-05-01', 1, FALSE, 6);
+
 -- Agencia 2
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (20, 'Concierto Rock Festival', '2026-03-01', 2);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (21, 'Feria de Abril', '2026-04-15', 2);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (22, 'Cumbre Empresarial', '2026-03-25', 2);
+INSERT INTO Evento VALUES (20, 'Concierto Rock Festival', '2026-03-01', '2026-03-01', '2026-05-01', 2, FALSE, 2);
+INSERT INTO Evento VALUES (21, 'Feria de Abril', '2026-04-15', '2026-04-15', '2026-06-15', 2, FALSE, 2);
+INSERT INTO Evento VALUES (22, 'Cumbre Empresarial', '2026-03-25', '2026-03-25', '2026-05-25', 2, FALSE, 3);
+
 -- Agencia 3
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (30, 'Exposicion Internacional', '2026-03-12', 3);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (31, 'Campeonato Natacion', '2026-03-18', 3);
---Agencia 16
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (76, 'Concierto Jazz', '2026-04-10', 16);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (77, 'Concierto Blues', '2026-04-12', 16);
+INSERT INTO Evento VALUES (30, 'Exposicion Internacional', '2026-03-12', '2026-03-12', '2026-05-12', 3, FALSE, 4);
+INSERT INTO Evento VALUES (31, 'Campeonato Natacion', '2026-03-18', '2026-03-18', '2026-05-18', 3, FALSE, 5);
+
+-- Agencia 16
+INSERT INTO Evento VALUES (76, 'Concierto Jazz', '2026-04-10', '2026-04-10', '2026-06-10', 16, FALSE, 6);
+INSERT INTO Evento VALUES (77, 'Concierto Blues', '2026-04-12', '2026-04-12', '2026-06-12', 16, FALSE, 1);
 
 -- Agencia 39
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (92, 'Punto de Partida', '2026-05-08', 39);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (93, 'Impacto Cero', '2026-05-12', 39);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (94, 'Impacto Rápido', '2026-05-20', 39);
---Agencia 40
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (300, 'Fiesta del Mar', '2026-06-10', 40);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (301, 'Congreso Pesquero', '2026-06-15', 40);
+INSERT INTO Evento VALUES (92, 'Punto de Partida', '2026-05-08', '2026-05-08', '2026-07-08', 39, FALSE, 2);
+INSERT INTO Evento VALUES (93, 'Impacto Cero', '2026-05-12', '2026-05-12', '2026-07-12', 39, FALSE, 3);
+INSERT INTO Evento VALUES (94, 'Impacto Rápido', '2026-05-20', '2026-05-20', '2026-07-20', 39, FALSE, 4);
+
+-- Agencia 40
+INSERT INTO Evento VALUES (300, 'Fiesta del Mar', '2026-06-10', '2026-06-10', '2026-08-10', 40, FALSE, 5);
+INSERT INTO Evento VALUES (301, 'Congreso Pesquero', '2026-06-15', '2026-06-15', '2026-08-15', 40, FALSE, 6);
 
 -- Agencia 41
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (410, 'Foro Digital', '2026-07-01', 41);
-INSERT INTO Evento (id, nombre, fecha, id_agencia) VALUES (411, 'Cumbre Innovación', '2026-07-10', 41);
+INSERT INTO Evento VALUES (410, 'Foro Digital', '2026-07-01', '2026-07-01', '2026-09-01', 41, FALSE, 1);
+INSERT INTO Evento VALUES (411, 'Cumbre Innovación', '2026-07-10', '2026-07-10', '2026-09-10', 41, FALSE, 2);
 
+-- Agencia 42 
 -- Agencia 42
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (420, 'Evento F', '2026-08-01', 42, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (421, 'EventoNF', '2026-08-02', 42, FALSE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (422, 'Evento Embargo Vigente', '2026-08-03', 42, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (423, 'Evento Embargo Caducado', '2026-08-04', 42, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (424, 'Evento Sin Embargo', '2026-08-05', 42, TRUE);
+INSERT INTO Evento VALUES (420, 'Evento F', '2026-08-01', '2026-08-01', '2026-10-01', 42, TRUE, 3);
+INSERT INTO Evento VALUES (421, 'EventoNF', '2026-08-02', '2026-08-02', '2026-10-02', 42, FALSE, 4);
+INSERT INTO Evento VALUES (422, 'Evento Embargo Vigente', '2026-08-03', '2026-08-03', '2026-10-03', 42, TRUE, 5);
+INSERT INTO Evento VALUES (423, 'Evento Embargo Caducado', '2026-08-04', '2026-08-04', '2026-10-04', 42, TRUE, 6);
+INSERT INTO Evento VALUES (424, 'Evento Sin Embargo', '2026-08-05', '2026-08-05', '2026-10-05', 42, TRUE, 1);
 
 -- Asignaciones (HU #33537)
 -- Agencia 1: Varias asignaciones para probar
@@ -334,8 +357,9 @@ UPDATE Reportero SET tipo = 'BASE' WHERE id = 200;
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 201;
 
 -- Insertar reporteros Freelance (id_agencia es NULL)
-INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (500, 'Freelance Juan', 'BASE', NULL);
-INSERT INTO Reportero (id, nombre, tipo, id_agencia) VALUES (501, 'Freelance Maria', 'GRAFICO', NULL);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia)
+VALUES (500, 'Freelance Juan', 'BASE', NULL, 1);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (501, 'Freelance Maria', 'GRAFICO', NULL, 2);
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (500, 1);
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2);
 
@@ -378,10 +402,14 @@ UPDATE Ofrecimiento SET precio = 400.0 WHERE id = 6;
 UPDATE Ofrecimiento SET precio = 250.0 WHERE id = 9;
 
 -- Nuevos Eventos para pruebas de embargo
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (500, 'Descubrimiento Arqueológico', '2026-04-10', 1, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (501, 'Filtración Tecnológica', '2026-04-05', 2, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (502, 'Sentencia Judicial', '2026-04-14', 3, TRUE);
-INSERT INTO Evento (id, nombre, fecha, id_agencia, asignacion_finalizada) VALUES (503, 'Adelanto Editorial', '2026-04-12', 1, TRUE);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (500, 'Descubrimiento Arqueológico', '2026-04-10', '2026-04-10', '2026-06-10', 1, TRUE, 1);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (501, 'Filtración Tecnológica', '2026-04-05', '2026-04-05', '2026-06-05', 2, TRUE, 2);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (502, 'Sentencia Judicial', '2026-04-14', '2026-04-14', '2026-06-14', 3, TRUE, 3);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
+VALUES (503, 'Adelanto Editorial', '2026-04-12', '2026-04-12', '2026-06-12', 1, TRUE, 4);
 
 -- Asignaciones correspondientes
 INSERT INTO Asignacion (id_evento, id_reportero, es_responsable) VALUES (500, 1, TRUE);

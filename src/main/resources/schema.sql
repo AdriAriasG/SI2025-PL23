@@ -14,6 +14,25 @@ DROP TABLE IF EXISTS Asignacion;
 DROP TABLE IF EXISTS Evento;
 DROP TABLE IF EXISTS Reportero;
 DROP TABLE IF EXISTS AgenciaPrensa;
+DROP TABLE IF EXISTS EventoDieta;
+DROP TABLE IF EXISTS Pais;
+DROP TABLE IF EXISTS Provincia;
+
+
+-- TABLAS SPRINT 3 
+CREATE TABLE Pais (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre VARCHAR(20) NOT NULL UNIQUE,
+    precio_manutencion REAL NOT NULL
+);
+
+CREATE TABLE Provincia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre VARCHAR(20) NOT NULL,
+    precio_alojamiento REAL NOT NULL,
+    id_pais INTEGER NOT NULL,
+    FOREIGN KEY (id_pais) REFERENCES Pais(id)
+);
 
 -- CREATE TABLES
 CREATE TABLE AgenciaPrensa (
@@ -27,16 +46,22 @@ CREATE TABLE Reportero (
     nombre VARCHAR(255) NOT NULL,
     tipo VARCHAR(20) CHECK (tipo IN ('GRAFICO', 'CAMAROGRAFO', 'BASE')) DEFAULT 'BASE',
     id_agencia INTEGER,
-    FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id)
+    id_provincia INTEGER NOT NULL,
+    FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id),
+    FOREIGN KEY (id_provincia) REFERENCES Provincia(id)
 );
 
 CREATE TABLE Evento (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(255) NOT NULL,
     fecha DATE NOT NULL,
+    fecha_inicio DATE NOT NULL, 
+    fecha_fin DATE NOT NULL,
     id_agencia INTEGER NOT NULL,
     asignacion_finalizada BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id)
+    id_provincia INTEGER NOT NULL,
+    FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id),
+    FOREIGN KEY (id_provincia) REFERENCES Provincia(id)
 );
 
 CREATE TABLE Asignacion (
@@ -156,3 +181,4 @@ CREATE TABLE DecisionFreelance (
     FOREIGN KEY (id_evento) REFERENCES Evento(id),
     FOREIGN KEY (id_reportero) REFERENCES Reportero(id)
 );
+
