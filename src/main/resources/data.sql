@@ -447,6 +447,7 @@ VALUES (602, 'Congreso Multi-Dia C', '2026-09-06', '2026-09-06', '2026-09-10', 1
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (600, 1);
 
 --Añadimos datos para probar los accesos especiales
+<<<<<<< HEAD
 INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
 VALUES (900, 'La moda de la reventa de ropa', '2026-05-01', '2026-05-01', '2026-05-01', 1, TRUE, 1);
 
@@ -458,6 +459,10 @@ VALUES (901, 'El festival de las mariposas', '2026-05-02', '2026-05-02', '2026-0
 INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 
 VALUES (902, 'La Revolución de los Taxis Voladores en Madrid', '2026-04-10', '2026-04-10', '2026-04-10', 1, TRUE, 1);
 
+
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (900, 'La moda de la reventa de ropa', '2026-05-01', '2026-05-01', '2026-05-01', 1, TRUE, 1);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (901, 'El festival de las mariposas', '2026-05-02', '2026-05-02', '2026-05-02', 1, TRUE, 1);
+
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (900, 900, 1, 'La reventa de ropa', '2030-12-31');
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (901, 901, 1, 'El festival de las mariposas', '2030-12-31');
 INSERT INTO Multimedia (id_reportaje, id_autor, ruta, tipo, estado) VALUES (901, 1, '/media/archivo_protegido.mp4', 'VIDEO', 'DEFINITIVO');
@@ -466,6 +471,8 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, a
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (900, 900, 'La nueva forma de los jovenes para ganar dinero y espacio', 'Buscan una forma fácil de ganar dinero y espacio en sus armarios.', '2026-04-16 10:00:00', 'Versión inicial', 1);
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (901, 901, 'El festival triunfa por todo lo alto', 'El pasado viernes se llevo a cabo el festival de las mariposas.', '2026-04-16 10:05:00', 'Versión inicial', 1);
 
+
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) VALUES (902, 'La Revolución de los Taxis Voladores en Madrid', '2026-04-10', '2026-04-10', '2026-04-10', 1, TRUE, 1);
 
 INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_embargo) VALUES (902, 902, 1, 'La Revolución de los Taxis Voladores en Madrid', '2026-01-01');
 INSERT INTO VersionReportaje (id, id_reportaje, subtitulo, cuerpo, fecha_hora, cambios_realizados, id_reportero_modificador) VALUES (902, 902, 'Las primeras pruebas con drones de pasajeros comenzarán el próximo mes en el entorno de IFEMA', 'El cielo de la capital española está a punto de cambiar para siempre. Tras tres años de negociaciones con la Agencia Estatal de Seguridad Aérea, la empresa tecnológica "SkyGlide" ha obtenido finalmente los permisos necesarios para realizar vuelos experimentales con naves biplaza no tripuladas.', '2026-04-16 12:00:00', 'Versión final', 1);
