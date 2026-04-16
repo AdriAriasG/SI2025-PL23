@@ -1,6 +1,7 @@
 package app.dto;
 
 import java.util.List;
+import java.util.Date;
 
 public class ReportajeDTO {
     private int version;      // Es el ID de la versión del reportaje
@@ -11,10 +12,14 @@ public class ReportajeDTO {
     private String subtitulo;
     private String cuerpo;
     private List<String> archivosMultimedia;
+    
+    // Nuevos campos para la HU #34062
+    private String fechaEmbargo;
+    private boolean accesoEspecial;
 
     public ReportajeDTO() {}
 
-    // Getters y Setters
+    // Getters y Setters existentes
     public int getVersion() { return version; }
     public void setVersion(int version) { this.version = version; }
 
@@ -38,4 +43,11 @@ public class ReportajeDTO {
 
     public List<String> getArchivosMultimedia() { return archivosMultimedia; }
     public void setArchivosMultimedia(List<String> archivosMultimedia) { this.archivosMultimedia = archivosMultimedia; }
+
+    // Nuevos Getters y Setters
+    public String getFechaEmbargo() { return fechaEmbargo; }
+    public void setFechaEmbargo(String fechaEmbargo) { this.fechaEmbargo = fechaEmbargo; }
+
+    public boolean isAccesoEspecial() { return accesoEspecial; }
+    public void setAccesoEspecial(boolean accesoEspecial) { this.accesoEspecial = accesoEspecial; }
 }
