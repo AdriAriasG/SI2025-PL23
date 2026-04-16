@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.*;
 
 public class ModificacionOfrecimientosRecibidosView {
 	private JFrame frame;
@@ -16,13 +15,16 @@ public class ModificacionOfrecimientosRecibidosView {
 	private JButton btnFiltrar, btnAceptar, btnRechazar, btnEliminar;
 	private JScrollPane scrollTabla;
 	private JLabel lblMensajeVacio;
+	
+	// NUEVO: Checkbox para el requisito de embargo
+	private JCheckBox chkEmbargo;
 
 	public ModificacionOfrecimientosRecibidosView() { initialize(); }
 
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Gestión y Modificación de Decisiones");
-		frame.setBounds(100, 100, 900, 600);
+		frame.setBounds(100, 100, 950, 650); // Un poco más ancho para la nueva columna
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 
@@ -66,13 +68,21 @@ public class ModificacionOfrecimientosRecibidosView {
 		gbc.gridx = 3; gbc.gridy = 2; gbc.weightx = 0.5;
 		panelFiltros.add(txtPrecioMax, gbc);
 
-		gbc.gridx = 3; gbc.gridy = 3; gbc.weightx = 0; gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.EAST;
+		// NUEVO Fila 3: Checkbox Embargo y Botón Filtrar
+		chkEmbargo = new JCheckBox("Mostrar únicamente reportajes embargados");
+		chkEmbargo.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3; gbc.weightx = 1.0;
+		panelFiltros.add(chkEmbargo, gbc);
+
 		btnFiltrar = new JButton("Filtrar Resultados");
+		gbc.gridx = 3; gbc.gridy = 3; gbc.gridwidth = 1; gbc.weightx = 0; 
+		gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.EAST;
 		panelFiltros.add(btnFiltrar, gbc);
 
 		contentPane.add(panelFiltros, BorderLayout.NORTH);
 
-		model = new DefaultTableModel(new String[]{"Evento", "Fecha", "Precio (€)", "Estado Actual"}, 0) {
+		// NUEVO: Quinta columna "Validez embargo" añadida al array
+		model = new DefaultTableModel(new String[]{"Evento", "Fecha", "Precio (€)", "Estado Actual", "Validez embargo"}, 0) {
 			@Override public boolean isCellEditable(int r, int c) { return false; }
 		};
 		table = new JTable(model);
@@ -114,6 +124,9 @@ public class ModificacionOfrecimientosRecibidosView {
 	public JButton getBtnAceptar() { return btnAceptar; }
 	public JButton getBtnRechazar() { return btnRechazar; }
 	public JButton getBtnEliminar() { return btnEliminar; }
+	
+	// NUEVO Getter para el Controller
+	public JCheckBox getChkEmbargo() { return chkEmbargo; }
 
 	public static class CheckItem {
 		private String label;
