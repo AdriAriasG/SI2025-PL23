@@ -30,6 +30,7 @@ public class AsignacionEdicionView {
     private JComboBox<String> cbFiltro;
     private JTable tablaEventos;
     private DefaultTableModel modeloEventos;
+    private JLabel lblRangoFechas;
 
     // Componentes para reporteros del evento (asignados + pendientes)
     private JTable tablaReporterosEvento;
@@ -85,7 +86,8 @@ public class AsignacionEdicionView {
         panelEventos.setLayout(new BoxLayout(panelEventos, BoxLayout.Y_AXIS));
         panelEventos.setBorder(BorderFactory.createTitledBorder("Eventos"));
 
-        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Fecha", "Estado"}, 0) {
+        // Tabla: ID | Nombre | Inicio | Fin | Estado  (HU #34430: rango de fechas)
+        modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Inicio", "Fin", "Estado"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -94,16 +96,17 @@ public class AsignacionEdicionView {
         tablaEventos = new JTable(modeloEventos);
         tablaEventos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaEventos.getColumnModel().getColumn(0).setPreferredWidth(40);
-        tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(80);
-        tablaEventos.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(90);
+        tablaEventos.getColumnModel().getColumn(3).setPreferredWidth(90);
+        tablaEventos.getColumnModel().getColumn(4).setPreferredWidth(90);
 
-        // Renderer para colorear eventos finalizados
+        // Renderer para colorear eventos finalizados (Estado está en columna 4)
         tablaEventos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String estado = (String) table.getValueAt(row, 3);
+                String estado = (String) table.getValueAt(row, 4);
                 if (!isSelected) {
                     if ("FINALIZADA".equals(estado)) {
                         c.setBackground(new Color(220, 220, 240));
@@ -126,6 +129,13 @@ public class AsignacionEdicionView {
         JScrollPane scrollEventos = new JScrollPane(tablaEventos);
         scrollEventos.setPreferredSize(new Dimension(740, 120));
         panelEventos.add(scrollEventos);
+
+        // Etiqueta de rango de fechas del evento seleccionado (HU #34430)
+        lblRangoFechas = new JLabel("Rango del evento: -");
+        JPanel panelRango = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelRango.add(lblRangoFechas);
+        panelEventos.add(panelRango);
+
         mainPanel.add(panelEventos);
 
         // === PANEL REPORTEROS DEL EVENTO ===
@@ -287,13 +297,16 @@ public class AsignacionEdicionView {
     }
 
     /**
-     * Limpia y pobla la tabla de eventos. Muestra el estado de finalización.
+     * Limpia y pobla la tabla de eventos. Muestra el rango de fechas y el estado de finalización.
+     * HU #34430: columnas Inicio y Fin en lugar de Fecha única.
      */
     public void setEventos(List<EventoDTO> eventos) {
         modeloEventos.setRowCount(0);
         for (EventoDTO e : eventos) {
             String estado = e.isAsignacionFinalizada() ? "FINALIZADA" : "Abierta";
-            modeloEventos.addRow(new Object[]{e.getId(), e.getNombre(), e.getFecha(), estado});
+            modeloEventos.addRow(new Object[]{
+                e.getId(), e.getNombre(), e.getFechaInicio(), e.getFechaFin(), estado
+            });
         }
     }
 
@@ -364,7 +377,7 @@ public class AsignacionEdicionView {
     public String getEstadoEventoSeleccionado() {
         int row = tablaEventos.getSelectedRow();
         if (row >= 0) {
-            return (String) modeloEventos.getValueAt(row, 3);
+            return (String) modeloEventos.getValueAt(row, 4);
         }
         return null;
     }
@@ -471,6 +484,17 @@ public class AsignacionEdicionView {
         tablaDisponibles.getColumnModel().getColumn(1).setPreferredWidth(40);
         tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(200);
         tablaDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
+    }
+
+    /**
+     * Muestra el rango de fechas del evento seleccionado (HU #34430).
+     */
+    public void setRangoFechasEvento(String inicio, String fin) {
+        if (inicio != null && fin != null) {
+            lblRangoFechas.setText("Rango del evento: " + inicio + "  →  " + fin);
+        } else {
+            lblRangoFechas.setText("Rango del evento: -");
+        }
     }
 
     public void showError(String mensaje) {

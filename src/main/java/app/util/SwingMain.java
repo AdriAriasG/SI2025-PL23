@@ -304,7 +304,7 @@ public class SwingMain {
 			return;
 		}
 
-		if (buttonText.contains("#33543")) {
+		if (buttonText.contains("#34426")) {
 			AsignacionModel model = new AsignacionModel();
 			AsignacionEdicionView view = new AsignacionEdicionView(); // NO se llama AsignacionView, es de la HU anterior q quedo el view de duplicado
 			new AsignacionEdicionController(model, view, agenciaSeleccionada);

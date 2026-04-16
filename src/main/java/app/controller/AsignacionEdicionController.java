@@ -84,6 +84,7 @@ public class AsignacionEdicionController {
 
         idEventoSeleccionado = -1;
         eventoFinalizado = false;
+        view.setRangoFechasEvento(null, null);
         view.setDisponibles(new java.util.ArrayList<>());
         view.setAsignadosConRR(new java.util.ArrayList<>());
         view.setEdicionHabilitada(true);
@@ -94,11 +95,18 @@ public class AsignacionEdicionController {
         int idEvento = view.getIdEventoSeleccionado();
         if (idEvento == -1) {
             view.getLblTematicasEvento().setText("Temáticas del evento: -");
+            view.setRangoFechasEvento(null, null);
             return;
         }
 
         idEventoSeleccionado = idEvento;
         eventoFinalizado = model.isAsignacionFinalizada(idEvento);
+
+        // Mostrar rango de fechas del evento (HU #34430)
+        app.dto.EventoDTO eventoDTO = model.getEventoById(idEvento);
+        if (eventoDTO != null) {
+            view.setRangoFechasEvento(eventoDTO.getFechaInicio(), eventoDTO.getFechaFin());
+        }
 
         // Cargar temáticas
         List<app.dto.TematicaDTO> tematicas = model.getTematicasEvento(idEvento);

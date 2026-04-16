@@ -17,9 +17,9 @@ public class AsignacionModel {
      * Obtiene los eventos de una agencia SIN reporteros asignados (HU #33537)
      */
     public List<EventoDTO> getEventosSinAsignar(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, id_agencia FROM Evento " +
+        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia FROM Evento " +
                      "WHERE id_agencia = ? AND id NOT IN (SELECT DISTINCT id_evento FROM Asignacion) " +
-                     "ORDER BY fecha, nombre";
+                     "ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
 
@@ -27,10 +27,10 @@ public class AsignacionModel {
      * Obtiene los eventos de una agencia CON algún reportero asignado (HU #33543)
      */
     public List<EventoDTO> getEventosConAsignados(int idAgencia) {
-        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.id_agencia FROM Evento e " +
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio, e.fecha_fin, e.id_agencia FROM Evento e " +
                      "JOIN Asignacion a ON e.id = a.id_evento " +
                      "WHERE e.id_agencia = ? " +
-                     "ORDER BY e.fecha, e.nombre";
+                     "ORDER BY e.fecha_inicio, e.nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
 
@@ -38,8 +38,8 @@ public class AsignacionModel {
      * Obtiene TODOS los eventos de una agencia (para el filtro combinado)
      */
     public List<EventoDTO> getTodosEventos(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, id_agencia FROM Evento " +
-                     "WHERE id_agencia = ? ORDER BY fecha, nombre";
+        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia FROM Evento " +
+                     "WHERE id_agencia = ? ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
 
@@ -47,8 +47,9 @@ public class AsignacionModel {
      * Obtiene los reporteros disponibles para asignar a un evento.
      * Un reportero está disponible si:
      * 1. Pertenece a la misma agencia que el evento
-     * 2. No está asignado a otro evento en la misma fecha
+     * 2. No está asignado a otro evento cuyo rango de fechas se solape con el de este evento
      * 3. No está ya asignado a este evento
+     * Dos eventos se solapan si inicio_A <= fin_B AND fin_A >= inicio_B (HU #34430)
      */
     public List<ReporteroDTO> getReporterosDisponibles(int idEvento, int idAgencia) {
         String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia FROM Reportero r " +
@@ -56,7 +57,8 @@ public class AsignacionModel {
                      "AND r.id NOT IN (" +
                      "    SELECT a.id_reportero FROM Asignacion a " +
                      "    JOIN Evento e ON a.id_evento = e.id " +
-                     "    WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "    WHERE e.fecha_inicio <= (SELECT fecha_fin FROM Evento WHERE id = ?) " +
+                     "    AND e.fecha_fin >= (SELECT fecha_inicio FROM Evento WHERE id = ?) " +
                      "    AND a.id_evento != ?" +
                      ") " +
                      "AND r.id NOT IN (" +
@@ -64,11 +66,12 @@ public class AsignacionModel {
                      "    WHERE a2.id_evento = ?" +
                      ") " +
                      "ORDER BY r.nombre";
-        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento);
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento, idEvento);
     }
 
     /**
      * Obtiene los reporteros disponibles filtrados por temática del evento.
+     * Disponibilidad por rango de fechas (HU #34430).
      */
     public List<ReporteroDTO> getReporterosDisponiblesPorTematica(int idEvento, int idAgencia) {
         String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia " +
@@ -80,7 +83,8 @@ public class AsignacionModel {
                      "  AND r.id NOT IN (" +
                      "      SELECT a.id_reportero FROM Asignacion a " +
                      "      JOIN Evento e ON a.id_evento = e.id " +
-                     "      WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "      WHERE e.fecha_inicio <= (SELECT fecha_fin FROM Evento WHERE id = ?) " +
+                     "      AND e.fecha_fin >= (SELECT fecha_inicio FROM Evento WHERE id = ?) " +
                      "      AND a.id_evento != ?" +
                      "  ) " +
                      "  AND r.id NOT IN (" +
@@ -88,11 +92,12 @@ public class AsignacionModel {
                      "      WHERE a2.id_evento = ?" +
                      "  ) " +
                      "ORDER BY r.nombre";
-        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento, idEvento);
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, idEvento, idEvento, idEvento, idEvento);
     }
 
     /**
      * Obtiene los reporteros disponibles filtrados por tipo.
+     * Disponibilidad por rango de fechas (HU #34430).
      */
     public List<ReporteroDTO> getReporterosDisponiblesPorTipo(int idEvento, int idAgencia, String tipo) {
         String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia FROM Reportero r " +
@@ -101,7 +106,8 @@ public class AsignacionModel {
                      "AND r.id NOT IN (" +
                      "    SELECT a.id_reportero FROM Asignacion a " +
                      "    JOIN Evento e ON a.id_evento = e.id " +
-                     "    WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "    WHERE e.fecha_inicio <= (SELECT fecha_fin FROM Evento WHERE id = ?) " +
+                     "    AND e.fecha_fin >= (SELECT fecha_inicio FROM Evento WHERE id = ?) " +
                      "    AND a.id_evento != ?" +
                      ") " +
                      "AND r.id NOT IN (" +
@@ -109,11 +115,12 @@ public class AsignacionModel {
                      "    WHERE a2.id_evento = ?" +
                      ") " +
                      "ORDER BY r.nombre";
-        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, tipo, idEvento, idEvento, idEvento);
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, tipo, idEvento, idEvento, idEvento, idEvento);
     }
 
     /**
      * Obtiene los reporteros disponibles filtrados por temática y tipo simultáneamente.
+     * Disponibilidad por rango de fechas (HU #34430).
      */
     public List<ReporteroDTO> getReporterosDisponiblesPorTematicaYTipo(int idEvento, int idAgencia, String tipo) {
         String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia " +
@@ -126,7 +133,8 @@ public class AsignacionModel {
                      "  AND r.id NOT IN (" +
                      "      SELECT a.id_reportero FROM Asignacion a " +
                      "      JOIN Evento e ON a.id_evento = e.id " +
-                     "      WHERE e.fecha = (SELECT fecha FROM Evento WHERE id = ?) " +
+                     "      WHERE e.fecha_inicio <= (SELECT fecha_fin FROM Evento WHERE id = ?) " +
+                     "      AND e.fecha_fin >= (SELECT fecha_inicio FROM Evento WHERE id = ?) " +
                      "      AND a.id_evento != ?" +
                      "  ) " +
                      "  AND r.id NOT IN (" +
@@ -134,7 +142,7 @@ public class AsignacionModel {
                      "      WHERE a2.id_evento = ?" +
                      "  ) " +
                      "ORDER BY r.nombre";
-        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, tipo, idEvento, idEvento, idEvento);
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idAgencia, idEvento, tipo, idEvento, idEvento, idEvento, idEvento);
     }
 
     /**
@@ -330,8 +338,8 @@ public class AsignacionModel {
      * Obtiene todos los eventos de una agencia incluyendo el campo asignacion_finalizada.
      */
     public List<EventoDTO> getTodosEventosConEstado(int idAgencia) {
-        String sql = "SELECT id, nombre, fecha, id_agencia, asignacion_finalizada FROM Evento " +
-                     "WHERE id_agencia = ? ORDER BY fecha, nombre";
+        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada FROM Evento " +
+                     "WHERE id_agencia = ? ORDER BY fecha_inicio, nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
     }
 
@@ -339,11 +347,20 @@ public class AsignacionModel {
      * Obtiene eventos con asignados incluyendo el campo asignacion_finalizada.
      */
     public List<EventoDTO> getEventosConAsignadosConEstado(int idAgencia) {
-        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.id_agencia, e.asignacion_finalizada " +
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.fecha, e.fecha_inicio, e.fecha_fin, e.id_agencia, e.asignacion_finalizada " +
                      "FROM Evento e " +
                      "JOIN Asignacion a ON e.id = a.id_evento " +
                      "WHERE e.id_agencia = ? " +
-                     "ORDER BY e.fecha, e.nombre";
+                     "ORDER BY e.fecha_inicio, e.nombre";
         return db.executeQueryPojo(EventoDTO.class, sql, idAgencia);
+    }
+
+    /**
+     * Obtiene un evento por su ID (HU #34430).
+     */
+    public EventoDTO getEventoById(int idEvento) {
+        String sql = "SELECT id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada FROM Evento WHERE id = ?";
+        List<EventoDTO> result = db.executeQueryPojo(EventoDTO.class, sql, idEvento);
+        return result.isEmpty() ? null : result.get(0);
     }
 }

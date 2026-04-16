@@ -426,3 +426,21 @@ INSERT INTO Reportaje (id, id_evento, id_reportero_autor, titulo, fecha_fin_emba
 -- Ofrecimientos para probar lógica de acceso
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5000, 500, 1, 'ACEPTADO', TRUE, TRUE);
 INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, acceso_especial) VALUES (5001, 503, 120, 'ACEPTADO', TRUE, FALSE);
+
+-- ---------------------------------------------------------
+-- DATOS SPRINT 3 — HU #34430: Eventos multi-día
+-- Agencia 1 (id=1) — reporteros: Carlos(1,GRAFICO), Laura(2,CAMAROGRAFO), Miguel(3,BASE), Ana(4,GRAFICO)
+-- Tres eventos con rangos diseñados para probar solapamiento:
+--   Ev.600: 2026-09-01 → 2026-09-05  (Carlos asignado)
+--   Ev.601: 2026-09-04 → 2026-09-08  (solapa con 600 en 04-05/09)
+--   Ev.602: 2026-09-06 → 2026-09-10  (NO solapa con 600; sí solapa con 601 en 06-08/09)
+-- ---------------------------------------------------------
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia)
+VALUES (600, 'Congreso Multi-Dia A', '2026-09-01', '2026-09-01', '2026-09-05', 1, FALSE, 1);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia)
+VALUES (601, 'Congreso Multi-Dia B', '2026-09-04', '2026-09-04', '2026-09-08', 1, FALSE, 2);
+INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia)
+VALUES (602, 'Congreso Multi-Dia C', '2026-09-06', '2026-09-06', '2026-09-10', 1, FALSE, 3);
+
+-- Carlos (id=1) asignado al evento 600
+INSERT INTO Asignacion (id_evento, id_reportero) VALUES (600, 1);
