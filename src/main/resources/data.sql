@@ -372,17 +372,30 @@ UPDATE Reportero SET tipo = 'BASE' WHERE id = 200;
 UPDATE Reportero SET tipo = 'GRAFICO' WHERE id = 201;
 
 -- Insertar reporteros Freelance (id_agencia es NULL)
-INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia)
-VALUES (500, 'Freelance Juan', 'BASE', NULL, 1);
-INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia) VALUES (501, 'Freelance Maria', 'GRAFICO', NULL, 2);
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia, email)
+VALUES (500, 'Freelance Juan', 'BASE', NULL, 1, 'juan.freelance@correo.com');
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia, email)
+VALUES (501, 'Freelance Maria', 'GRAFICO', NULL, 2, 'maria.freelance@correo.com');
+INSERT INTO Reportero (id, nombre, tipo, id_agencia, id_provincia, email)
+VALUES (502, 'Freelance Roberto', 'CAMAROGRAFO', NULL, 3, 'roberto.freelance@correo.com');
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (500, 1);
 INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (501, 2);
+INSERT INTO ReporteroTematica (id_reportero, id_tematica) VALUES (502, 1);
 
--- DecisionFreelance (HU #34070)
+-- DecisionFreelance (HU #34070 y #34437)
+-- Evento 10 (Final Copa Local, Deportes): Juan INTERESADO, Roberto INTERESADO, Maria INTERESADO
+-- Maria (Cultura) está interesada pero su temática no coincide con Deportes → útil para TEST 3
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 500, 'INTERESADO');
-INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (13, 500, 'NO_INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 502, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (10, 501, 'INTERESADO');
+-- Evento 11 (Inauguracion Museo, Cultura): Maria DUDOSO
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (11, 501, 'DUDOSO');
+-- Evento 13 (Maraton Ciudad, Deportes): Juan NO_INTERESADO, Roberto DUDOSO
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (13, 500, 'NO_INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (13, 502, 'DUDOSO');
+-- Evento 14 (Festival de Cine, Deportes+Cultura): Maria INTERESADO, Juan INTERESADO
 INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (14, 501, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (14, 500, 'INTERESADO');
 
 -- Multimedia (HU #34061, #34062)
 -- Reportaje 1 (Final Copa Local), autor 1
@@ -483,6 +496,11 @@ VALUES (602, 'Congreso Multi-Dia C', '2026-09-06', '2026-09-06', '2026-09-10', 1
 
 -- Carlos (id=1) asignado al evento 600
 INSERT INTO Asignacion (id_evento, id_reportero) VALUES (600, 1);
+
+-- DecisionFreelance para Ev.601 (útil para TEST 10 de HU #34437)
+-- Laura, Miguel, Ana libres en sept; Carlos bloqueado por Ev.600 (solapa 04-05/sep)
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (601, 500, 'INTERESADO');
+INSERT INTO DecisionFreelance (id_evento, id_reportero, decision) VALUES (601, 502, 'INTERESADO');
 
 --Añadimos datos para probar los accesos especiales
 INSERT INTO Evento (id, nombre, fecha, fecha_inicio, fecha_fin, id_agencia, asignacion_finalizada, id_provincia) 

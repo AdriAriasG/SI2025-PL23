@@ -11,11 +11,12 @@ import app.dto.AgenciaDTO;
 import app.dto.EventoDTO;
 import app.dto.ReporteroDTO;
 import app.model.AsignacionModel;
+
 import app.view.AsignacionEdicionView;
 
 /**
  * Controlador para la asignación/modificación de reporteros a eventos.
- * Cubre HU #33537, #33543 y #34426 (RR + finalización).
+ * Cubre HU #33537, #33543, #34426, #34430 y #34437 (freelances).
  */
 public class AsignacionEdicionController {
     private AsignacionModel model;
@@ -23,6 +24,7 @@ public class AsignacionEdicionController {
     private AgenciaDTO agencia;
     private int idEventoSeleccionado = -1;
     private boolean eventoFinalizado = false;
+    private boolean modoFreelance = false;
 
     public AsignacionEdicionController(AsignacionModel model, AsignacionEdicionView view, AgenciaDTO agencia) {
         this.model = model;
@@ -54,7 +56,16 @@ public class AsignacionEdicionController {
         view.getChkFiltroTematica().addActionListener(e -> cargarReporterosDisponibles());
         view.getCbFiltroTipo().addActionListener(e -> cargarReporterosDisponibles());
 
-        // Listener para checkboxes de disponibles
+        // Listeners para radio buttons de fuente (HU #34437)
+        view.getRbAgencia().addActionListener(e -> {
+            modoFreelance = false;
+            cargarReporterosDisponibles();
+        });
+        view.getRbFreelance().addActionListener(e -> {
+            modoFreelance = true;
+            cargarReporterosDisponibles();
+        });
+
         registrarListenerDisponibles();
     }
 
@@ -74,7 +85,6 @@ public class AsignacionEdicionController {
         List<EventoDTO> eventos;
 
         if (filtroIndex == 0) {
-            // Sin asignar: no tienen asignaciones, así que nunca están finalizados
             eventos = model.getEventosSinAsignar(agencia.getId());
         } else {
             eventos = model.getEventosConAsignadosConEstado(agencia.getId());
@@ -102,25 +112,26 @@ public class AsignacionEdicionController {
         idEventoSeleccionado = idEvento;
         eventoFinalizado = model.isAsignacionFinalizada(idEvento);
 
-        // Mostrar rango de fechas del evento (HU #34430)
-        app.dto.EventoDTO eventoDTO = model.getEventoById(idEvento);
+        EventoDTO eventoDTO = model.getEventoById(idEvento);
         if (eventoDTO != null) {
             view.setRangoFechasEvento(eventoDTO.getFechaInicio(), eventoDTO.getFechaFin());
         }
 
-        // Cargar temáticas
         List<app.dto.TematicaDTO> tematicas = model.getTematicasEvento(idEvento);
         view.setTematicas(tematicas);
 
-        // Cargar reporteros asignados con info de RR
         List<Object[]> asignadosConRR = model.getReporterosAsignadosConRR(idEvento);
         view.setAsignadosConRR(asignadosConRR);
 
-        // Habilitar/deshabilitar según estado
         view.setEdicionHabilitada(!eventoFinalizado);
+
+        // Bloquear Finalizar si hay freelance DUDOSO asignado (HU #34437)
+        if (!eventoFinalizado) {
+            actualizarEstadoBotonFinalizar();
+        }
+
         registrarListenerDisponibles();
 
-        // Cargar disponibles
         if (!eventoFinalizado) {
             cargarReporterosDisponibles();
         } else {
@@ -133,21 +144,32 @@ public class AsignacionEdicionController {
 
         boolean filtrarTematica = view.getChkFiltroTematica().isSelected();
         String tipo = view.getSelectedTipo();
-
         List<ReporteroDTO> disponibles;
 
-        if (filtrarTematica && tipo != null) {
-            disponibles = model.getReporterosDisponiblesPorTematicaYTipo(
-                idEventoSeleccionado, agencia.getId(), tipo);
-        } else if (filtrarTematica) {
-            disponibles = model.getReporterosDisponiblesPorTematica(
-                idEventoSeleccionado, agencia.getId());
-        } else if (tipo != null) {
-            disponibles = model.getReporterosDisponiblesPorTipo(
-                idEventoSeleccionado, agencia.getId(), tipo);
+        if (modoFreelance) {
+            if (filtrarTematica && tipo != null) {
+                disponibles = model.getFreelancesDisponiblesPorTematicaYTipo(idEventoSeleccionado, tipo);
+            } else if (filtrarTematica) {
+                disponibles = model.getFreelancesDisponiblesPorTematica(idEventoSeleccionado);
+            } else if (tipo != null) {
+                disponibles = model.getFreelancesDisponiblesPorTipo(idEventoSeleccionado, tipo);
+            } else {
+                disponibles = model.getFreelancesDisponibles(idEventoSeleccionado);
+            }
         } else {
-            disponibles = model.getReporterosDisponibles(
-                idEventoSeleccionado, agencia.getId());
+            if (filtrarTematica && tipo != null) {
+                disponibles = model.getReporterosDisponiblesPorTematicaYTipo(
+                        idEventoSeleccionado, agencia.getId(), tipo);
+            } else if (filtrarTematica) {
+                disponibles = model.getReporterosDisponiblesPorTematica(
+                        idEventoSeleccionado, agencia.getId());
+            } else if (tipo != null) {
+                disponibles = model.getReporterosDisponiblesPorTipo(
+                        idEventoSeleccionado, agencia.getId(), tipo);
+            } else {
+                disponibles = model.getReporterosDisponibles(
+                        idEventoSeleccionado, agencia.getId());
+            }
         }
 
         view.setDisponibles(disponibles);
@@ -188,9 +210,6 @@ public class AsignacionEdicionController {
         }
     }
 
-    /**
-     * Designa al reportero seleccionado como Reportero Responsable (RR).
-     */
     private void onDesignarRR() {
         if (eventoFinalizado) {
             view.showError("La asignación está finalizada. No se puede cambiar el RR.");
@@ -216,9 +235,10 @@ public class AsignacionEdicionController {
 
     /**
      * Finaliza la asignación del evento seleccionado.
-     * Validación: debe haber un RR designado Y al menos un reportero BASE cubierto.
-     * Si el RR es de tipo BASE, él mismo satisface el requisito y puede ir solo.
-     * Si el RR no es de tipo BASE, debe haber además al menos un BASE adicional.
+     * Validaciones:
+     * - Debe haber un RR designado.
+     * - Debe haber al menos un reportero BASE (el RR puede ser BASE y satisfacer el requisito solo).
+     * - No puede haber ningún freelance asignado con decisión DUDOSO (HU #34437).
      */
     private void onFinalizar() {
         if (eventoFinalizado) {
@@ -230,17 +250,20 @@ public class AsignacionEdicionController {
             return;
         }
 
-        // Validar que hay un RR designado
         int idRR = model.getReporteroResponsable(idEventoSeleccionado);
         if (idRR == -1) {
             view.showError("No se puede finalizar: debe designar un Reportero Responsable (RR).");
             return;
         }
 
-        // Validar cobertura BASE: si el RR es BASE, es suficiente; si no, debe haber al menos un BASE adicional
         boolean rrEsBase = model.esReporteroResponsableTipoBase(idEventoSeleccionado);
         if (!rrEsBase && !model.tieneReporteroBaseNoRR(idEventoSeleccionado)) {
             view.showError("No se puede finalizar: debe haber al menos un reportero de tipo BASE asignado que no sea el RR.");
+            return;
+        }
+
+        if (model.tieneFreelanceDudosoAsignado(idEventoSeleccionado)) {
+            view.showError("No se puede finalizar: hay un reportero freelance asignado con estado 'En duda'.\nEspere a que confirme su disponibilidad.");
             return;
         }
 
@@ -265,7 +288,7 @@ public class AsignacionEdicionController {
                 String nombre = view.getNombreDisponible(id);
                 String tipo = view.getTipoDisponible(id);
                 if (nombre != null) {
-                    view.addPendiente(id, nombre, tipo);
+                    view.addPendiente(id, nombre, tipo, modoFreelance);
                 }
             }
         }
@@ -282,7 +305,6 @@ public class AsignacionEdicionController {
             view.showError("La asignación está finalizada. No se pueden realizar cambios.");
             return;
         }
-
         if (idEventoSeleccionado == -1) {
             view.showError("Debe seleccionar un evento primero.");
             return;
@@ -307,8 +329,13 @@ public class AsignacionEdicionController {
                 try {
                     model.asignarReportero(idEventoSeleccionado, idReportero);
                     exitosas++;
+
+                    // Enviar email de notificación al freelance (HU #34437)
+                    if (modoFreelance) {
+                        enviarEmailFreelance(idReportero);
+                    }
                 } catch (Exception e) {
-                    // Ignorar errores individuales
+                    // Ignorar errores individuales de asignación
                 }
             }
 
@@ -317,13 +344,29 @@ public class AsignacionEdicionController {
             }
 
             recargarDatosEvento();
+            actualizarEstadoBotonFinalizar();
         }
+    }
+
+    private void enviarEmailFreelance(int idReportero) {
+        String emailDestino = model.getEmailFreelance(idReportero);
+        String destino = (emailDestino != null && !emailDestino.isBlank()) ? emailDestino : "(sin email registrado)";
+        System.out.println("[EMAIL] Notificación enviada a freelance id=" + idReportero + " → " + destino);
+        view.showInfo("Se ha enviado un email de notificación al reportero freelance:\n" + destino);
+    }
+
+    /**
+     * Actualiza el estado del botón Finalizar según si hay freelances DUDOSO asignados.
+     */
+    private void actualizarEstadoBotonFinalizar() {
+        if (idEventoSeleccionado == -1 || eventoFinalizado) return;
+        boolean hayDudoso = model.tieneFreelanceDudosoAsignado(idEventoSeleccionado);
+        view.setFinalizarHabilitado(!hayDudoso);
     }
 
     private void recargarDatosEvento() {
         if (idEventoSeleccionado == -1) return;
 
-        // Recargar lista de eventos
         int filtroIndex = view.getCbFiltro().getSelectedIndex();
         List<EventoDTO> eventos;
         if (filtroIndex == 0) {
@@ -333,17 +376,12 @@ public class AsignacionEdicionController {
         }
         view.setEventos(eventos);
 
-        // Verificar si el evento sigue en la lista
         boolean eventoEncontrado = false;
         for (EventoDTO e : eventos) {
-            if (e.getId() == idEventoSeleccionado) {
-                eventoEncontrado = true;
-                break;
-            }
+            if (e.getId() == idEventoSeleccionado) { eventoEncontrado = true; break; }
         }
 
         if (eventoEncontrado) {
-            // Reseleccionar el evento en la tabla
             for (int i = 0; i < view.getTablaEventos().getRowCount(); i++) {
                 if (((Number) view.getTablaEventos().getValueAt(i, 0)).intValue() == idEventoSeleccionado) {
                     view.getTablaEventos().setRowSelectionInterval(i, i);
@@ -353,7 +391,6 @@ public class AsignacionEdicionController {
 
             eventoFinalizado = model.isAsignacionFinalizada(idEventoSeleccionado);
 
-            // Recargar reporteros con RR
             List<Object[]> asignadosConRR = model.getReporterosAsignadosConRR(idEventoSeleccionado);
             view.setAsignadosConRR(asignadosConRR);
 
@@ -361,6 +398,7 @@ public class AsignacionEdicionController {
             registrarListenerDisponibles();
 
             if (!eventoFinalizado) {
+                actualizarEstadoBotonFinalizar();
                 cargarReporterosDisponibles();
             } else {
                 view.setDisponibles(new java.util.ArrayList<>());

@@ -21,7 +21,7 @@ import app.dto.ReporteroDTO;
 
 /**
  * Vista para la asignación/modificación de reporteros a eventos.
- * Cubre HU #33537, #33543 y #34426.
+ * Cubre HU #33537, #33543, #34426, #34430 y #34437.
  */
 public class AsignacionEdicionView {
     private JFrame frame;
@@ -53,6 +53,10 @@ public class AsignacionEdicionView {
     private JComboBox<String> cbFiltroTipo;
     private JLabel lblTematicasEvento;
 
+    // Filtro fuente: agencia vs freelance (HU #34437)
+    private JRadioButton rbAgencia;
+    private JRadioButton rbFreelance;
+
     // Botones
     private JButton btnAsignar;
     private JButton btnCancelar;
@@ -64,7 +68,7 @@ public class AsignacionEdicionView {
     private void initialize() {
         frame = new JFrame();
         frame.setTitle("Asignar / Modificar Reporteros");
-        frame.setBounds(100, 100, 780, 680);
+        frame.setBounds(100, 100, 850, 720);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -73,7 +77,7 @@ public class AsignacionEdicionView {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         frame.getContentPane().add(mainPanel, BorderLayout.CENTER);
 
-        // === PANEL FILTRO ===
+        // === PANEL FILTRO EVENTOS ===
         JPanel panelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelFiltro.add(new JLabel("Filtro:"));
         cbFiltro = new JComboBox<>(new String[]{"Sin asignar", "Con asignados"});
@@ -86,40 +90,32 @@ public class AsignacionEdicionView {
         panelEventos.setLayout(new BoxLayout(panelEventos, BoxLayout.Y_AXIS));
         panelEventos.setBorder(BorderFactory.createTitledBorder("Eventos"));
 
-        // Tabla: ID | Nombre | Inicio | Fin | Estado  (HU #34430: rango de fechas)
         modeloEventos = new DefaultTableModel(new String[]{"ID", "Nombre", "Inicio", "Fin", "Estado"}, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            @Override public boolean isCellEditable(int row, int column) { return false; }
         };
         tablaEventos = new JTable(modeloEventos);
         tablaEventos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaEventos.getColumnModel().getColumn(0).setPreferredWidth(40);
-        tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(200);
         tablaEventos.getColumnModel().getColumn(2).setPreferredWidth(90);
         tablaEventos.getColumnModel().getColumn(3).setPreferredWidth(90);
         tablaEventos.getColumnModel().getColumn(4).setPreferredWidth(90);
 
-        // Renderer para colorear eventos finalizados (Estado está en columna 4)
         tablaEventos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String estado = (String) table.getValueAt(row, 4);
                 if (!isSelected) {
                     if ("FINALIZADA".equals(estado)) {
                         c.setBackground(new Color(220, 220, 240));
                         c.setForeground(new Color(100, 100, 140));
-                        if (c instanceof JLabel) {
-                            ((JLabel) c).setFont(c.getFont().deriveFont(Font.ITALIC));
-                        }
+                        if (c instanceof JLabel) ((JLabel) c).setFont(c.getFont().deriveFont(Font.ITALIC));
                     } else {
                         c.setBackground(table.getBackground());
                         c.setForeground(table.getForeground());
-                        if (c instanceof JLabel) {
-                            ((JLabel) c).setFont(c.getFont().deriveFont(Font.PLAIN));
-                        }
+                        if (c instanceof JLabel) ((JLabel) c).setFont(c.getFont().deriveFont(Font.PLAIN));
                     }
                 }
                 return c;
@@ -127,15 +123,13 @@ public class AsignacionEdicionView {
         });
 
         JScrollPane scrollEventos = new JScrollPane(tablaEventos);
-        scrollEventos.setPreferredSize(new Dimension(740, 120));
+        scrollEventos.setPreferredSize(new Dimension(810, 110));
         panelEventos.add(scrollEventos);
 
-        // Etiqueta de rango de fechas del evento seleccionado (HU #34430)
         lblRangoFechas = new JLabel("Rango del evento: -");
         JPanel panelRango = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelRango.add(lblRangoFechas);
         panelEventos.add(panelRango);
-
         mainPanel.add(panelEventos);
 
         // === PANEL REPORTEROS DEL EVENTO ===
@@ -147,40 +141,47 @@ public class AsignacionEdicionView {
         JPanel panelLeyenda = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblAsignado = new JLabel("■ Asignado");
         lblAsignado.setForeground(new Color(0, 100, 0));
-        JLabel lblPendiente = new JLabel("    ■ Pendiente");
+        JLabel lblFreelance = new JLabel("   ■ Freelance");
+        lblFreelance.setForeground(new Color(120, 0, 180));
+        JLabel lblPendiente = new JLabel("   ■ Pendiente");
         lblPendiente.setForeground(new Color(200, 100, 0));
-        JLabel lblRR = new JLabel("    ★ Responsable (RR)");
+        JLabel lblRR = new JLabel("   ★ Responsable (RR)");
         lblRR.setForeground(new Color(0, 0, 180));
         panelLeyenda.add(lblAsignado);
+        panelLeyenda.add(lblFreelance);
         panelLeyenda.add(lblPendiente);
         panelLeyenda.add(lblRR);
         panelReporterosEvento.add(panelLeyenda);
 
-        modeloReporterosEvento = new DefaultTableModel(new String[]{"Estado", "ID", "Nombre", "Tipo", "RR"}, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+        // Tabla: Estado | ID | Nombre | Tipo | RR | Origen
+        modeloReporterosEvento = new DefaultTableModel(
+                new String[]{"Estado", "ID", "Nombre", "Tipo", "RR", "Origen"}, 0) {
+            @Override public boolean isCellEditable(int row, int column) { return false; }
         };
         tablaReporterosEvento = new JTable(modeloReporterosEvento);
         tablaReporterosEvento.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaReporterosEvento.getColumnModel().getColumn(0).setPreferredWidth(80);
         tablaReporterosEvento.getColumnModel().getColumn(1).setPreferredWidth(40);
-        tablaReporterosEvento.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tablaReporterosEvento.getColumnModel().getColumn(2).setPreferredWidth(180);
         tablaReporterosEvento.getColumnModel().getColumn(3).setPreferredWidth(100);
         tablaReporterosEvento.getColumnModel().getColumn(4).setPreferredWidth(50);
+        tablaReporterosEvento.getColumnModel().getColumn(5).setPreferredWidth(80);
 
-        // Renderer para colorear filas según estado y RR
         tablaReporterosEvento.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
                     String estado = (String) table.getValueAt(row, 0);
                     String rr = (String) table.getValueAt(row, 4);
+                    String origen = (String) table.getValueAt(row, 5);
                     if ("★ RR".equals(rr)) {
                         c.setBackground(new Color(210, 220, 255));
                         c.setForeground(new Color(0, 0, 180));
+                    } else if ("Freelance".equals(origen) && "Asignado".equals(estado)) {
+                        c.setBackground(new Color(240, 220, 255));
+                        c.setForeground(new Color(120, 0, 180));
                     } else if ("Asignado".equals(estado)) {
                         c.setBackground(new Color(220, 255, 220));
                         c.setForeground(new Color(0, 100, 0));
@@ -200,10 +201,9 @@ public class AsignacionEdicionView {
         });
 
         scrollReporterosEvento = new JScrollPane(tablaReporterosEvento);
-        scrollReporterosEvento.setPreferredSize(new Dimension(740, 120));
+        scrollReporterosEvento.setPreferredSize(new Dimension(810, 120));
         panelReporterosEvento.add(scrollReporterosEvento);
 
-        // Botones de reporteros del evento
         JPanel panelBtnReporteros = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnDesignarRR = new JButton("Designar como RR");
         btnEliminar = new JButton("Eliminar Seleccionado");
@@ -212,7 +212,6 @@ public class AsignacionEdicionView {
         panelBtnReporteros.add(btnEliminar);
         panelBtnReporteros.add(btnFinalizar);
         panelReporterosEvento.add(panelBtnReporteros);
-
         mainPanel.add(panelReporterosEvento);
 
         // === PANEL REPORTEROS DISPONIBLES ===
@@ -220,7 +219,19 @@ public class AsignacionEdicionView {
         panelDisponibles.setLayout(new BoxLayout(panelDisponibles, BoxLayout.Y_AXIS));
         panelDisponibles.setBorder(BorderFactory.createTitledBorder("Reporteros Disponibles (marque para añadir al evento)"));
 
-        // Filtros
+        // Fila 1: fuente (Agencia / Freelance)
+        JPanel panelFuente = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelFuente.add(new JLabel("Ver:"));
+        rbAgencia = new JRadioButton("De la agencia", true);
+        rbFreelance = new JRadioButton("Freelance");
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(rbAgencia);
+        bg.add(rbFreelance);
+        panelFuente.add(rbAgencia);
+        panelFuente.add(rbFreelance);
+        panelDisponibles.add(panelFuente);
+
+        // Fila 2: filtros temática y tipo
         JPanel panelFiltrosDisp = new JPanel(new FlowLayout(FlowLayout.LEFT));
         chkFiltroTematica = new JCheckBox("Filtrar por temática del evento");
         panelFiltrosDisp.add(chkFiltroTematica);
@@ -236,24 +247,19 @@ public class AsignacionEdicionView {
         panelDisponibles.add(panelTematicas);
 
         modeloDisponibles = new DefaultTableModel(new String[]{"Añadir", "ID", "Nombre", "Tipo"}, 0) {
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0) return Boolean.class;
-                return String.class;
+            @Override public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex == 0 ? Boolean.class : String.class;
             }
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == 0;
-            }
+            @Override public boolean isCellEditable(int row, int column) { return column == 0; }
         };
         tablaDisponibles = new JTable(modeloDisponibles);
         tablaDisponibles.getColumnModel().getColumn(0).setPreferredWidth(50);
         tablaDisponibles.getColumnModel().getColumn(1).setPreferredWidth(40);
-        tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(220);
         tablaDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
 
         JScrollPane scrollDisponibles = new JScrollPane(tablaDisponibles);
-        scrollDisponibles.setPreferredSize(new Dimension(740, 130));
+        scrollDisponibles.setPreferredSize(new Dimension(810, 120));
         panelDisponibles.add(scrollDisponibles);
         mainPanel.add(panelDisponibles);
 
@@ -280,6 +286,9 @@ public class AsignacionEdicionView {
     public JCheckBox getChkFiltroTematica() { return chkFiltroTematica; }
     public JComboBox<String> getCbFiltroTipo() { return cbFiltroTipo; }
     public JLabel getLblTematicasEvento() { return lblTematicasEvento; }
+    public JRadioButton getRbAgencia() { return rbAgencia; }
+    public JRadioButton getRbFreelance() { return rbFreelance; }
+    public boolean isFreelanceModeSelected() { return rbFreelance.isSelected(); }
 
     // === MÉTODOS PARA POBLAR DATOS ===
 
@@ -296,10 +305,6 @@ public class AsignacionEdicionView {
         }
     }
 
-    /**
-     * Limpia y pobla la tabla de eventos. Muestra el rango de fechas y el estado de finalización.
-     * HU #34430: columnas Inicio y Fin en lugar de Fecha única.
-     */
     public void setEventos(List<EventoDTO> eventos) {
         modeloEventos.setRowCount(0);
         for (EventoDTO e : eventos) {
@@ -311,8 +316,8 @@ public class AsignacionEdicionView {
     }
 
     /**
-     * Establece los reporteros asignados al evento, con info de RR.
-     * @param datos lista de Object[] con: id, nombre, tipo, id_agencia, es_responsable
+     * Pobla la tabla de asignados. Detecta freelance si id_agencia (row[3]) es null.
+     * @param datos Object[] con: id, nombre, tipo, id_agencia, es_responsable
      */
     public void setAsignadosConRR(List<Object[]> datos) {
         idsAsignados.clear();
@@ -323,28 +328,31 @@ public class AsignacionEdicionView {
             int id = ((Number) row[0]).intValue();
             String nombre = (String) row[1];
             String tipo = (String) row[2];
-            boolean esRR = row[4] != null && (row[4] instanceof Boolean ? (Boolean) row[4] : ((Number) row[4]).intValue() != 0);
+            boolean esRR = row[4] != null && (row[4] instanceof Boolean
+                    ? (Boolean) row[4] : ((Number) row[4]).intValue() != 0);
+            boolean esFreelance = row[3] == null;
 
             idsAsignados.add(id);
             modeloReporterosEvento.addRow(new Object[]{
-                "Asignado", id, nombre, tipo, esRR ? "★ RR" : ""
+                "Asignado", id, nombre, tipo,
+                esRR ? "★ RR" : "",
+                esFreelance ? "Freelance" : "Plantilla"
             });
         }
     }
 
-    public boolean addPendiente(int id, String nombre, String tipo) {
-        if (idsAsignados.contains(id) || idsPendientes.contains(id)) {
-            return false;
-        }
+    public boolean addPendiente(int id, String nombre, String tipo, boolean isFreelance) {
+        if (idsAsignados.contains(id) || idsPendientes.contains(id)) return false;
         idsPendientes.add(id);
-        modeloReporterosEvento.addRow(new Object[]{"Pendiente", id, nombre, tipo, ""});
+        modeloReporterosEvento.addRow(new Object[]{
+            "Pendiente", id, nombre, tipo, "",
+            isFreelance ? "Freelance" : "Plantilla"
+        });
         return true;
     }
 
     public boolean removePendiente(int id) {
-        if (!idsPendientes.contains(id)) {
-            return false;
-        }
+        if (!idsPendientes.contains(id)) return false;
         idsPendientes.remove(id);
         for (int i = 0; i < modeloReporterosEvento.getRowCount(); i++) {
             if (((Number) modeloReporterosEvento.getValueAt(i, 1)).intValue() == id) {
@@ -368,33 +376,25 @@ public class AsignacionEdicionView {
 
     public int getIdEventoSeleccionado() {
         int row = tablaEventos.getSelectedRow();
-        if (row >= 0) {
-            return ((Number) modeloEventos.getValueAt(row, 0)).intValue();
-        }
+        if (row >= 0) return ((Number) modeloEventos.getValueAt(row, 0)).intValue();
         return -1;
     }
 
     public String getEstadoEventoSeleccionado() {
         int row = tablaEventos.getSelectedRow();
-        if (row >= 0) {
-            return (String) modeloEventos.getValueAt(row, 4);
-        }
+        if (row >= 0) return (String) modeloEventos.getValueAt(row, 4);
         return null;
     }
 
     public int getIdReporteroEventoSeleccionado() {
         int row = tablaReporterosEvento.getSelectedRow();
-        if (row >= 0) {
-            return ((Number) modeloReporterosEvento.getValueAt(row, 1)).intValue();
-        }
+        if (row >= 0) return ((Number) modeloReporterosEvento.getValueAt(row, 1)).intValue();
         return -1;
     }
 
     public String getEstadoReporteroEventoSeleccionado() {
         int row = tablaReporterosEvento.getSelectedRow();
-        if (row >= 0) {
-            return (String) modeloReporterosEvento.getValueAt(row, 0);
-        }
+        if (row >= 0) return (String) modeloReporterosEvento.getValueAt(row, 0);
         return null;
     }
 
@@ -402,27 +402,24 @@ public class AsignacionEdicionView {
         List<Integer> ids = new ArrayList<>();
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
             Boolean seleccionado = (Boolean) modeloDisponibles.getValueAt(i, 0);
-            if (seleccionado != null && seleccionado) {
+            if (seleccionado != null && seleccionado)
                 ids.add(((Number) modeloDisponibles.getValueAt(i, 1)).intValue());
-            }
         }
         return ids;
     }
 
     public String getNombreDisponible(int id) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
-            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id) {
+            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id)
                 return (String) modeloDisponibles.getValueAt(i, 2);
-            }
         }
         return null;
     }
 
     public String getTipoDisponible(int id) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
-            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id) {
+            if (((Number) modeloDisponibles.getValueAt(i, 1)).intValue() == id)
                 return (String) modeloDisponibles.getValueAt(i, 3);
-            }
         }
         return null;
     }
@@ -432,17 +429,9 @@ public class AsignacionEdicionView {
         return "Todos".equals(sel) ? null : sel;
     }
 
-    public List<Integer> getIdsPendientes() {
-        return new ArrayList<>(idsPendientes);
-    }
-
-    public List<Integer> getIdsAsignados() {
-        return new ArrayList<>(idsAsignados);
-    }
-
-    public void clearPendientes() {
-        idsPendientes.clear();
-    }
+    public List<Integer> getIdsPendientes() { return new ArrayList<>(idsPendientes); }
+    public List<Integer> getIdsAsignados() { return new ArrayList<>(idsAsignados); }
+    public void clearPendientes() { idsPendientes.clear(); }
 
     public void setCheckboxDisponible(int id, boolean marcado) {
         for (int i = 0; i < modeloDisponibles.getRowCount(); i++) {
@@ -454,8 +443,7 @@ public class AsignacionEdicionView {
     }
 
     /**
-     * Habilita/deshabilita los controles de edición.
-     * Cuando un evento está finalizado, se deshabilitan.
+     * Habilita/deshabilita los controles de edición (evento finalizado o no).
      */
     public void setEdicionHabilitada(boolean habilitada) {
         btnAsignar.setEnabled(habilitada);
@@ -464,31 +452,33 @@ public class AsignacionEdicionView {
         btnFinalizar.setEnabled(habilitada);
         chkFiltroTematica.setEnabled(habilitada);
         cbFiltroTipo.setEnabled(habilitada);
+        rbAgencia.setEnabled(habilitada);
+        rbFreelance.setEnabled(habilitada);
 
-        // Hacer que los checkboxes de disponibles no sean editables
         modeloDisponibles = new DefaultTableModel(
-            new String[]{"Añadir", "ID", "Nombre", "Tipo"}, 0) {
+                new String[]{"Añadir", "ID", "Nombre", "Tipo"}, 0) {
             final boolean editable = habilitada;
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0) return Boolean.class;
-                return String.class;
+            @Override public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex == 0 ? Boolean.class : String.class;
             }
-            @Override
-            public boolean isCellEditable(int row, int column) {
+            @Override public boolean isCellEditable(int row, int column) {
                 return editable && column == 0;
             }
         };
         tablaDisponibles.setModel(modeloDisponibles);
         tablaDisponibles.getColumnModel().getColumn(0).setPreferredWidth(50);
         tablaDisponibles.getColumnModel().getColumn(1).setPreferredWidth(40);
-        tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tablaDisponibles.getColumnModel().getColumn(2).setPreferredWidth(220);
         tablaDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
     }
 
     /**
-     * Muestra el rango de fechas del evento seleccionado (HU #34430).
+     * Habilita o deshabilita solo el botón Finalizar (para bloqueo por freelance DUDOSO).
      */
+    public void setFinalizarHabilitado(boolean habilitado) {
+        btnFinalizar.setEnabled(habilitado);
+    }
+
     public void setRangoFechasEvento(String inicio, String fin) {
         if (inicio != null && fin != null) {
             lblRangoFechas.setText("Rango del evento: " + inicio + "  →  " + fin);

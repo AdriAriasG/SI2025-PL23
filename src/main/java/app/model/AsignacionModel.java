@@ -363,4 +363,108 @@ public class AsignacionModel {
         List<EventoDTO> result = db.executeQueryPojo(EventoDTO.class, sql, idEvento);
         return result.isEmpty() ? null : result.get(0);
     }
+
+    // ===== HU #34437: Freelances en asignación =====
+
+    private static final String DISPONIBILIDAD_FECHA =
+        "AND r.id NOT IN (" +
+        "    SELECT a.id_reportero FROM Asignacion a " +
+        "    JOIN Evento e ON a.id_evento = e.id " +
+        "    WHERE e.fecha_inicio <= (SELECT fecha_fin FROM Evento WHERE id = ?) " +
+        "    AND e.fecha_fin >= (SELECT fecha_inicio FROM Evento WHERE id = ?) " +
+        "    AND a.id_evento != ?" +
+        ") " +
+        "AND r.id NOT IN (" +
+        "    SELECT a2.id_reportero FROM Asignacion a2 WHERE a2.id_evento = ?" +
+        ") ";
+
+    /**
+     * Freelances con decisión INTERESADO o DUDOSO para el evento, disponibles por rango de fechas.
+     */
+    public List<ReporteroDTO> getFreelancesDisponibles(int idEvento) {
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia AS idAgencia, r.email FROM Reportero r " +
+                     "JOIN DecisionFreelance df ON r.id = df.id_reportero " +
+                     "WHERE r.id_agencia IS NULL " +
+                     "AND df.id_evento = ? " +
+                     "AND df.decision IN ('INTERESADO', 'DUDOSO') " +
+                     DISPONIBILIDAD_FECHA +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idEvento, idEvento, idEvento, idEvento, idEvento);
+    }
+
+    /**
+     * Freelances disponibles filtrados por temática del evento.
+     */
+    public List<ReporteroDTO> getFreelancesDisponiblesPorTematica(int idEvento) {
+        String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia AS idAgencia, r.email " +
+                     "FROM Reportero r " +
+                     "JOIN DecisionFreelance df ON r.id = df.id_reportero " +
+                     "JOIN ReporteroTematica rt ON r.id = rt.id_reportero " +
+                     "JOIN EventoTematica et ON rt.id_tematica = et.id_tematica " +
+                     "WHERE r.id_agencia IS NULL " +
+                     "AND df.id_evento = ? " +
+                     "AND et.id_evento = ? " +
+                     "AND df.decision IN ('INTERESADO', 'DUDOSO') " +
+                     DISPONIBILIDAD_FECHA +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idEvento, idEvento, idEvento, idEvento, idEvento, idEvento);
+    }
+
+    /**
+     * Freelances disponibles filtrados por tipo.
+     */
+    public List<ReporteroDTO> getFreelancesDisponiblesPorTipo(int idEvento, String tipo) {
+        String sql = "SELECT r.id, r.nombre, r.tipo, r.id_agencia AS idAgencia, r.email FROM Reportero r " +
+                     "JOIN DecisionFreelance df ON r.id = df.id_reportero " +
+                     "WHERE r.id_agencia IS NULL " +
+                     "AND df.id_evento = ? " +
+                     "AND r.tipo = ? " +
+                     "AND df.decision IN ('INTERESADO', 'DUDOSO') " +
+                     DISPONIBILIDAD_FECHA +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idEvento, tipo, idEvento, idEvento, idEvento, idEvento);
+    }
+
+    /**
+     * Freelances disponibles filtrados por temática y tipo.
+     */
+    public List<ReporteroDTO> getFreelancesDisponiblesPorTematicaYTipo(int idEvento, String tipo) {
+        String sql = "SELECT DISTINCT r.id, r.nombre, r.tipo, r.id_agencia AS idAgencia, r.email " +
+                     "FROM Reportero r " +
+                     "JOIN DecisionFreelance df ON r.id = df.id_reportero " +
+                     "JOIN ReporteroTematica rt ON r.id = rt.id_reportero " +
+                     "JOIN EventoTematica et ON rt.id_tematica = et.id_tematica " +
+                     "WHERE r.id_agencia IS NULL " +
+                     "AND df.id_evento = ? " +
+                     "AND et.id_evento = ? " +
+                     "AND r.tipo = ? " +
+                     "AND df.decision IN ('INTERESADO', 'DUDOSO') " +
+                     DISPONIBILIDAD_FECHA +
+                     "ORDER BY r.nombre";
+        return db.executeQueryPojo(ReporteroDTO.class, sql, idEvento, idEvento, tipo, idEvento, idEvento, idEvento, idEvento);
+    }
+
+    /**
+     * Obtiene el email de un reportero freelance para enviar notificación.
+     */
+    public String getEmailFreelance(int idReportero) {
+        String sql = "SELECT email FROM Reportero WHERE id = ? AND id_agencia IS NULL";
+        List<Object[]> result = db.executeQueryArray(sql, idReportero);
+        if (result.isEmpty() || result.get(0)[0] == null) return null;
+        return result.get(0)[0].toString();
+    }
+
+    /**
+     * Comprueba si algún freelance asignado al evento tiene decisión DUDOSO.
+     * En ese caso la asignación no puede finalizarse (HU #34437).
+     */
+    public boolean tieneFreelanceDudosoAsignado(int idEvento) {
+        String sql = "SELECT COUNT(*) FROM Asignacion a " +
+                     "JOIN Reportero r ON a.id_reportero = r.id " +
+                     "JOIN DecisionFreelance df ON df.id_reportero = r.id AND df.id_evento = a.id_evento " +
+                     "WHERE a.id_evento = ? AND r.id_agencia IS NULL AND df.decision = 'DUDOSO'";
+        List<Object[]> result = db.executeQueryArray(sql, idEvento);
+        if (result.isEmpty() || result.get(0)[0] == null) return false;
+        return ((Number) result.get(0)[0]).intValue() > 0;
+    }
 }

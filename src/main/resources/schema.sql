@@ -47,6 +47,7 @@ CREATE TABLE Reportero (
     tipo VARCHAR(20) CHECK (tipo IN ('GRAFICO', 'CAMAROGRAFO', 'BASE')) DEFAULT 'BASE',
     id_agencia INTEGER,
     id_provincia INTEGER NOT NULL,
+    email VARCHAR(255),
     FOREIGN KEY (id_agencia) REFERENCES AgenciaPrensa(id),
     FOREIGN KEY (id_provincia) REFERENCES Provincia(id)
 );

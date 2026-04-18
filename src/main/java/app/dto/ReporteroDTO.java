@@ -4,7 +4,8 @@ public class ReporteroDTO {
     private int id;
     private String nombre;
     private String tipo; // GRAFICO, CAMAROGRAFO, BASE
-    private int idAgencia;
+    private Integer idAgencia; // Integer (nullable) para soportar freelances (id_agencia NULL)
+    private String email;
 
     // Constructor vacío para DbUtils
     public ReporteroDTO() {}
@@ -25,8 +26,11 @@ public class ReporteroDTO {
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public int getIdAgencia() { return idAgencia; }
-    public void setIdAgencia(int idAgencia) { this.idAgencia = idAgencia; }
+    public Integer getIdAgencia() { return idAgencia; }
+    public void setIdAgencia(Integer idAgencia) { this.idAgencia = idAgencia; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     @Override
     public String toString() {
