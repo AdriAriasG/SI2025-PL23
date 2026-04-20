@@ -529,3 +529,36 @@ INSERT INTO Ofrecimiento (id, id_evento, id_empresa, estado, acceso_concedido, a
 UPDATE Reportaje
 SET estado = 'TERMINADO'
 WHERE id IN (1,2,3,4,50,51,60,61,62,70,71,72,73,900,901,902,7000,7001,7002);
+
+-- 1. Aseguramos que la Agencia Catalana (42) tenga eventos en varias temáticas
+-- El evento 422 ya es de Tecnología (Temática 3), vamos a añadirle otro de Deportes (Temática 1)
+INSERT INTO EventoTematica (id_evento, id_tematica) VALUES (420, 1); -- Evento F ahora es de Deportes
+
+-- 2. Configuramos las Empresas para que tengan Tarifa Plana o no
+-- Empresa 120 y 123 YA tienen tarifa plana (según tus INSERTS)
+-- Empresa 118 y 119 NO tienen tarifa plana
+UPDATE EmpresaComunicacion SET tiene_tarifa_plana = 1 WHERE id IN (120, 123);
+UPDATE EmpresaComunicacion SET tiene_tarifa_plana = 0 WHERE id IN (118, 119);
+
+-- 3. OFRECIMIENTOS PARA EL EVENTO 422 (Tecnología) - AGENCIA CATALANA
+-- Borramos ofrecimientos previos de este evento para no tener errores de PK
+DELETE FROM Ofrecimiento WHERE id_evento = 422;
+
+-- Empresa con Tarifa Plana (ID 120) paga 500€
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, precio, pagado) 
+VALUES (422, 120, 'ACEPTADO', 500.0, 1);
+
+-- Empresa SIN Tarifa Plana (ID 118) paga 150€ (Pago individual)
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, precio, pagado) 
+VALUES (422, 118, 'ACEPTADO', 150.0, 1);
+
+-- 4. OFRECIMIENTOS PARA EL EVENTO 420 (Deportes) - AGENCIA CATALANA
+DELETE FROM Ofrecimiento WHERE id_evento = 420;
+
+-- Empresa con Tarifa Plana (ID 123) paga 1000€
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, precio, pagado) 
+VALUES (420, 123, 'ACEPTADO', 1000.0, 1);
+
+-- Empresa SIN Tarifa Plana (ID 119) paga 300€ (Pago individual)
+INSERT INTO Ofrecimiento (id_evento, id_empresa, estado, precio, pagado) 
+VALUES (420, 119, 'ACEPTADO', 300.0, 1);

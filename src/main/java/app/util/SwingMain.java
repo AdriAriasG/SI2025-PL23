@@ -28,9 +28,11 @@ import app.controller.RestaurarVersionController;
 import app.model.InformeModel;  
 import app.model.DistribuirReportajeModel;
 import app.model.FreelanceDecisionModel;
+import app.model.InformeBeneficiosModel;
 import app.model.OfrecerReportajesModel;
 import app.view.DistribuirReportajeView;
 import app.view.FreelanceDecisionView;
+import app.view.InformeBeneficiosView;
 import app.view.AsignacionEdicionView;
 import app.view.InformeView;
 import app.view.ModificarOfrecimientoView;
@@ -38,6 +40,7 @@ import app.view.OfrecerReportajesView;
 import app.controller.AsignacionEdicionController;
 import app.controller.DistribuirReportajeController;
 import app.controller.FreelanceDecisionController;
+import app.controller.InformeBeneficiosController;
 import app.controller.InformeController;
 import app.controller.ModificarOfrecimientoController;
 import app.controller.OfrecerReportajesController;
@@ -92,7 +95,7 @@ public class SwingMain {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Gestión de Reportajes");
-		frame.setBounds(100, 100, 550, 800);
+		frame.setBounds(100, 100, 550, 1100);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		((JPanel)frame.getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -114,6 +117,7 @@ public class SwingMain {
 		addButtonAgencia("HU #33539: Ofrecer reportajes (IVAN)");
 		addButtonAgencia("Modificar ofrecimiento (IVAN)");
 		addButtonAgencia("Distribuir reportaje (IVAN)");
+		addButtonAgencia("Informe Beneficios (IRENE)");
 
 		// --- REPORTERO (DIEGO) ---
 		addLabel("REPORTERO (Diego)");
@@ -327,6 +331,12 @@ public class SwingMain {
 			ModificarOfrecimientoModel model = new ModificarOfrecimientoModel();
 			ModificarOfrecimientoView view = new ModificarOfrecimientoView();
 			new ModificarOfrecimientoController(model, view, agenciaSeleccionada);
+		}
+		else if (buttonText.contains("Beneficios")) {
+		    InformeBeneficiosModel model = new InformeBeneficiosModel();
+		    InformeBeneficiosView view = new InformeBeneficiosView();
+		    // Aquí le pasamos la agenciaSeleccionada que ya tienes declarada al principio del método
+		    new InformeBeneficiosController(model, view, agenciaSeleccionada);
 		}
 		// Resto de botones no implementados
 		else {
