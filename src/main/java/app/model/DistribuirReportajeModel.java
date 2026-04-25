@@ -205,6 +205,12 @@ public class DistribuirReportajeModel {
     }
 
     public void quitarAcceso(int idEvento, int idEmpresa) {
+        if (empresaHaDescargadoReportaje(idEvento, idEmpresa)) {
+            throw new ApplicationException(
+                    "No se puede quitar el acceso porque la empresa ya ha descargado el reportaje."
+            );
+        }
+
         String sql =
                 "UPDATE Ofrecimiento " +
                 "SET acceso_concedido = FALSE, acceso_especial = FALSE " +
